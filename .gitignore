@@ -1,0 +1,8 @@
+*.tmp
+*.log
+.idea/
+.vscode/
+bin/
+.vs/
+obj/
+
