@@ -8,6 +8,7 @@ public class DatabaseContext : DbContext
     public DatabaseContext(DbContextOptions<DatabaseContext> options)
         : base(options) { }
     public DbSet<Track> Tracks { get; set; }
+    public DbSet<Request> Requests { get; set; }   
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -107,5 +108,17 @@ public class DatabaseContext : DbContext
             .HasOne(pt => pt.Track)
             .WithMany(p => p.UserTracks)
             .HasForeignKey(pt => pt.TrackId);
+
+        modelBuilder.Entity<Album>()
+            .HasOne(a => a.Image)
+            .WithMany()
+            .HasForeignKey(a => a.CoverId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        modelBuilder.Entity<Playlist>()
+            .HasOne(a => a.Image)
+            .WithMany()
+            .HasForeignKey(a => a.CoverId)
+            .OnDelete(DeleteBehavior.NoAction);
     }
 }

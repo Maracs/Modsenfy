@@ -12,7 +12,7 @@ using Modsenfy.DataAccessLayer.Data;
 namespace Modsenfy.PresentationLayer.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20230615011610_Initial")]
+    [Migration("20230615015135_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -51,16 +51,13 @@ namespace Modsenfy.PresentationLayer.Migrations
                     b.Property<int>("CoverId")
                         .HasColumnType("int");
 
-                    b.Property<int>("ImageId")
-                        .HasColumnType("int");
-
                     b.HasKey("AlbumId");
 
                     b.HasIndex("AlbumTypeId");
 
                     b.HasIndex("ArtistId");
 
-                    b.HasIndex("ImageId");
+                    b.HasIndex("CoverId");
 
                     b.ToTable("Album");
                 });
@@ -192,9 +189,6 @@ namespace Modsenfy.PresentationLayer.Migrations
                     b.Property<int>("CoverId")
                         .HasColumnType("int");
 
-                    b.Property<int>("ImageId")
-                        .HasColumnType("int");
-
                     b.Property<string>("PlaylistName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -210,7 +204,7 @@ namespace Modsenfy.PresentationLayer.Migrations
 
                     b.HasKey("PlaylistId");
 
-                    b.HasIndex("ImageId");
+                    b.HasIndex("CoverId");
 
                     b.HasIndex("UserId");
 
@@ -486,8 +480,8 @@ namespace Modsenfy.PresentationLayer.Migrations
 
                     b.HasOne("Modsenfy.DataAccessLayer.Entities.Image", "Image")
                         .WithMany()
-                        .HasForeignKey("ImageId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("CoverId")
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("AlbumType");
@@ -523,8 +517,8 @@ namespace Modsenfy.PresentationLayer.Migrations
                 {
                     b.HasOne("Modsenfy.DataAccessLayer.Entities.Image", "Image")
                         .WithMany()
-                        .HasForeignKey("ImageId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("CoverId")
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("Modsenfy.DataAccessLayer.Entities.User", "User")

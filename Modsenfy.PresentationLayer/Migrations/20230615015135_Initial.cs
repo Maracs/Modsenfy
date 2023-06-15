@@ -151,7 +151,6 @@ namespace Modsenfy.PresentationLayer.Migrations
                     AlbumOwnerId = table.Column<int>(type: "int", nullable: false),
                     ArtistId = table.Column<int>(type: "int", nullable: false),
                     CoverId = table.Column<int>(type: "int", nullable: false),
-                    ImageId = table.Column<int>(type: "int", nullable: false),
                     AlbumTypeId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -170,11 +169,10 @@ namespace Modsenfy.PresentationLayer.Migrations
                         principalColumn: "ArtistId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Album_Image_ImageId",
-                        column: x => x.ImageId,
+                        name: "FK_Album_Image_CoverId",
+                        column: x => x.CoverId,
                         principalTable: "Image",
-                        principalColumn: "ImageId",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "ImageId");
                 });
 
             migrationBuilder.CreateTable(
@@ -253,7 +251,6 @@ namespace Modsenfy.PresentationLayer.Migrations
                     PlaylistName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     PlaylistRelease = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CoverId = table.Column<int>(type: "int", nullable: false),
-                    ImageId = table.Column<int>(type: "int", nullable: false),
                     PlaylistOwnerId = table.Column<int>(type: "int", nullable: false),
                     UserId = table.Column<int>(type: "int", nullable: false)
                 },
@@ -261,11 +258,10 @@ namespace Modsenfy.PresentationLayer.Migrations
                 {
                     table.PrimaryKey("PK_Playlist", x => x.PlaylistId);
                     table.ForeignKey(
-                        name: "FK_Playlist_Image_ImageId",
-                        column: x => x.ImageId,
+                        name: "FK_Playlist_Image_CoverId",
+                        column: x => x.CoverId,
                         principalTable: "Image",
-                        principalColumn: "ImageId",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "ImageId");
                     table.ForeignKey(
                         name: "FK_Playlist_User_UserId",
                         column: x => x.UserId,
@@ -295,7 +291,7 @@ namespace Modsenfy.PresentationLayer.Migrations
                         column: x => x.UserId,
                         principalTable: "User",
                         principalColumn: "UserId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
                 });
 
             migrationBuilder.CreateTable(
@@ -319,7 +315,7 @@ namespace Modsenfy.PresentationLayer.Migrations
                         column: x => x.UserId,
                         principalTable: "User",
                         principalColumn: "UserId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
                 });
 
             migrationBuilder.CreateTable(
@@ -344,7 +340,7 @@ namespace Modsenfy.PresentationLayer.Migrations
                         column: x => x.UserId,
                         principalTable: "User",
                         principalColumn: "UserId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
                 });
 
             migrationBuilder.CreateTable(
@@ -368,7 +364,7 @@ namespace Modsenfy.PresentationLayer.Migrations
                         column: x => x.TrackId,
                         principalTable: "Tracks",
                         principalColumn: "TrackId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
                 });
 
             migrationBuilder.CreateTable(
@@ -393,7 +389,7 @@ namespace Modsenfy.PresentationLayer.Migrations
                         column: x => x.UserId,
                         principalTable: "User",
                         principalColumn: "UserId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
                 });
 
             migrationBuilder.CreateTable(
@@ -417,7 +413,7 @@ namespace Modsenfy.PresentationLayer.Migrations
                         column: x => x.TrackId,
                         principalTable: "Tracks",
                         principalColumn: "TrackId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
                 });
 
             migrationBuilder.CreateTable(
@@ -442,7 +438,7 @@ namespace Modsenfy.PresentationLayer.Migrations
                         column: x => x.UserId,
                         principalTable: "User",
                         principalColumn: "UserId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
                 });
 
             migrationBuilder.CreateIndex(
@@ -456,9 +452,9 @@ namespace Modsenfy.PresentationLayer.Migrations
                 column: "ArtistId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Album_ImageId",
+                name: "IX_Album_CoverId",
                 table: "Album",
-                column: "ImageId");
+                column: "CoverId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Artist_ImageId",
@@ -471,9 +467,9 @@ namespace Modsenfy.PresentationLayer.Migrations
                 column: "ImageTypeId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Playlist_ImageId",
+                name: "IX_Playlist_CoverId",
                 table: "Playlist",
-                column: "ImageId");
+                column: "CoverId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Playlist_UserId",
