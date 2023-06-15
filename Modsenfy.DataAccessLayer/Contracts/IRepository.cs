@@ -1,3 +1,6 @@
+using Microsoft.EntityFrameworkCore.Storage;
+using Modsenfy.DataAccessLayer.Data;
+
 namespace Modsenfy.DataAccessLayer.Contracts;
 
 public interface IRepository <T> where T : class
@@ -13,6 +16,4 @@ public interface IRepository <T> where T : class
     Task Update(T entity);
 
     void Delete(T entity);
-
-    void DeleteById(int id);
 }

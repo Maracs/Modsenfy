@@ -3,19 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Modsenfy.DataAccessLayer.Data;
 
 #nullable disable
 
-namespace Modsenfy.PresentationLayer.Migrations
+namespace Modsenfy.DataAccessLayer.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20230615015135_Initial")]
-    partial class Initial
+    partial class DatabaseContextModelSnapshot : ModelSnapshot
     {
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -224,6 +222,65 @@ namespace Modsenfy.PresentationLayer.Migrations
                     b.HasIndex("TrackId");
 
                     b.ToTable("PlaylistTracks");
+                });
+
+            modelBuilder.Entity("Modsenfy.DataAccessLayer.Entities.Request", b =>
+                {
+                    b.Property<int>("RequestId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RequestId"), 1L, 1);
+
+                    b.Property<int>("ImageId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("RequestArtistBio")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RequestArtistName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("RequestStatusId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("RequestTimeCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("RequestTimeProcessed")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("RequestId");
+
+                    b.HasIndex("ImageId");
+
+                    b.HasIndex("RequestStatusId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Requests");
+                });
+
+            modelBuilder.Entity("Modsenfy.DataAccessLayer.Entities.RequestStatus", b =>
+                {
+                    b.Property<int>("RequestStatusId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RequestStatusId"), 1L, 1);
+
+                    b.Property<string>("RequestStatusName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("RequestStatusId");
+
+                    b.ToTable("RequestStatus");
                 });
 
             modelBuilder.Entity("Modsenfy.DataAccessLayer.Entities.Role", b =>
@@ -549,6 +606,33 @@ namespace Modsenfy.PresentationLayer.Migrations
                     b.Navigation("Playlist");
 
                     b.Navigation("Track");
+                });
+
+            modelBuilder.Entity("Modsenfy.DataAccessLayer.Entities.Request", b =>
+                {
+                    b.HasOne("Modsenfy.DataAccessLayer.Entities.Image", "Image")
+                        .WithMany()
+                        .HasForeignKey("ImageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Modsenfy.DataAccessLayer.Entities.RequestStatus", "RequestStatus")
+                        .WithMany()
+                        .HasForeignKey("RequestStatusId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Modsenfy.DataAccessLayer.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Image");
+
+                    b.Navigation("RequestStatus");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Modsenfy.DataAccessLayer.Entities.Stream", b =>

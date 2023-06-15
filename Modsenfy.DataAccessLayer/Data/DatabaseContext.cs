@@ -7,13 +7,20 @@ public class DatabaseContext : DbContext
 {
     public DatabaseContext(DbContextOptions<DatabaseContext> options)
         : base(options) { }
+
     public DbSet<Track> Tracks { get; set; }
-    public DbSet<Request> Requests { get; set; }   
+    public DbSet<Request> Requests { get; set; } 
+    public DbSet<TrackArtists> TrackArtists { get; set; }
+  
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         var connectionString = "Server=.\\SQLEXPRESS;Initial Catalog=Modsenfy;Trusted_Connection=True;TrustServerCertificate=True";
-        optionsBuilder.UseSqlServer(connectionString, options => options.MigrationsAssembly("Modsenfy.PresentationLayer"));
+        if (!optionsBuilder.IsConfigured)
+        {
+            optionsBuilder.UseSqlServer(connectionString,
+                builder => builder.MigrationsAssembly("Modsenfy.DataAccessLayer"));
+        }
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
