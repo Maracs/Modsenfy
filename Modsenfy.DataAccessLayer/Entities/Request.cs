@@ -1,3 +1,5 @@
+using System;
+
 namespace Modsenfy.DataAccessLayer.Entities;
 
 public class Request
