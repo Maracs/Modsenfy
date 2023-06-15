@@ -5,5 +5,5 @@ namespace Modsenfy.BusinessAccessLayer.DTOs;
 public class UserStreamDto
 {
 	public UserDto Listener { get; set; }
-	public IEnumerable<InnerStreamWithTrackDto
+	public IEnumerable<InnerStreamWithTrackDto> innerStreamWithTrackDtos { get; set; }
 }

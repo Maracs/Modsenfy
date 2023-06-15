@@ -10,6 +10,7 @@ builder.Services.AddDbContext<DatabaseContext>(options =>
 
 
 
+
 builder.Services.AddAutoMapper(typeof(AutoMapperProfile).Assembly);
 
 
