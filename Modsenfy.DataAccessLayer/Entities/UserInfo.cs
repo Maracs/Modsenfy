@@ -16,7 +16,7 @@ public class UserInfo
 
     public string UserInfoAddress { get; set; }
 
-    public DateOnly UserInfoRegistrationDate { get; set; }
+    public DateTime UserInfoRegistrationDate { get; set; }
 
     public int ImageId { get; set; }
 

@@ -9,7 +9,7 @@ public class Album
 
     public string AlbumName { get; set; }
 
-    public DateOnly AlbumRelease { get; set; }
+    public DateTime AlbumRelease { get; set; }
 
     public int AlbumOwnerId { get; set; }
 

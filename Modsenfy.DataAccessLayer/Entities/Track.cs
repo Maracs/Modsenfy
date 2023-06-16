@@ -11,7 +11,7 @@ public class Track
 
     public int TrackStreams { get; set; }
 
-    public TimeOnly TrackDuration { get; set; }
+    public DateTime TrackDuration { get; set; }
 
     public string TrackGenius { get; set; }
 
