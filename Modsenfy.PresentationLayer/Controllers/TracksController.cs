@@ -74,11 +74,11 @@ namespace Modsenfy.PresentationLayer.Controllers
             return Ok(track.TrackId);
         }
 
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<TrackWithAlbumDto>>> GetSeveralTracks(List<int> ids)
-        {
-
-        }
+        //[HttpGet]
+        //public async Task<ActionResult<IEnumerable<TrackWithAlbumDto>>> GetSeveralTracks(List<int> ids)
+        //{
+            
+        //}
 
     }
 }
