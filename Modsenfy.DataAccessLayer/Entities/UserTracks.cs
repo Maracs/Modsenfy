@@ -10,5 +10,5 @@ public class UserTracks
 
     public Track Track { get; set; }
 
-    public DateOnly UserTrackAdded { get; set; }
+    public DateTime UserTrackAdded { get; set; }
 }

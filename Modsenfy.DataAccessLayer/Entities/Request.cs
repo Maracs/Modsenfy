@@ -8,7 +8,19 @@ public class Request
 
     public string RequestArtistBio { get; set; }
 
-    public DateTime RequestTime { get; set; }
+    public DateTime RequestTimeCreated { get; set; }
+
+    public DateTime RequestTimeProcessed { get; set; }
 
     public int RequestStatusId { get; set; }
+
+    public RequestStatus RequestStatus { get; set; }
+
+    public int ImageId { get; set; }
+
+    public Image Image { get; set; }
+
+    public int UserId { get; set; }
+
+    public User User { get; set; }
 }

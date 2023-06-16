@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore;
+
 namespace Modsenfy.DataAccessLayer.Entities;
 
 public class PlaylistTracks
