@@ -1,5 +1,10 @@
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Modsenfy.BusinessAccessLayer.DTOs;
+using Modsenfy.BusinessAccessLayer.DTOs.RequestDtos;
+using Modsenfy.DataAccessLayer.Contracts;
+using Modsenfy.DataAccessLayer.Entities;
+using Modsenfy.DataAccessLayer.Repositories;
 
 namespace Modsenfy.PresentationLayer.Controllers;
 
@@ -8,9 +13,33 @@ namespace Modsenfy.PresentationLayer.Controllers;
 [ApiController]
 public class UsersController:ControllerBase
 {
-    [HttpPost]
-    public async Task<ActionResult> RegisterUser([FromBody] UserDto userDto)
+
+    private readonly UserRepository _userRepository;
+
+    private readonly UserInfoRepository _userInfoRepository;
+
+    private readonly ImageRepository _imageRepository;
+
+    private readonly IMapper _mapper;
+
+    public UsersController(IMapper mapper, UserRepository userRepository,UserInfoRepository userInfoRepository,ImageRepository imageRepository)
     {
+        _userRepository = userRepository;
+        
+        _userInfoRepository = userInfoRepository;
+        
+        _imageRepository = imageRepository;
+
+        _mapper = mapper;
+    }
+    
+    
+    [HttpPost]
+    public async Task<ActionResult<int>> RegisterUser([FromBody] UserWithDetailsAndEmailAndPasshashDto userDto)
+    {
+        if (await _userRepository.IfNicknameExists(userDto.Nickname) || await _userRepository.IfEmailExists(userDto.Email))
+            return BadRequest("This nickname or email is already taken");
+        
         return Ok();
     }
 

@@ -24,6 +24,5 @@ public class AutoMapperProfile : Profile
             .ForMember(dest => dest.Audio, opt => opt.MapFrom(src => src.Audio));
 
         CreateMap<TrackDto, Track>();
-
     }
 }

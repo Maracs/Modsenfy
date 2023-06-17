@@ -11,7 +11,11 @@ public class DatabaseContext : DbContext
     public DbSet<Track> Tracks { get; set; }
     public DbSet<Request> Requests { get; set; } 
     public DbSet<TrackArtists> TrackArtists { get; set; }
-  
+    public DbSet<User> Users { get; set; }
+    public  DbSet<UserInfo> UserInfos { get; set; }
+    
+    public  DbSet<Image> Images { get; set; }
+
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {

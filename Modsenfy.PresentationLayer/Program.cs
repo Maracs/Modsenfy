@@ -14,6 +14,9 @@ builder.Services.AddDbContext<DatabaseContext>(options =>
 builder.Services.AddAutoMapper(typeof(AutoMapperProfile).Assembly);
 
 builder.Services.AddScoped<TrackRepository>();
+builder.Services.AddScoped<UserRepository>();
+builder.Services.AddScoped<UserInfoRepository>();
+builder.Services.AddScoped<ImageRepository>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
