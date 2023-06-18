@@ -5,5 +5,5 @@ namespace Modsenfy.DataAccessLayer.Contracts;
 
 public interface IAlbumRepository : IRepository<Album>
 {
-    
+    Task<Album> GetByIdWithJoins(int id);
 }
