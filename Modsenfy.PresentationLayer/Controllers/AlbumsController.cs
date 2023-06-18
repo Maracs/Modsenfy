@@ -1,19 +1,33 @@
 using Modsenfy.BusinessAccessLayer.DTOs;
+using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
+using Modsenfy.DataAccessLayer.Repositories;
+using Newtonsoft.Json;
+using Modsenfy.BusinessAccessLayer.Services;
 
 namespace Modsenfy.PresentationLayer.Controllers
 {
-
-	using Microsoft.AspNetCore.Mvc;
-	using Newtonsoft.Json;
+   
 
 	[Route("[controller]")]
 	[ApiController]
 	public class AlbumsController : ControllerBase
 	{
+		private readonly AlbumRepository _albumRepository;
+		private readonly IMapper _mapper;
+		private readonly AlbumService _albumService;
+
+		public AlbumsController(AlbumRepository albumRepository, IMapper mapper, AlbumService albumService)
+		{
+			_albumRepository = albumRepository;
+			_mapper = mapper;
+			_albumService = albumService;
+		}
+		
 		[HttpGet("{id}")]
-		public async Task<ActionResult<AlbumWithTracksDto>> GetAlbum([FromRoute]int id){   
-			Console.WriteLine(id);
-			return Ok();
+		public async Task<ActionResult<AlbumWithTracksDto>> GetAlbum([FromRoute]int id){
+			var albumDto = await _albumService.GetAlbum(id);
+			return Ok(albumDto);
 		}
 
 		[HttpPost]
@@ -25,8 +39,8 @@ namespace Modsenfy.PresentationLayer.Controllers
 
 		[HttpPut("{id}")]
 		public async Task<ActionResult> UpdateAlbum([FromRoute] int id, [FromBody] AlbumCreateDto albumCreateDto){
-            Console.WriteLine(id);
-            Console.WriteLine(JsonConvert.SerializeObject(albumCreateDto));
+			Console.WriteLine(id);
+			Console.WriteLine(JsonConvert.SerializeObject(albumCreateDto));
 			return Ok();
 		}
 
@@ -44,8 +58,8 @@ namespace Modsenfy.PresentationLayer.Controllers
 
 		[HttpGet("{id}/tracks")]
 		public async Task<ActionResult<IEnumerable<TrackDto>>> GetTracksOfAlbum([FromRoute] int id){
-
-			return Ok();
+			var trackDtos = await _albumService.GetTracksOfAlbum(id);
+			return Ok(trackDtos);
 		}
 
 		[HttpGet("{id}/new-releases")]
