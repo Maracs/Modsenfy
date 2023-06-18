@@ -20,15 +20,20 @@ public class UsersController:ControllerBase
 
     private readonly ImageRepository _imageRepository;
 
+    private readonly ImageTypeRepository _imageTypeRepository;
+
     private readonly IMapper _mapper;
 
-    public UsersController(IMapper mapper, UserRepository userRepository,UserInfoRepository userInfoRepository,ImageRepository imageRepository)
+    public UsersController(IMapper mapper, UserRepository userRepository,
+        UserInfoRepository userInfoRepository,ImageRepository imageRepository,ImageTypeRepository imageTypeRepository)
     {
         _userRepository = userRepository;
         
         _userInfoRepository = userInfoRepository;
         
         _imageRepository = imageRepository;
+
+        _imageTypeRepository = imageTypeRepository;
 
         _mapper = mapper;
     }
@@ -44,9 +49,13 @@ public class UsersController:ControllerBase
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult> GetUserProfile(int id)
+    public async Task<ActionResult<UserWithDetailsAndEmailAndIdAndRoleDto>> GetUserProfile([FromRoute]int id)
     {
-        return Ok();
+        var user = await _userRepository.GetByIdWithJoins(id);
+
+        var userDto = _mapper.Map<UserWithDetailsAndEmailAndIdAndRoleDto>(user);
+        
+        return Ok(userDto);
     }
 
     [HttpPut("{id}")]

@@ -2,10 +2,10 @@ namespace Modsenfy.BusinessAccessLayer.DTOs;
 
 public class UserDetailsDto
 {
-	public string Lastname { get; set; }
-	public string Firstname { get; set; }
-	public string Middlename { get; set; }
-	public string Phone { get; set; }
-	public string Address { get; set; }
-	public string RegistrationDate { get; set; }
+	public string UserInfoLastname { get; set; }
+	public string UserInfoFirstname { get; set; }
+	public string UserInfoMiddlename { get; set; }
+	public string UserInfoPhone { get; set; }
+	public string UserInfoAddress { get; set; }
+	public string UserInfoRegistrationDate { get; set; }
 }

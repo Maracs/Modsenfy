@@ -24,5 +24,25 @@ public class AutoMapperProfile : Profile
             .ForMember(dest => dest.Audio, opt => opt.MapFrom(src => src.Audio));
 
         CreateMap<TrackDto, Track>();
+
+       
+        
+        CreateMap<Image, ImageDto>()
+            .ForMember(dest => dest.ImageType, opt => opt.MapFrom(src => src.ImageType.ImageTypeName))
+            .ForMember(dest=>dest.Filename,opt=>opt.MapFrom(src=>src.ImageFilename));
+       
+        RecognizePrefixes("UserInfo");
+
+        CreateMap<UserInfo, UserDetailsDto>()
+            .ForMember(dest => dest.UserInfoRegistrationDate,
+                opt => opt.MapFrom(src => src.UserInfoRegistrationDate.ToString()));
+        
+        RecognizePrefixes("User");
+
+        CreateMap<User, UserWithDetailsAndEmailAndIdAndRoleDto>()
+            .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.Role.RoleName))
+            .ForMember(dest=>dest.Image,opt=>opt.MapFrom(src=>src.UserInfo.Image))
+            .ForMember(dest=>dest.Details,opt=>opt.MapFrom(src=>src.UserInfo));
+
     }
 }

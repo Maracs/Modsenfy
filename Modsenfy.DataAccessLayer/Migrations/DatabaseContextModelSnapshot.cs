@@ -156,7 +156,7 @@ namespace Modsenfy.DataAccessLayer.Migrations
 
                     b.HasIndex("ImageTypeId");
 
-                    b.ToTable("Image");
+                    b.ToTable("Images");
                 });
 
             modelBuilder.Entity("Modsenfy.DataAccessLayer.Entities.ImageType", b =>
@@ -173,7 +173,7 @@ namespace Modsenfy.DataAccessLayer.Migrations
 
                     b.HasKey("ImageTypeId");
 
-                    b.ToTable("ImageType");
+                    b.ToTable("ImageTypes");
                 });
 
             modelBuilder.Entity("Modsenfy.DataAccessLayer.Entities.Playlist", b =>
@@ -383,9 +383,6 @@ namespace Modsenfy.DataAccessLayer.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserId"), 1L, 1);
 
-                    b.Property<int>("RoleId")
-                        .HasColumnType("int");
-
                     b.Property<string>("UserEmail")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -406,11 +403,12 @@ namespace Modsenfy.DataAccessLayer.Migrations
 
                     b.HasKey("UserId");
 
-                    b.HasIndex("RoleId");
+                    b.HasIndex("UserInfoId")
+                        .IsUnique();
 
-                    b.HasIndex("UserInfoId");
+                    b.HasIndex("UserRoleId");
 
-                    b.ToTable("User");
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("Modsenfy.DataAccessLayer.Entities.UserAlbums", b =>
@@ -481,7 +479,7 @@ namespace Modsenfy.DataAccessLayer.Migrations
 
                     b.HasIndex("ImageId");
 
-                    b.ToTable("UserInfo");
+                    b.ToTable("UserInfos");
                 });
 
             modelBuilder.Entity("Modsenfy.DataAccessLayer.Entities.UserPlaylists", b =>
@@ -702,15 +700,15 @@ namespace Modsenfy.DataAccessLayer.Migrations
 
             modelBuilder.Entity("Modsenfy.DataAccessLayer.Entities.User", b =>
                 {
-                    b.HasOne("Modsenfy.DataAccessLayer.Entities.Role", "Role")
-                        .WithMany()
-                        .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                    b.HasOne("Modsenfy.DataAccessLayer.Entities.UserInfo", "UserInfo")
+                        .WithOne("User")
+                        .HasForeignKey("Modsenfy.DataAccessLayer.Entities.User", "UserInfoId")
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("Modsenfy.DataAccessLayer.Entities.UserInfo", "UserInfo")
-                        .WithMany()
-                        .HasForeignKey("UserInfoId")
+                    b.HasOne("Modsenfy.DataAccessLayer.Entities.Role", "Role")
+                        .WithMany("Users")
+                        .HasForeignKey("UserRoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -760,9 +758,9 @@ namespace Modsenfy.DataAccessLayer.Migrations
             modelBuilder.Entity("Modsenfy.DataAccessLayer.Entities.UserInfo", b =>
                 {
                     b.HasOne("Modsenfy.DataAccessLayer.Entities.Image", "Image")
-                        .WithMany()
+                        .WithMany("UserInfos")
                         .HasForeignKey("ImageId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Image");
@@ -773,13 +771,13 @@ namespace Modsenfy.DataAccessLayer.Migrations
                     b.HasOne("Modsenfy.DataAccessLayer.Entities.Playlist", "Playlist")
                         .WithMany("UserPlaylists")
                         .HasForeignKey("PlaylistId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("Modsenfy.DataAccessLayer.Entities.User", "User")
                         .WithMany("UserPlaylists")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Playlist");
@@ -822,11 +820,21 @@ namespace Modsenfy.DataAccessLayer.Migrations
                     b.Navigation("UserArtists");
                 });
 
+            modelBuilder.Entity("Modsenfy.DataAccessLayer.Entities.Image", b =>
+                {
+                    b.Navigation("UserInfos");
+                });
+
             modelBuilder.Entity("Modsenfy.DataAccessLayer.Entities.Playlist", b =>
                 {
                     b.Navigation("PlaylistTracks");
 
                     b.Navigation("UserPlaylists");
+                });
+
+            modelBuilder.Entity("Modsenfy.DataAccessLayer.Entities.Role", b =>
+                {
+                    b.Navigation("Users");
                 });
 
             modelBuilder.Entity("Modsenfy.DataAccessLayer.Entities.Track", b =>
@@ -851,6 +859,12 @@ namespace Modsenfy.DataAccessLayer.Migrations
                     b.Navigation("UserPlaylists");
 
                     b.Navigation("UserTracks");
+                });
+
+            modelBuilder.Entity("Modsenfy.DataAccessLayer.Entities.UserInfo", b =>
+                {
+                    b.Navigation("User")
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

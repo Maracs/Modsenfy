@@ -15,6 +15,8 @@ public class DatabaseContext : DbContext
     public  DbSet<UserInfo> UserInfos { get; set; }
     
     public  DbSet<Image> Images { get; set; }
+    
+    public  DbSet<ImageType> ImageTypes { get; set; }
 
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -29,6 +31,29 @@ public class DatabaseContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<User>().HasKey(user => user.UserId);
+
+        modelBuilder.Entity<UserInfo>().HasKey(userInfo => userInfo.UserInfoId);
+        
+        modelBuilder.Entity<UserInfo>()
+            .HasOne(userInfo=>userInfo.User)
+            .WithOne(user=>user.UserInfo)
+            .HasForeignKey<User>(user=>user.UserInfoId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        modelBuilder.Entity<Role>().HasKey(role => role.RoleId);
+
+        modelBuilder.Entity<User>()
+            .HasOne(user => user.Role)
+            .WithMany(role => role.Users)
+            .HasForeignKey(pt => pt.UserRoleId);
+
+        modelBuilder.Entity<UserInfo>()
+            .HasOne(userInfo => userInfo.Image)
+            .WithMany(image => image.UserInfos)
+            .HasForeignKey(pt => pt.ImageId)
+            .OnDelete(DeleteBehavior.NoAction);
+        
         modelBuilder.Entity<PlaylistTracks>()
             .HasKey(pt => new { pt.PlaylistId, pt.TrackId });
 
@@ -100,12 +125,14 @@ public class DatabaseContext : DbContext
         modelBuilder.Entity<UserPlaylists>()
             .HasOne(pt => pt.User)
             .WithMany(p => p.UserPlaylists)
-            .HasForeignKey(pt => pt.UserId);
+            .HasForeignKey(pt => pt.UserId)
+            .OnDelete(DeleteBehavior.NoAction);;
 
         modelBuilder.Entity<UserPlaylists>()
             .HasOne(pt => pt.Playlist)
             .WithMany(p => p.UserPlaylists)
-            .HasForeignKey(pt => pt.PlaylistId);
+            .HasForeignKey(pt => pt.PlaylistId)
+            .OnDelete(DeleteBehavior.NoAction);;
 
         modelBuilder.Entity<UserTracks>()
             .HasKey(pt => new { pt.UserId, pt.TrackId });

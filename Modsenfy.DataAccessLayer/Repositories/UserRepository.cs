@@ -8,6 +8,12 @@ namespace Modsenfy.DataAccessLayer.Repositories;
 public class UserRepository:IUserRepository
 {
     private readonly DatabaseContext _databaseContext;
+
+    public UserRepository(DatabaseContext databaseContext)
+    {
+        _databaseContext = databaseContext;
+    }
+    
     public async Task SaveChanges()
     {
          await _databaseContext.SaveChangesAsync();
@@ -58,5 +64,13 @@ public class UserRepository:IUserRepository
     public  void Delete(User entity)
     {
         _databaseContext.Users.Remove(entity);
+    }
+
+    public async Task<User> GetByIdWithJoins(int id)
+    {
+       var user= await _databaseContext.Users.Include(user => user.Role)
+            .Include(user => user.UserInfo)
+            .ThenInclude(userInfo => userInfo.Image).ThenInclude(image => image.ImageType).FirstOrDefaultAsync(user=>user.UserId==id);
+       return user;
     }
 }
