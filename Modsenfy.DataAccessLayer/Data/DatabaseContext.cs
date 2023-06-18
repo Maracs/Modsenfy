@@ -14,7 +14,7 @@ public class DatabaseContext : DbContext
 	public DbSet<Album> Albums { get; set; }
 
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+	protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 	{
 		var connectionString = "Server=.\\SQLEXPRESS;Initial Catalog=Modsenfy;Trusted_Connection=True;TrustServerCertificate=True";
 		if (!optionsBuilder.IsConfigured)
@@ -117,11 +117,29 @@ public class DatabaseContext : DbContext
 			.WithMany(p => p.UserTracks)
 			.HasForeignKey(pt => pt.TrackId);
 
+
+		modelBuilder.Entity<Album>()
+			.HasKey(a => a.AlbumId);
+
 		modelBuilder.Entity<Album>()
 			.HasOne(a => a.Image)
 			.WithMany()
 			.HasForeignKey(a => a.CoverId)
 			.OnDelete(DeleteBehavior.NoAction);
+
+		modelBuilder.Entity<Album>()
+			.HasOne(a => a.Artist)
+			.WithMany()
+			.HasForeignKey(a => a.AlbumOwnerId)
+			.OnDelete(DeleteBehavior.NoAction);
+			
+		modelBuilder.Entity<Artist>()
+			.HasMany(a => a.Albums)
+			.WithOne(a => a.Artist)
+			.HasForeignKey(a => a.AlbumOwnerId)
+			.OnDelete(DeleteBehavior.NoAction);
+
+
 
 		modelBuilder.Entity<Playlist>()
 			.HasOne(a => a.Image)
