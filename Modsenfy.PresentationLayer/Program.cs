@@ -13,6 +13,8 @@ builder.Services.AddDbContext<DatabaseContext>(options =>
 
 builder.Services.AddAutoMapper(typeof(AutoMapperProfile).Assembly);
 
+builder.Services.AddScoped<ArtistRepository>();
+
 builder.Services.AddScoped<TrackRepository>();
 
 builder.Services.AddControllers();
