@@ -25,51 +25,63 @@ namespace Modsenfy.PresentationLayer.Controllers
 		}
 		
 		[HttpGet("{id}")]
-		public async Task<ActionResult<AlbumWithTracksDto>> GetAlbum([FromRoute]int id){
+		public async Task<ActionResult<AlbumWithTracksDto>> GetAlbum([FromRoute]int id)
+		{
 			var albumDto = await _albumService.GetAlbum(id);
-			return Ok(albumDto);
+			if (albumDto == null)
+                return NotFound();
+            return Ok(albumDto);
 		}
 
 		[HttpPost]
-		public async Task<ActionResult<int>> CreateAlbum([FromBody] AlbumCreateDto albumCreateDto){
+		public async Task<ActionResult<int>> CreateAlbum([FromBody] AlbumCreateDto albumCreateDto)
+		{
 			Console.WriteLine(JsonConvert.SerializeObject(albumCreateDto));
 
 			return Ok();
 		}
 
 		[HttpPut("{id}")]
-		public async Task<ActionResult> UpdateAlbum([FromRoute] int id, [FromBody] AlbumCreateDto albumCreateDto){
+		public async Task<ActionResult> UpdateAlbum([FromRoute] int id, [FromBody] AlbumCreateDto albumCreateDto)
+		{
 			Console.WriteLine(id);
 			Console.WriteLine(JsonConvert.SerializeObject(albumCreateDto));
 			return Ok();
 		}
 
 		[HttpDelete("{id}")]
-		public async Task<ActionResult> DeleteAlbum([FromRoute] int id){
+		public async Task<ActionResult> DeleteAlbum([FromRoute] int id)
+		{
 
 			return Ok();
 		}
 
 		[HttpGet]
-		public async Task<ActionResult<IEnumerable<AlbumWithTracksDto>>> GetSeveralAlbums([FromQuery] string ids){
-			
-			return Ok();
+		public async Task<ActionResult<IEnumerable<AlbumWithTracksDto>>> GetSeveralAlbums(
+			[FromQuery] int limit = -1, [FromQuery] int offset = 0, [FromQuery] string ids = "all")
+		{
+			var albumDtos = await _albumService.GetSeveralAlbums(ids, limit, offset);
+			return Ok(albumDtos);
 		}
 
 		[HttpGet("{id}/tracks")]
-		public async Task<ActionResult<IEnumerable<TrackDto>>> GetTracksOfAlbum([FromRoute] int id){
+		public async Task<ActionResult<IEnumerable<TrackDto>>> GetTracksOfAlbum([FromRoute] int id)
+		{
 			var trackDtos = await _albumService.GetTracksOfAlbum(id);
 			return Ok(trackDtos);
+			
 		}
 
-		[HttpGet("{id}/new-releases")]
-		public async Task<ActionResult<IEnumerable<AlbumWithTracksDto>>> GetNewAlbumReleases([FromRoute] int id, [FromQuery] int limit, [FromQuery] int offset){
-
-			return Ok();
+		[HttpGet("/new-releases")]
+		public async Task<ActionResult<IEnumerable<AlbumWithTracksDto>>> GetNewAlbumReleases([FromQuery] int limit, [FromQuery] int offset)
+		{
+			var albumDtos = await _albumService.GetNewAlbumReleases(limit, offset);
+			return Ok(albumDtos);
 		}
 
 		[HttpGet("{id}/streams")]
-		public async Task<ActionResult<IEnumerable<StreamDto>>> GetAlbumStreams([FromRoute] int id, [FromQuery] int limit, [FromQuery] int offset){
+		public async Task<ActionResult<IEnumerable<StreamDto>>> GetAlbumStreams([FromRoute] int id, [FromQuery] int limit, [FromQuery] int offset)
+		{
 			Console.WriteLine(limit);
 			Console.WriteLine(offset);
 			return Ok();
