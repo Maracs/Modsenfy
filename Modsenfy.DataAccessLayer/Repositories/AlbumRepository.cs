@@ -58,73 +58,116 @@ public class AlbumRepository : IAlbumRepository
 		return album;
 	}
 
-	public IEnumerable<Album> GetLimited(int limit, int offset)
+	public async Task<IEnumerable<Album>> GetLimited(int limit, int offset)
 	{
-        var albums = _databaseContext.Albums
-            .Include(a => a.AlbumType)
-            .Include(a => a.Artist)
-                .ThenInclude(ar => ar.Image)
-                    .ThenInclude(i => i.ImageType)
-            .Include(a => a.Image)
-                .ThenInclude(i => i.ImageType)
-            .Include(a => a.Tracks)
-                .ThenInclude(t => t.Audio)
-            .Include(a => a.Tracks)
-                .ThenInclude(t => t.Genre)
-            .Include(a => a.Tracks)
-                .ThenInclude(t => t.TrackArtists)
-                    .ThenInclude(ta => ta.Artist)
-            .Skip(offset)
-            .Take(limit).ToList();
+		var albums = await _databaseContext.Albums
+			.Include(a => a.AlbumType)
+			.Include(a => a.Artist)
+				.ThenInclude(ar => ar.Image)
+					.ThenInclude(i => i.ImageType)
+			.Include(a => a.Image)
+				.ThenInclude(i => i.ImageType)
+			.Include(a => a.Tracks)
+				.ThenInclude(t => t.Audio)
+			.Include(a => a.Tracks)
+				.ThenInclude(t => t.Genre)
+			.Include(a => a.Tracks)
+				.ThenInclude(t => t.TrackArtists)
+					.ThenInclude(ta => ta.Artist)
+			.Skip(offset)
+			.Take(limit)
+			.ToListAsync();
 
-        return albums;
-    }
+		return albums;
+	}
 
-	public IEnumerable<Album> GetOrderedByReleaseAndLimited(int limit, int offset)
+	public async Task<IEnumerable<Album>> GetOrderedByRelease()
 	{
-        var albums = _databaseContext.Albums
-            .Include(a => a.AlbumType)
-            .Include(a => a.Artist)
-                .ThenInclude(ar => ar.Image)
-                    .ThenInclude(i => i.ImageType)
-            .Include(a => a.Image)
-                .ThenInclude(i => i.ImageType)
-            .Include(a => a.Tracks)
-                .ThenInclude(t => t.Audio)
-            .Include(a => a.Tracks)
-                .ThenInclude(t => t.Genre)
-            .Include(a => a.Tracks)
-                .ThenInclude(t => t.TrackArtists)
-                    .ThenInclude(ta => ta.Artist)
-            .OrderByDescending(a => a.AlbumRelease)
-            .Skip(offset)
-            .Take(limit).ToList();
-        return albums;
-    }
+		var albums = await _databaseContext.Albums
+			.Include(a => a.AlbumType)
+			.Include(a => a.Artist)
+				.ThenInclude(ar => ar.Image)
+					.ThenInclude(i => i.ImageType)
+			.Include(a => a.Image)
+				.ThenInclude(i => i.ImageType)
+			.Include(a => a.Tracks)
+				.ThenInclude(t => t.Audio)
+			.Include(a => a.Tracks)
+				.ThenInclude(t => t.Genre)
+			.Include(a => a.Tracks)
+				.ThenInclude(t => t.TrackArtists)
+					.ThenInclude(ta => ta.Artist)
+			.OrderByDescending(a => a.AlbumRelease)
+			.ToListAsync();
+		return albums;
+	}
+	
+	public async Task<IEnumerable<Album>> GetOrderedByReleaseAndSkipped(int offset)
+	{
+		var albums = await _databaseContext.Albums
+			.Include(a => a.AlbumType)
+			.Include(a => a.Artist)
+				.ThenInclude(ar => ar.Image)
+					.ThenInclude(i => i.ImageType)
+			.Include(a => a.Image)
+				.ThenInclude(i => i.ImageType)
+			.Include(a => a.Tracks)
+				.ThenInclude(t => t.Audio)
+			.Include(a => a.Tracks)
+				.ThenInclude(t => t.Genre)
+			.Include(a => a.Tracks)
+				.ThenInclude(t => t.TrackArtists)
+					.ThenInclude(ta => ta.Artist)
+			.OrderByDescending(a => a.AlbumRelease)
+			.Skip(offset)
+			.ToListAsync();
+		return albums;
+	}
+	public async Task<IEnumerable<Album>> GetOrderedByReleaseAndLimited(int limit, int offset)
+	{
+		var albums = await _databaseContext.Albums
+			.Include(a => a.AlbumType)
+			.Include(a => a.Artist)
+				.ThenInclude(ar => ar.Image)
+					.ThenInclude(i => i.ImageType)
+			.Include(a => a.Image)
+				.ThenInclude(i => i.ImageType)
+			.Include(a => a.Tracks)
+				.ThenInclude(t => t.Audio)
+			.Include(a => a.Tracks)
+				.ThenInclude(t => t.Genre)
+			.Include(a => a.Tracks)
+				.ThenInclude(t => t.TrackArtists)
+					.ThenInclude(ta => ta.Artist)
+			.OrderByDescending(a => a.AlbumRelease)
+			.Skip(offset)
+			.Take(limit).ToListAsync();
+		return albums;
+	}
 
-    public IEnumerable<Album> GetSkipped(int offset)
-    {
-        var albums = _databaseContext.Albums
-            .Include(a => a.AlbumType)
-            .Include(a => a.Artist)
-                .ThenInclude(ar => ar.Image)
-                    .ThenInclude(i => i.ImageType)
-            .Include(a => a.Image)
-                .ThenInclude(i => i.ImageType)
-            .Include(a => a.Tracks)
-                .ThenInclude(t => t.Audio)
-            .Include(a => a.Tracks)
-                .ThenInclude(t => t.Genre)
-            .Include(a => a.Tracks)
-                .ThenInclude(t => t.TrackArtists)
-                    .ThenInclude(ta => ta.Artist)
-            .Skip(offset)
-            .ToList();
+	public async Task<IEnumerable<Album>> GetSkipped(int offset)
+	{
+		var albums = await _databaseContext.Albums
+			.Include(a => a.AlbumType)
+			.Include(a => a.Artist)
+				.ThenInclude(ar => ar.Image)
+					.ThenInclude(i => i.ImageType)
+			.Include(a => a.Image)
+				.ThenInclude(i => i.ImageType)
+			.Include(a => a.Tracks)
+				.ThenInclude(t => t.Audio)
+			.Include(a => a.Tracks)
+				.ThenInclude(t => t.Genre)
+			.Include(a => a.Tracks)
+				.ThenInclude(t => t.TrackArtists)
+					.ThenInclude(ta => ta.Artist)
+			.Skip(offset)
+			.ToListAsync();
 
-        return albums;
-    }
+		return albums;
+	}
 
-    public async Task SaveChanges()
+	public async Task SaveChanges()
 	{
 		await _databaseContext.SaveChangesAsync();
 	}
