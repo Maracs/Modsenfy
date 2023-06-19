@@ -58,7 +58,73 @@ public class AlbumRepository : IAlbumRepository
 		return album;
 	}
 
-	public async Task SaveChanges()
+	public IEnumerable<Album> GetLimited(int limit, int offset)
+	{
+        var albums = _databaseContext.Albums
+            .Include(a => a.AlbumType)
+            .Include(a => a.Artist)
+                .ThenInclude(ar => ar.Image)
+                    .ThenInclude(i => i.ImageType)
+            .Include(a => a.Image)
+                .ThenInclude(i => i.ImageType)
+            .Include(a => a.Tracks)
+                .ThenInclude(t => t.Audio)
+            .Include(a => a.Tracks)
+                .ThenInclude(t => t.Genre)
+            .Include(a => a.Tracks)
+                .ThenInclude(t => t.TrackArtists)
+                    .ThenInclude(ta => ta.Artist)
+            .Skip(offset)
+            .Take(limit).ToList();
+
+        return albums;
+    }
+
+	public IEnumerable<Album> GetOrderedByReleaseAndLimited(int limit, int offset)
+	{
+        var albums = _databaseContext.Albums
+            .Include(a => a.AlbumType)
+            .Include(a => a.Artist)
+                .ThenInclude(ar => ar.Image)
+                    .ThenInclude(i => i.ImageType)
+            .Include(a => a.Image)
+                .ThenInclude(i => i.ImageType)
+            .Include(a => a.Tracks)
+                .ThenInclude(t => t.Audio)
+            .Include(a => a.Tracks)
+                .ThenInclude(t => t.Genre)
+            .Include(a => a.Tracks)
+                .ThenInclude(t => t.TrackArtists)
+                    .ThenInclude(ta => ta.Artist)
+            .OrderByDescending(a => a.AlbumRelease)
+            .Skip(offset)
+            .Take(limit).ToList();
+        return albums;
+    }
+
+    public IEnumerable<Album> GetSkipped(int offset)
+    {
+        var albums = _databaseContext.Albums
+            .Include(a => a.AlbumType)
+            .Include(a => a.Artist)
+                .ThenInclude(ar => ar.Image)
+                    .ThenInclude(i => i.ImageType)
+            .Include(a => a.Image)
+                .ThenInclude(i => i.ImageType)
+            .Include(a => a.Tracks)
+                .ThenInclude(t => t.Audio)
+            .Include(a => a.Tracks)
+                .ThenInclude(t => t.Genre)
+            .Include(a => a.Tracks)
+                .ThenInclude(t => t.TrackArtists)
+                    .ThenInclude(ta => ta.Artist)
+            .Skip(offset)
+            .ToList();
+
+        return albums;
+    }
+
+    public async Task SaveChanges()
 	{
 		await _databaseContext.SaveChangesAsync();
 	}
@@ -67,4 +133,6 @@ public class AlbumRepository : IAlbumRepository
 	{
 		throw new NotImplementedException();
 	}
+	
+	
 }

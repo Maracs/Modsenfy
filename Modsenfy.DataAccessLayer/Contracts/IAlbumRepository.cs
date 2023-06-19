@@ -5,5 +5,9 @@ namespace Modsenfy.DataAccessLayer.Contracts;
 
 public interface IAlbumRepository : IRepository<Album>
 {
-    Task<Album> GetByIdWithJoins(int id);
+	Task<Album> GetByIdWithJoins(int id);
+    IEnumerable<Album> GetLimited(int limit, int offset);
+
+    IEnumerable<Album> GetSkipped(int offset);
+    IEnumerable<Album> GetOrderedByReleaseAndLimited(int limit, int offset);
 }
