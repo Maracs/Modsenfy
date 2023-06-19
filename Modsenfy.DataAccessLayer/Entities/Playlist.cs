@@ -6,7 +6,7 @@ public class Playlist
 
     public string PlaylistName { get; set; }
 
-    public DateOnly PlaylistRelease { get; set; }
+    public DateTime PlaylistRelease { get; set; }
 
     public int CoverId { get; set; }
 
