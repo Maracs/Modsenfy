@@ -131,7 +131,7 @@ public class DatabaseContext : DbContext
 			.HasOne(a => a.Artist)
 			.WithMany()
 			.HasForeignKey(a => a.AlbumOwnerId)
-			.OnDelete(DeleteBehavior.NoAction);
+			.OnDelete(DeleteBehavior.Cascade);
 			
 		modelBuilder.Entity<Artist>()
 			.HasMany(a => a.Albums)
