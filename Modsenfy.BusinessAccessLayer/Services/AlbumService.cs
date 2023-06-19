@@ -33,16 +33,64 @@ public class AlbumService
 		return albumDto;
 	}
 	
-	public async Task<IEnumerable<TrackDto>> GetTracksOfAlbum(int id)
+	public async Task<IEnumerable<TrackDto>?> GetTracksOfAlbum(int id)
 	{
 		var album = await _albumRepository.GetByIdWithJoins(id);
+		Console.WriteLine(JsonConvert.SerializeObject(album));
+		if (album == null)
+			return null;
 		var tracks = album.Tracks;
 		IEnumerable<TrackDto> trackDtos = new List<TrackDto>();
 		foreach (Track track in tracks)
 		{
 			trackDtos = trackDtos.Append(_mapper.Map<TrackDto>(track));
 		}
-        return trackDtos;
+		return trackDtos;
+	}
+	
+	public IEnumerable<AlbumWithTracksDto> GetNewAlbumReleases(int limit, int offset)
+	{
+		var albums = _albumRepository.GetOrderedByReleaseAndLimited(limit, offset);
+		IEnumerable<AlbumWithTracksDto> albumDtos = new List<AlbumWithTracksDto>();
+		foreach (Album album in albums)
+		{
+			albumDtos = albumDtos.Append(_mapper.Map<AlbumWithTracksDto>(album));
+		}
+		return albumDtos;
+	}
+	
+	public IEnumerable<AlbumWithTracksDto> GetSeveralAlbums(string ids, int limit, int offset)
+	{
+		IEnumerable<Album> albums;
+		IEnumerable<int> intIds;
+		if (ids.Equals("all"))
+		{
+			if (limit == -1 && offset == 0)
+				albums = _albumRepository.GetAll().Result;
+			else if (limit == -1)
+				albums = _albumRepository.GetSkipped(offset);
+			else
+				albums = _albumRepository.GetLimited(limit, offset);
+		}
+		else
+		{
+			var splittedIds = ids.Split(',');
+			intIds = splittedIds.Select(id => int.Parse(id));
+			albums = new List<Album>();
+			foreach (var id in intIds)			
+			{
+				var album = _albumRepository.GetByIdWithJoins(id).Result;
+				albums = albums.Append(album);
+			}
+		}
+
+
+		IEnumerable<AlbumWithTracksDto> albumDtos = new List<AlbumWithTracksDto>();
+		foreach (Album album in albums)
+		{
+			albumDtos = albumDtos.Append(_mapper.Map<AlbumWithTracksDto>(album));
+		}
+		return albumDtos;
 	}
 	
 }
