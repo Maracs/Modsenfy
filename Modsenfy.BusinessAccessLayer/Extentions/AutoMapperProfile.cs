@@ -18,11 +18,11 @@ public class AutoMapperProfile : Profile
 		CreateMap<Audio, AudioDto>()
 			.ForMember(dest => dest.AudioFilename, opt => opt.MapFrom(src => src.AudioFilename));
 
-        CreateMap<Genre, GenreDto>()
-            .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.GenreName));
+		CreateMap<Genre, GenreDto>()
+			.ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.GenreName));
 
 
-        CreateMap<Artist, ArtistDto>()
+		CreateMap<Artist, ArtistDto>()
 			.ForMember(dest => dest.Image, opt => opt.MapFrom(src => src.Image));
 			
 		
@@ -54,7 +54,11 @@ public class AutoMapperProfile : Profile
 			.ForMember(dest => dest.Audio, opt => opt.MapFrom(src => src.Audio));
 
 		CreateMap<TrackDto, Track>();
-		
+
+		CreateMap<DataAccessLayer.Entities.Stream, StreamDto>()
+			.ForMember(dest => dest.Listener, opt => opt.MapFrom(src => src.User))
+			.ForMember(dest => dest.Track, opt => opt.MapFrom(src => src.Track));
+
 		var configuration = new MapperConfiguration(cfg =>
 		{
 			cfg.RecognizePrefixes("Album");
