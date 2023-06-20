@@ -12,4 +12,5 @@ public interface IAlbumRepository : IRepository<Album>
 	Task<IEnumerable<Album>> GetOrderedByReleaseAndLimited(int limit, int offset);
 	Task<IEnumerable<Album>> GetOrderedByRelease();
 	Task<IEnumerable<Album>> GetOrderedByReleaseAndSkipped(int offset);
+    Task<IEnumerable<Entities.Stream>> GetAlbumStreams(int id);
 }

@@ -23,11 +23,28 @@ public class AlbumRepository : IAlbumRepository
 	public void Delete(Album album)
 	{
 		_databaseContext.Remove(album);
+		_databaseContext.SaveChanges();
 	}
 
 	public async Task<IEnumerable<Album>> GetAll()
 	{
-		return await _databaseContext.Albums.ToListAsync();
+		var albums = await _databaseContext.Albums
+			.Include(a => a.AlbumType)
+			.Include(a => a.Artist)
+				.ThenInclude(ar => ar.Image)
+					.ThenInclude(i => i.ImageType)
+			.Include(a => a.Image)
+				.ThenInclude(i => i.ImageType)
+			.Include(a => a.Tracks)
+				.ThenInclude(t => t.Audio)
+			.Include(a => a.Tracks)
+				.ThenInclude(t => t.Genre)
+			.Include(a => a.Tracks)
+				.ThenInclude(t => t.TrackArtists)
+					.ThenInclude(ta => ta.Artist)
+			.ToListAsync();
+
+		return albums;
 	}
 
 	public async Task<Album> GetById(int id)
@@ -176,6 +193,16 @@ public class AlbumRepository : IAlbumRepository
 	{
 		throw new NotImplementedException();
 	}
-	
-	
+
+	public async Task<IEnumerable<Entities.Stream>> GetAlbumStreams(int id)
+	{
+		var streams = await _databaseContext.Stream
+			.Include(s => s.User)
+			.Include(s => s.Track)
+			.Where(s => s.Track.AlbumId == id)
+			.OrderByDescending(s => s.StreamDate)
+			.ToListAsync();
+		return streams;
+
+	}
 }

@@ -29,8 +29,8 @@ namespace Modsenfy.PresentationLayer.Controllers
 		{
 			var albumDto = await _albumService.GetAlbum(id);
 			if (albumDto == null)
-                return NotFound();
-            return Ok(albumDto);
+				return NotFound();
+			return Ok(albumDto);
 		}
 
 		[HttpPost]
@@ -52,8 +52,9 @@ namespace Modsenfy.PresentationLayer.Controllers
 		[HttpDelete("{id}")]
 		public async Task<ActionResult> DeleteAlbum([FromRoute] int id)
 		{
-
-			return Ok();
+			var album = await _albumRepository.GetById(id);
+            _albumRepository.Delete(album);
+            return Ok();
 		}
 
 		[HttpGet]
@@ -82,9 +83,8 @@ namespace Modsenfy.PresentationLayer.Controllers
 		[HttpGet("{id}/streams")]
 		public async Task<ActionResult<IEnumerable<StreamDto>>> GetAlbumStreams([FromRoute] int id, [FromQuery] int limit, [FromQuery] int offset)
 		{
-			Console.WriteLine(limit);
-			Console.WriteLine(offset);
-			return Ok();
+            await _albumService.GetAlbumStreams(id);
+            return Ok();
 		}
 	}
 }
