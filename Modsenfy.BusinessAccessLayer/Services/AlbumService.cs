@@ -62,7 +62,9 @@ public class AlbumService
 		IEnumerable<AlbumWithTracksDto> albumDtos = new List<AlbumWithTracksDto>();
 		foreach (Album album in albums)
 		{
-			albumDtos = albumDtos.Append(_mapper.Map<AlbumWithTracksDto>(album));
+			var albumDto = _mapper.Map<AlbumWithTracksDto>(album);
+			albumDto.AlbumStreams = CountTotalStreams(album);
+			albumDtos = albumDtos.Append(albumDto);
 		}
 		return albumDtos;
 	}
@@ -96,11 +98,18 @@ public class AlbumService
 		IEnumerable<AlbumWithTracksDto> albumDtos = new List<AlbumWithTracksDto>();
 		foreach (Album album in albums)
 		{
-			albumDtos = albumDtos.Append(_mapper.Map<AlbumWithTracksDto>(album));
+			var albumDto = _mapper.Map<AlbumWithTracksDto>(album);
+			albumDto.AlbumStreams = CountTotalStreams(album);
+			albumDtos = albumDtos.Append(albumDto);
 		}
 		return albumDtos;
 	}
 	
-	
+	public async Task GetAlbumStreams(int id)
+	{
+		var albumStreams = await _albumRepository.GetAlbumStreams(id);
+		var streamDtos = albumStreams.Select(s => _mapper.Map<StreamDto>(s));
+        Console.WriteLine(JsonConvert.SerializeObject(streamDtos, Formatting.Indented));
+    }
 	
 }
