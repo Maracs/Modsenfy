@@ -12,9 +12,10 @@ public class DatabaseContext : DbContext
 	public DbSet<Request> Requests { get; set; } 
 	public DbSet<TrackArtists> TrackArtists { get; set; }
 	public DbSet<Album> Albums { get; set; }
+	public DbSet<Entities.Stream> Stream { get; set; }
 
 
-	protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 	{
 		var connectionString = "Server=.\\SQLEXPRESS;Initial Catalog=Modsenfy;Trusted_Connection=True;TrustServerCertificate=True";
 		if (!optionsBuilder.IsConfigured)
