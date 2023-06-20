@@ -8,7 +8,9 @@ public class TrackDto
 	
 	public int TrackStreams { get; set; }
 	
-	public string Genre { get; set; }
+	public DateTime TrackDuration { get; set; }
+
+    public string Genre { get; set; }
 	
 	public string TrackGenius { get; set; }
 	
