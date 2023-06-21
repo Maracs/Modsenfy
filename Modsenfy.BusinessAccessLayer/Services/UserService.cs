@@ -45,7 +45,7 @@ public class UserService
         var image = new Image()
         {
             ImageFilename = userDto.Image.ImageFilename,
-            ImageTypeId = (await _imageTypeRepository.GetIfExists(userDto.Image.ImageType)).ImageTypeId
+            ImageTypeId = (await _imageTypeRepository.GetIfExists(userDto.Image.ImageTypeName)).ImageTypeId
         };
         
         var imageId = (await _imageRepository.CreateAndGet(image)).ImageId;
@@ -116,7 +116,7 @@ public class UserService
         var image = await _imageRepository.GetById(userInfo.ImageId);
         image.ImageFilename = userDto.Image.ImageFilename;
 
-        var imageType = await _imageTypeRepository.GetIfExists(userDto.Image.ImageType);
+        var imageType = await _imageTypeRepository.GetIfExists(userDto.Image.ImageTypeName);
         if(imageType==null)
             return false;
         image.ImageTypeId = imageType.ImageTypeId;
@@ -156,8 +156,8 @@ public class UserService
                 Release = playlist.PlaylistRelease.ToString(),
                 Owner = new UserDto()
                 {
-                    Id = user.UserId,
-                    Nickname = user.UserNickname,
+                    UserId = user.UserId,
+                    UserNickname = user.UserNickname,
                     Image = _mapper.Map<ImageDto>(user.UserInfo.Image),
                 },
                 Followers = new PlaylistFollowersDto()
@@ -176,7 +176,7 @@ public class UserService
                     TrackId = track.Track.TrackId,
                     TrackName = track.Track.TrackName,
                     TrackStreams = track.Track.Streams.Count,
-                    Genre = track.Track.Genre.GenreName,
+                    GenreName = track.Track.Genre.GenreName,
                     TrackDuration = track.Track.TrackDuration,
                     TrackGenius = track.Track.TrackGenius,
                     Audio = new AudioDto()

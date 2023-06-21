@@ -25,7 +25,7 @@ public class AutoMapperProfile : Profile
 			
 		CreateMap<Track, TrackDto>()
 			.ForMember(dest => dest.Artists, opt => opt.MapFrom(src => src.TrackArtists.Select(ta => ta.Artist)))
-			.ForMember(dest => dest.Genre, opt => opt.MapFrom(src => src.Genre.GenreName))
+			.ForMember(dest => dest.GenreName, opt => opt.MapFrom(src => src.Genre.GenreName))
 			.ForMember(dest => dest.Audio, opt => opt.MapFrom(src => src.Audio)).ReverseMap();
 			
 
