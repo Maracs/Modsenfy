@@ -2,5 +2,5 @@ namespace Modsenfy.BusinessAccessLayer.DTOs;
 
 public class AudioDto
 {
-	public string Filename { get; set; }
+	public string AudioFilename { get; set; }
 }

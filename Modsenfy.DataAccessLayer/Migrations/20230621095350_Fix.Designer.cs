@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Modsenfy.DataAccessLayer.Data;
 
@@ -11,9 +12,10 @@ using Modsenfy.DataAccessLayer.Data;
 namespace Modsenfy.DataAccessLayer.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    partial class DatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20230621095350_Fix")]
+    partial class Fix
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -308,7 +310,7 @@ namespace Modsenfy.DataAccessLayer.Migrations
                     b.Property<DateTime>("StreamDate")
                         .HasColumnType("datetime2");
 
-                    b.HasKey("UserId", "TrackId", "StreamDate");
+                    b.HasKey("UserId", "TrackId");
 
                     b.HasIndex("TrackId");
 

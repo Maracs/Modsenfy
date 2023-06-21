@@ -11,6 +11,7 @@ public class DatabaseContext : DbContext
     public DbSet<Track> Tracks { get; set; }
     public DbSet<Request> Requests { get; set; } 
     public DbSet<TrackArtists> TrackArtists { get; set; }
+    public DbSet<UserInfo> UserInfo { get; set; }
   
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -39,7 +40,7 @@ public class DatabaseContext : DbContext
             .HasForeignKey(pt => pt.TrackId);
 
         modelBuilder.Entity<Entities.Stream>()
-            .HasKey(pt => new { pt.UserId, pt.TrackId });
+            .HasKey(pt => new { pt.UserId, pt.TrackId , pt.StreamDate});
 
         modelBuilder.Entity<Entities.Stream>()
             .HasOne(pt => pt.Track)
@@ -117,9 +118,24 @@ public class DatabaseContext : DbContext
             .HasForeignKey(pt => pt.TrackId);
 
         modelBuilder.Entity<Album>()
+                    .HasKey(a => a.AlbumId);
+
+        modelBuilder.Entity<Album>()
             .HasOne(a => a.Image)
             .WithMany()
             .HasForeignKey(a => a.CoverId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        modelBuilder.Entity<Album>()
+            .HasOne(a => a.Artist)
+            .WithMany()
+            .HasForeignKey(a => a.AlbumOwnerId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<Artist>()
+            .HasMany(a => a.Albums)
+            .WithOne(a => a.Artist)
+            .HasForeignKey(a => a.AlbumOwnerId)
             .OnDelete(DeleteBehavior.NoAction);
 
         modelBuilder.Entity<Playlist>()
