@@ -58,12 +58,5 @@ public class AutoMapperProfile : Profile
 		CreateMap<DataAccessLayer.Entities.Stream, StreamDto>()
 			.ForMember(dest => dest.Listener, opt => opt.MapFrom(src => src.User))
 			.ForMember(dest => dest.Track, opt => opt.MapFrom(src => src.Track));
-
-		var configuration = new MapperConfiguration(cfg =>
-		{
-			cfg.RecognizePrefixes("Album");
-		});
-		configuration.CompileMappings();
-
 	}
 }
