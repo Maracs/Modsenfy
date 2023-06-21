@@ -15,6 +15,8 @@ public class UserInfo
     public string UserInfoPhone { get; set; }
 
     public string UserInfoAddress { get; set; }
+    
+    public User User { get; set; }
 
     public DateTime UserInfoRegistrationDate { get; set; }
 

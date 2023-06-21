@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Modsenfy.DataAccessLayer.Repositories
 {
-    public class TrackRepository : IRepository<Track>
+    public class TrackRepository : ITrackRepository
     {
         private readonly DatabaseContext _databaseContext;
 

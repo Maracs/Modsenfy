@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Modsenfy.DataAccessLayer.Entities;
+using Stream = Modsenfy.DataAccessLayer.Entities.Stream;
 
 namespace Modsenfy.DataAccessLayer.Data;
 
@@ -13,6 +14,18 @@ public class DatabaseContext : DbContext
 	public DbSet<TrackArtists> TrackArtists { get; set; }
 	public DbSet<Album> Albums { get; set; }
 	public DbSet<Entities.Stream> Stream { get; set; }
+  public DbSet<Track> Tracks { get; set; }
+   public DbSet<Request> Requests { get; set; } 
+    
+    public DbSet<RequestStatus> RequestStatuses { get; set; }
+    public DbSet<TrackArtists> TrackArtists { get; set; }
+    public DbSet<User> Users { get; set; }
+    public  DbSet<UserInfo> UserInfos { get; set; }
+    
+    public  DbSet<Image> Images { get; set; }
+    
+    public  DbSet<ImageType> ImageTypes { get; set; }
+
 
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -27,6 +40,38 @@ public class DatabaseContext : DbContext
 
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{
+  
+     modelBuilder.Entity<Playlist>().HasKey(playlist => playlist.PlaylistId);
+
+        modelBuilder.Entity<Playlist>()
+            .HasOne(playlist => playlist.User)
+            .WithMany(user => user.Playlists)
+            .HasForeignKey(playlist=>playlist.PlaylistOwnerId);
+        
+        
+        modelBuilder.Entity<User>().HasKey(user => user.UserId);
+
+        modelBuilder.Entity<UserInfo>().HasKey(userInfo => userInfo.UserInfoId);
+        
+        modelBuilder.Entity<UserInfo>()
+            .HasOne(userInfo=>userInfo.User)
+            .WithOne(user=>user.UserInfo)
+            .HasForeignKey<User>(user=>user.UserInfoId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        modelBuilder.Entity<Role>().HasKey(role => role.RoleId);
+
+        modelBuilder.Entity<User>()
+            .HasOne(user => user.Role)
+            .WithMany(role => role.Users)
+            .HasForeignKey(pt => pt.UserRoleId);
+
+        modelBuilder.Entity<UserInfo>()
+            .HasOne(userInfo => userInfo.Image)
+            .WithMany(image => image.UserInfos)
+            .HasForeignKey(pt => pt.ImageId)
+            .OnDelete(DeleteBehavior.NoAction);
+  
 		modelBuilder.Entity<PlaylistTracks>()
 			.HasKey(pt => new { pt.PlaylistId, pt.TrackId });
 
@@ -40,8 +85,8 @@ public class DatabaseContext : DbContext
 			.WithMany(p => p.PlaylistTracks)
 			.HasForeignKey(pt => pt.TrackId);
 
-		modelBuilder.Entity<Entities.Stream>()
-			.HasKey(pt => new { pt.UserId, pt.TrackId });
+	  modelBuilder.Entity<Entities.Stream>()
+            .HasKey(pt => new { pt.UserId, pt.TrackId,pt.StreamDate });
 
 		modelBuilder.Entity<Entities.Stream>()
 			.HasOne(pt => pt.Track)

@@ -9,4 +9,6 @@ public class UserAlbums
     public int AlbumId { get; set; }
 
     public Album Album { get; set;}
+    
+    public DateTime UserAlbumsAdded { get; set; }
 }

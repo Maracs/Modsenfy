@@ -16,8 +16,17 @@ builder.Services.AddDbContext<DatabaseContext>(options =>
 builder.Services.AddAutoMapper(typeof(AutoMapperProfile).Assembly);
 
 builder.Services.AddScoped<TrackRepository>();
+
+builder.Services.AddScoped<UserRepository>();
+builder.Services.AddScoped<UserInfoRepository>();
+builder.Services.AddScoped<ImageRepository>();
+builder.Services.AddScoped<ImageTypeRepository>();
+builder.Services.AddScoped<RequestRepository>();
 builder.Services.AddScoped<AlbumRepository>();
 builder.Services.AddScoped<AlbumService>();
+
+builder.Services.AddScoped<UserService>();
+
 
 
 builder.Services.AddControllers()
