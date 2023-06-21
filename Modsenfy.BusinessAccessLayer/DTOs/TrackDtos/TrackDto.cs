@@ -8,11 +8,11 @@ public class TrackDto
 	
 	public int TrackStreams { get; set; }
 	
-	public DateTime TrackDuration { get; set; }
-
-    public string Genre { get; set; }
+  public string TrackGenre { get; set; }
 	
 	public string TrackGenius { get; set; }
+
+	public DateTime TrackDuration { get; set; }
 	
 	public IEnumerable<ArtistDto> Artists { get; set; }
 	

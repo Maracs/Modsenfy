@@ -2,5 +2,5 @@ namespace Modsenfy.BusinessAccessLayer.DTOs;
 
 public class GenreDto
 {
-    public string Name { get; set; }
+    public string GenreName { get; set; }
 }

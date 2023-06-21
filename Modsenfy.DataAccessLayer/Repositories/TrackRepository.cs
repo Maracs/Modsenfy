@@ -28,12 +28,13 @@ namespace Modsenfy.DataAccessLayer.Repositories
 
         public void Delete(Track entity)
         {
-            throw new NotImplementedException();
+            _databaseContext.Remove(entity);
+            return;
         }
 
-        public Task<IEnumerable<Track>> GetAll()
+        public async Task<IEnumerable<Track>> GetAll()
         {
-            throw new NotImplementedException();
+            return await _databaseContext.Tracks.ToListAsync();
         }
 
         public async Task<Track> GetById(int id)
@@ -46,17 +47,33 @@ namespace Modsenfy.DataAccessLayer.Repositories
         {
             var track = await _databaseContext.Tracks
                  .Include(t => t.Audio)
+                 .Include(t => t.Genre)
                  .Include(t => t.TrackArtists)
                     .ThenInclude(ta => ta.Artist)
                         .ThenInclude(a => a.Image)
                             .ThenInclude(i => i.ImageType)
-                 .Include(t => t.TrackArtists)
-                    .ThenInclude(ta => ta.Artist)
-                        .ThenInclude(a => a.UserArtists)
                  .Include(t => t.Album)
                     .ThenInclude(al => al.Image)
                         .ThenInclude(i => i.ImageType)
+                 .Include(t => t.Album)
+                    .ThenInclude(a => a.AlbumType)
                  .FirstOrDefaultAsync(t => t.TrackId  == id);
+            return track;
+        }
+
+        public async Task<Track> GetByIdWithStreams(int id)
+        {
+            var track = await _databaseContext.Tracks
+                .Include(t => t.Audio)
+                .Include(t => t.Genre)
+                .Include(t => t.TrackArtists)
+                    .ThenInclude(ta => ta.Artist)
+                        .ThenInclude(a => a.Image)
+                            .ThenInclude(i => i.ImageType)
+                .Include(t => t.Streams)
+                    .ThenInclude(st => st.User)
+                        .ThenInclude(u => u.UserInfo)
+                .FirstOrDefaultAsync(t => t.TrackId == id); 
             return track;
         }
 
@@ -75,6 +92,16 @@ namespace Modsenfy.DataAccessLayer.Repositories
             return followers;
         }
 
+        public async Task<IEnumerable<Track>> GetSeverlTracks(List<int> ids)
+        {
+            List<Track> tracks = new List<Track>();
+            foreach (var id in ids)
+            {
+                tracks.Add(await GetByIdWithJoins(id));
+            }
+            return tracks;
+        }
+
         public async Task SaveChanges()
         {
             await _databaseContext.SaveChangesAsync();
@@ -90,7 +117,6 @@ namespace Modsenfy.DataAccessLayer.Repositories
             track.Genre = entity.Genre;
             track.TrackName = entity.TrackName;
             track.TrackGenius = entity.TrackGenius;
-
         }
     }
 }

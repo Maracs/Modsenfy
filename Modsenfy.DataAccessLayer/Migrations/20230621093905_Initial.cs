@@ -161,7 +161,6 @@ namespace Modsenfy.DataAccessLayer.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     AlbumName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     AlbumRelease = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    AlbumOwnerId = table.Column<int>(type: "int", nullable: false),
                     ArtistId = table.Column<int>(type: "int", nullable: false),
                     CoverId = table.Column<int>(type: "int", nullable: false),
                     AlbumTypeId = table.Column<int>(type: "int", nullable: false)
