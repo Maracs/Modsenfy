@@ -44,7 +44,7 @@ public class UserService
 
         var image = new Image()
         {
-            ImageFilename = userDto.Image.Filename,
+            ImageFilename = userDto.Image.ImageFilename,
             ImageTypeId = (await _imageTypeRepository.GetIfExists(userDto.Image.ImageType)).ImageTypeId
         };
         
@@ -114,7 +114,7 @@ public class UserService
         userInfo.UserInfoRegistrationDate =  DateTime.Parse(userDto.Details.UserInfoRegistrationDate );
 
         var image = await _imageRepository.GetById(userInfo.ImageId);
-        image.ImageFilename = userDto.Image.Filename;
+        image.ImageFilename = userDto.Image.ImageFilename;
 
         var imageType = await _imageTypeRepository.GetIfExists(userDto.Image.ImageType);
         if(imageType==null)
@@ -173,15 +173,15 @@ public class UserService
             {
                 var trackDto = new TrackDto()
                 {
-                    Id = track.Track.TrackId,
-                    Name = track.Track.TrackName,
-                    Streams = track.Track.Streams.Count,
+                    TrackId = track.Track.TrackId,
+                    TrackName = track.Track.TrackName,
+                    TrackStreams = track.Track.Streams.Count,
                     Genre = track.Track.Genre.GenreName,
-                    Duration = track.Track.TrackDuration.ToString(),
-                    Genius = track.Track.TrackGenius,
+                    TrackDuration = track.Track.TrackDuration,
+                    TrackGenius = track.Track.TrackGenius,
                     Audio = new AudioDto()
                     {
-                        Filename = track.Track.Audio.AudioFilename
+                        AudioFilename = track.Track.Audio.AudioFilename
                     },
                     Artists = new List<ArtistDto>()
 
@@ -191,9 +191,9 @@ public class UserService
                 {
                     var artistDto = new ArtistDto()
                     {
-                        Id = artist.Artist.ArtistId,
-                        Name = artist.Artist.ArtistName,
-                        Bio = artist.Artist.ArtistBio,
+                        ArtistId  = artist.Artist.ArtistId,
+                        ArtistName = artist.Artist.ArtistName,
+                        ArtistBio = artist.Artist.ArtistBio,
                         Image = _mapper.Map<ImageDto>(artist.Artist.Image),
                         Followers = new ArtistFollowersDto()
                         {

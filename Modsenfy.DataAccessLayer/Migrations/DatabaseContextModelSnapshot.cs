@@ -306,7 +306,7 @@ namespace Modsenfy.DataAccessLayer.Migrations
 
                     b.HasIndex("TrackId");
 
-                    b.ToTable("Stream");
+                    b.ToTable("Streams");
                 });
 
             modelBuilder.Entity("Modsenfy.DataAccessLayer.Entities.Track", b =>
@@ -764,13 +764,13 @@ namespace Modsenfy.DataAccessLayer.Migrations
                     b.HasOne("Modsenfy.DataAccessLayer.Entities.Playlist", "Playlist")
                         .WithMany("UserPlaylists")
                         .HasForeignKey("PlaylistId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Modsenfy.DataAccessLayer.Entities.User", "User")
                         .WithMany("UserPlaylists")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Playlist");
