@@ -10,43 +10,57 @@ public class DatabaseContext : DbContext
 		: base(options) { }
 
 	public DbSet<Track> Tracks { get; set; }
-	public DbSet<Request> Requests { get; set; } 
-	public DbSet<TrackArtists> TrackArtists { get; set; }
-	public DbSet<Album> Albums { get; set; }
-	public DbSet<Entities.Stream> Streams { get; set; }
 	
-    public DbSet<RequestStatus> RequestStatuses { get; set; }
+  public DbSet<Request> Requests { get; set; } 
+
+  public DbSet<TrackArtists> TrackArtists { get; set; }
+	
+  public DbSet<Album> Albums { get; set; }
+	
+  public DbSet<Entities.Stream> Streams { get; set; }
+	
+  public DbSet<RequestStatus> RequestStatuses { get; set; }
    
-    public DbSet<User> Users { get; set; }
-    public  DbSet<UserInfo> UserInfos { get; set; }
-    
-    public  DbSet<Image> Images { get; set; }
-    
-    public  DbSet<ImageType> ImageTypes { get; set; }
-
-
-
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-	{
-		var connectionString = "Server=.\\SQLEXPRESS;Initial Catalog=Modsenfy;Trusted_Connection=True;TrustServerCertificate=True";
-		if (!optionsBuilder.IsConfigured)
-		{
-			optionsBuilder.UseSqlServer(connectionString,
-				builder => builder.MigrationsAssembly("Modsenfy.DataAccessLayer"));
-		}
-	}
-
-	protected override void OnModelCreating(ModelBuilder modelBuilder)
-	{
+  public DbSet<User> Users { get; set; }
   
-     modelBuilder.Entity<Playlist>().HasKey(playlist => playlist.PlaylistId);
+  public  DbSet<UserInfo> UserInfos { get; set; }
+    
+  public  DbSet<Image> Images { get; set; }
+    
+  public  DbSet<ImageType> ImageTypes { get; set; }
+  
+  protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        var connectionString = "Server=.\\SQLEXPRESS;Initial Catalog=Modsenfy;Trusted_Connection=True;TrustServerCertificate=True";
+        if (!optionsBuilder.IsConfigured)
+        {
+            optionsBuilder.UseSqlServer(connectionString,
+                builder => builder.MigrationsAssembly("Modsenfy.DataAccessLayer"));
+        }
+    }
+    
+     protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Playlist>()
+            .HasKey(playlist => playlist.PlaylistId);
+
+        modelBuilder.Entity<Album>()
+            .HasOne(a => a.Artist)
+            .WithMany()
+            .HasForeignKey(a => a.AlbumOwnerId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<Artist>()
+            .HasMany(a => a.Albums)
+            .WithOne(a => a.Artist)
+            .HasForeignKey(a => a.AlbumOwnerId)
+            .OnDelete(DeleteBehavior.NoAction);
 
         modelBuilder.Entity<Playlist>()
             .HasOne(playlist => playlist.User)
             .WithMany(user => user.Playlists)
             .HasForeignKey(playlist=>playlist.PlaylistOwnerId);
-        
-        
+      
         modelBuilder.Entity<User>().HasKey(user => user.UserId);
 
         modelBuilder.Entity<UserInfo>().HasKey(userInfo => userInfo.UserInfoId);
@@ -70,8 +84,8 @@ public class DatabaseContext : DbContext
             .HasForeignKey(pt => pt.ImageId)
             .OnDelete(DeleteBehavior.NoAction);
   
-		modelBuilder.Entity<PlaylistTracks>()
-			.HasKey(pt => new { pt.PlaylistId, pt.TrackId });
+		    modelBuilder.Entity<PlaylistTracks>()
+			      .HasKey(pt => new { pt.PlaylistId, pt.TrackId });
 
 		modelBuilder.Entity<PlaylistTracks>()
 			.HasOne(pt => pt.Playlist)
@@ -161,7 +175,6 @@ public class DatabaseContext : DbContext
 			.WithMany(p => p.UserTracks)
 			.HasForeignKey(pt => pt.TrackId);
 
-
 		modelBuilder.Entity<Album>()
 			.HasKey(a => a.AlbumId);
 
@@ -182,8 +195,6 @@ public class DatabaseContext : DbContext
 			.WithOne(a => a.Artist)
 			.HasForeignKey(a => a.AlbumOwnerId)
 			.OnDelete(DeleteBehavior.NoAction);
-
-
 
 		modelBuilder.Entity<Playlist>()
 			.HasOne(a => a.Image)

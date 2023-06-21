@@ -26,21 +26,11 @@ namespace Modsenfy.PresentationLayer.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<TrackWithAlbumDto>> GetTrack(int id)
         {
-            var track = await _trackRepository.GetById(id);
+            var track = await _trackRepository.GetByIdWithJoins(id);
             if (track == null)
                 return NotFound();
 
             var trackDto = _mapper.Map<TrackWithAlbumDto>(track);
-
-            var followers = await _trackRepository.GetFollowersThroughTrack(track);
-
-            var artists = trackDto.Artists.ToList();
-            for (int i = 0; i < artists.Count; i++)
-            {
-                artists[i].Followers.Total = followers[i];
-            }
-
-            trackDto.Artists = artists;
 
             return Ok(trackDto);
         }
@@ -48,7 +38,11 @@ namespace Modsenfy.PresentationLayer.Controllers
         [HttpPost]
         public async Task<ActionResult> CreateTrack(TrackDto trackDto)
         {
-            var track = _mapper.Map<Track>(trackDto);
+            var track = new Track() 
+            {
+             
+            };
+
             await _trackRepository.Create(track);
             await _trackRepository.SaveChanges();
 
@@ -74,11 +68,24 @@ namespace Modsenfy.PresentationLayer.Controllers
             return Ok(track.TrackId);
         }
 
-        //[HttpGet]
-        //public async Task<ActionResult<IEnumerable<TrackWithAlbumDto>>> GetSeveralTracks(List<int> ids)
-        //{
-            
-        //}
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<TrackWithAlbumDto>>> GetSeveralTracks(List<int> ids)
+        {
+            var tracks = await _trackRepository.GetSeverlTracks(ids);
+            List<TrackWithAlbumDto> tracksDto = new List<TrackWithAlbumDto>();
+            foreach (var track in tracks)
+            {
+                tracksDto.Add(_mapper.Map<TrackWithAlbumDto>(track));   
+            }
+            return Ok(tracksDto);
+        }
 
+        [HttpGet("{id}/streams")]
+        public async Task<ActionResult<TrackWithStreamsDto>> GetTrackStreams(int id)
+        {
+            var track = await _trackRepository.GetByIdWithStreams(id);
+            var trackDto = _mapper.Map<TrackWithStreamsDto>(track);
+            return Ok(trackDto);
+        }
     }
 }

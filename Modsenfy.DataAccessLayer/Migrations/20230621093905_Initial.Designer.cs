@@ -12,7 +12,7 @@ using Modsenfy.DataAccessLayer.Data;
 namespace Modsenfy.DataAccessLayer.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20230615142450_Initial")]
+    [Migration("20230621093905_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -35,9 +35,6 @@ namespace Modsenfy.DataAccessLayer.Migrations
                     b.Property<string>("AlbumName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("AlbumOwnerId")
-                        .HasColumnType("int");
 
                     b.Property<DateTime>("AlbumRelease")
                         .HasColumnType("datetime2");
