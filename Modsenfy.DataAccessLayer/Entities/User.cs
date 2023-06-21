@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Modsenfy.DataAccessLayer.Entities;
 
 public class User
