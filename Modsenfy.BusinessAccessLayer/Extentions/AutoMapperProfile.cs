@@ -29,7 +29,7 @@ public class AutoMapperProfile : Profile
 		CreateMap<Track, TrackDto>()
 			.ForMember(dest => dest.Artists, opt => opt.MapFrom(src => src.TrackArtists.Select(ta => ta.Artist)))
 			.ForMember(dest => dest.Genre, opt => opt.MapFrom(src => src.Genre.GenreName))
-			.ForMember(dest => dest.Audio, opt => opt.MapFrom(src => src.Audio));
+			.ForMember(dest => dest.Audio, opt => opt.MapFrom(src => src.Audio)).ReverseMap();
 			
 
 		CreateMap<Album, AlbumWithTracksDto>()
@@ -58,27 +58,7 @@ public class AutoMapperProfile : Profile
 		CreateMap<DataAccessLayer.Entities.Stream, StreamDto>()
 			.ForMember(dest => dest.Listener, opt => opt.MapFrom(src => src.User))
 			.ForMember(dest => dest.Track, opt => opt.MapFrom(src => src.Track));
-      
-      
-      
-      
-        CreateMap<Image, ImageDto>()
-            .ForMember(dest => dest.ImageType, opt => opt.MapFrom(src => src.ImageType.ImageTypeName))
-            .ForMember(dest=>dest.Filename,opt=>opt.MapFrom(src=>src.ImageFilename));
-        
-        CreateMap<Audio, AudioDto>();
-        CreateMap<Album, AlbumDto>()
-            .ForMember(dest => dest.Image, opt => opt.MapFrom(src => src.Image));
-        CreateMap<Artist, ArtistDto>()
-            .ForMember(dest => dest.Image, opt => opt.MapFrom(src => src.Image));
-
-        CreateMap<Track, TrackWithAlbumDto>()
-            .ForMember(dest => dest.Artists, opt => opt.MapFrom(src => src.TrackArtists.Select(ta => ta.Artist)))
-            .ForMember(dest => dest.Album, opt => opt.MapFrom(src => src.Album))
-            .ForMember(dest => dest.Audio, opt => opt.MapFrom(src => src.Audio));
-
-        CreateMap<TrackDto, Track>();
-
+		
         RecognizePrefixes("UserInfo");
 
         CreateMap<UserInfo, UserDetailsDto>()

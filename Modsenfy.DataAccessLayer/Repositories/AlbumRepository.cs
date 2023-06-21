@@ -196,7 +196,7 @@ public class AlbumRepository : IAlbumRepository
 
 	public async Task<IEnumerable<Entities.Stream>> GetAlbumStreams(int id)
 	{
-		var streams = await _databaseContext.Stream
+		var streams = await _databaseContext.Streams
 			.Include(s => s.User)
 			.Include(s => s.Track)
 			.Where(s => s.Track.AlbumId == id)

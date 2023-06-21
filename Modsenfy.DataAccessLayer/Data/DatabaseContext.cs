@@ -13,12 +13,10 @@ public class DatabaseContext : DbContext
 	public DbSet<Request> Requests { get; set; } 
 	public DbSet<TrackArtists> TrackArtists { get; set; }
 	public DbSet<Album> Albums { get; set; }
-	public DbSet<Entities.Stream> Stream { get; set; }
-  public DbSet<Track> Tracks { get; set; }
-   public DbSet<Request> Requests { get; set; } 
-    
+	public DbSet<Entities.Stream> Streams { get; set; }
+	
     public DbSet<RequestStatus> RequestStatuses { get; set; }
-    public DbSet<TrackArtists> TrackArtists { get; set; }
+   
     public DbSet<User> Users { get; set; }
     public  DbSet<UserInfo> UserInfos { get; set; }
     
