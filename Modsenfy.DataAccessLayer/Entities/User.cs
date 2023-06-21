@@ -1,11 +1,11 @@
+using System.Collections.Generic;
+
 namespace Modsenfy.DataAccessLayer.Entities;
 
 public class User
 {
     public int UserId { get; set; }
-
     public string UserNickname { get; set; }
-
     public string UserEmail { get; set; }
 
     public string UserPasshash { get; set; }
@@ -37,4 +37,8 @@ public class User
     [Newtonsoft.Json.JsonIgnore]
     [System.Text.Json.Serialization.JsonIgnore]
     public ICollection<UserPlaylists> UserPlaylists { get; set; }
+    
+    [Newtonsoft.Json.JsonIgnore]
+    [System.Text.Json.Serialization.JsonIgnore]
+    public ICollection<Playlist> Playlists { get; set; }
 }
