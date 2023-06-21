@@ -9,7 +9,9 @@ public class TrackDto
 	public int Streams { get; set; }
 	
 	public string Genre { get; set; }
-	
+
+	public string Duration { get; set; }
+
 	public string Genius { get; set; }
 	
 	public IEnumerable<ArtistDto> Artists { get; set; }

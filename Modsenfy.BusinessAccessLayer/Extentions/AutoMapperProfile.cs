@@ -10,7 +10,8 @@ public class AutoMapperProfile : Profile
     public AutoMapperProfile()
     {
         CreateMap<Image, ImageDto>()
-            .ForMember(dest => dest.ImageType, opt => opt.MapFrom(src => src.ImageType));
+            .ForMember(dest => dest.ImageType, opt => opt.MapFrom(src => src.ImageType.ImageTypeName))
+            .ForMember(dest=>dest.Filename,opt=>opt.MapFrom(src=>src.ImageFilename));
         
         CreateMap<Audio, AudioDto>();
         CreateMap<Album, AlbumDto>()
@@ -27,9 +28,7 @@ public class AutoMapperProfile : Profile
 
        
         
-        CreateMap<Image, ImageDto>()
-            .ForMember(dest => dest.ImageType, opt => opt.MapFrom(src => src.ImageType.ImageTypeName))
-            .ForMember(dest=>dest.Filename,opt=>opt.MapFrom(src=>src.ImageFilename));
+
        
         RecognizePrefixes("UserInfo");
 
@@ -43,6 +42,12 @@ public class AutoMapperProfile : Profile
             .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.Role.RoleName))
             .ForMember(dest=>dest.Image,opt=>opt.MapFrom(src=>src.UserInfo.Image))
             .ForMember(dest=>dest.Details,opt=>opt.MapFrom(src=>src.UserInfo));
+        
+        CreateMap<User, UserWithIdAndDetailsAndEmailDto>()
+            .ForMember(dest=>dest.Image,opt=>opt.MapFrom(src=>src.UserInfo.Image))
+            .ForMember(dest=>dest.Details,opt=>opt.MapFrom(src=>src.UserInfo));
 
+      
+        
     }
 }

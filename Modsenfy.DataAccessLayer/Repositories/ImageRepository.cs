@@ -18,6 +18,7 @@ public class ImageRepository:IImageRepository
     {
         var imageEntry = await _databaseContext.Images.AddAsync(entity);
 
+        await _databaseContext.SaveChangesAsync();
         return imageEntry.Entity;
     }
 

@@ -48,4 +48,13 @@ public class ImageTypeRepository:IImageTypeRepository
     {
         _databaseContext.ImageTypes.Remove(entity);
     }
+    
+    public async Task<ImageType> GetIfExists(string type)
+    {
+         if(await _databaseContext.ImageTypes.AnyAsync(x=>x.ImageTypeName == type)==false)
+             return null;
+
+         return await _databaseContext.ImageTypes.SingleOrDefaultAsync(x => x.ImageTypeName == type);
+    }
+    
 }

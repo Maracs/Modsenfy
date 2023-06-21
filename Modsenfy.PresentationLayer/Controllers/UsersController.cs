@@ -2,6 +2,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Modsenfy.BusinessAccessLayer.DTOs;
 using Modsenfy.BusinessAccessLayer.DTOs.RequestDtos;
+using Modsenfy.BusinessAccessLayer.Services;
 using Modsenfy.DataAccessLayer.Contracts;
 using Modsenfy.DataAccessLayer.Entities;
 using Modsenfy.DataAccessLayer.Repositories;
@@ -16,24 +17,17 @@ public class UsersController:ControllerBase
 
     private readonly UserRepository _userRepository;
 
-    private readonly UserInfoRepository _userInfoRepository;
-
-    private readonly ImageRepository _imageRepository;
-
-    private readonly ImageTypeRepository _imageTypeRepository;
+    
 
     private readonly IMapper _mapper;
 
-    public UsersController(IMapper mapper, UserRepository userRepository,
-        UserInfoRepository userInfoRepository,ImageRepository imageRepository,ImageTypeRepository imageTypeRepository)
+    private readonly UserService _userService;
+    
+    public UsersController(IMapper mapper, UserRepository userRepository, UserService userService)
     {
         _userRepository = userRepository;
-        
-        _userInfoRepository = userInfoRepository;
-        
-        _imageRepository = imageRepository;
 
-        _imageTypeRepository = imageTypeRepository;
+        _userService = userService;
 
         _mapper = mapper;
     }
@@ -44,8 +38,11 @@ public class UsersController:ControllerBase
     {
         if (await _userRepository.IfNicknameExists(userDto.Nickname) || await _userRepository.IfEmailExists(userDto.Email))
             return BadRequest("This nickname or email is already taken");
+
+        var userId = await _userService.RegisterUser(userDto);
         
-        return Ok();
+        
+        return Ok(userId);
     }
 
     [HttpGet("{id}")]
@@ -59,26 +56,46 @@ public class UsersController:ControllerBase
     }
 
     [HttpPut("{id}")]
-    public async Task<ActionResult> UpdateUser(int id,[FromBody] UserDto userDto)
+    public async Task<ActionResult> UpdateUser([FromRoute] int id,[FromBody] UserWithDetailsAndEmailDto userDto)
     {
+
+        if (!await _userService.UpdateUser(id, userDto))
+            return BadRequest("Incorrect image type");
+        
         return Ok();
     }
 
     [HttpDelete("{id}")]
-    public async Task<ActionResult> DeleteUser(int id)
+    public async Task<ActionResult> DeleteUser([FromRoute] int id)
     {
+        if (await _userRepository.GetById(id) == null)
+            return BadRequest("User with this Id does not exists");
+        
+        await _userService.DeleteUser(id);
+        
         return Ok();
     }
 
     [HttpGet("{id}/playlists")]
-    public async Task<ActionResult<IEnumerable<PlaylistDto>>> GetUserPlaylists(int id, [FromQuery] int limit,
+    public async Task<ActionResult<IEnumerable<PlaylistDto>>> GetUserPlaylists([FromRoute] int id, [FromQuery] int limit,
         [FromQuery] int offset)
     {
-        return Ok();
+        if (await _userRepository.GetById(id) == null)
+            return BadRequest("User with this Id does not exists");
+
+        if (limit < 0 )
+            return BadRequest("Invalid limit value");
+        
+        if (offset<0)
+            return BadRequest("Invalid offset value");
+        
+        var playlists = await _userService.GetUserPlaylists(id, limit, offset);
+        
+        return Ok(playlists);
     }
 
     [HttpPost("{id}/playlists")]
-    public async Task<ActionResult> CreateUserPlaylist(int id, [FromBody] PlaylistDto playlistDto)
+    public async Task<ActionResult> CreateUserPlaylist([FromRoute] int id, [FromBody] PlaylistDto playlistDto)
     {
         return Ok();
     }
@@ -87,18 +104,24 @@ public class UsersController:ControllerBase
     public async Task<ActionResult<IEnumerable<RequestDto>>> GetSeveralRequests([FromQuery] int limit,
         [FromQuery] int offset, [FromQuery] string status)
     {
-        return Ok();
+        var requests = await _userService.GetSeveralRequests(limit, offset, status);
+       
+        return Ok(requests);
     }
 
     [HttpGet("requests/{id}")]
-    public async Task<ActionResult> GetRequest(int id)
+    public async Task<ActionResult<RequestDto>> GetRequest([FromRoute] int id)
     {
-        return Ok();
+
+        var request = await _userService.GetRequest(id);
+        
+        return Ok(request);
     }
 
     [HttpPost("requests/{id}/managing")]
-    public async Task<ActionResult> AnswerRequest([FromBody] string answer)
+    public async Task<ActionResult> AnswerRequest([FromRoute] int id,[FromBody] string answer)
     {
+        await _userService.AnswerRequest(id, answer);
         return Ok();
     }
     

@@ -197,14 +197,11 @@ namespace Modsenfy.DataAccessLayer.Migrations
                     b.Property<DateTime>("PlaylistRelease")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
                     b.HasKey("PlaylistId");
 
                     b.HasIndex("CoverId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("PlaylistOwnerId");
 
                     b.ToTable("Playlist");
                 });
@@ -246,10 +243,7 @@ namespace Modsenfy.DataAccessLayer.Migrations
                     b.Property<int>("RequestStatusId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("RequestTimeCreated")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("RequestTimeProcessed")
+                    b.Property<DateTime>("RequestTime")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("UserId")
@@ -280,7 +274,7 @@ namespace Modsenfy.DataAccessLayer.Migrations
 
                     b.HasKey("RequestStatusId");
 
-                    b.ToTable("RequestStatus");
+                    b.ToTable("RequestStatuses");
                 });
 
             modelBuilder.Entity("Modsenfy.DataAccessLayer.Entities.Role", b =>
@@ -311,7 +305,7 @@ namespace Modsenfy.DataAccessLayer.Migrations
                     b.Property<DateTime>("StreamDate")
                         .HasColumnType("datetime2");
 
-                    b.HasKey("UserId", "TrackId");
+                    b.HasKey("UserId", "TrackId", "StreamDate");
 
                     b.HasIndex("TrackId");
 
@@ -419,6 +413,9 @@ namespace Modsenfy.DataAccessLayer.Migrations
                     b.Property<int>("AlbumId")
                         .HasColumnType("int");
 
+                    b.Property<DateTime>("UserAlbumsAdded")
+                        .HasColumnType("datetime2");
+
                     b.HasKey("UserId", "AlbumId");
 
                     b.HasIndex("AlbumId");
@@ -490,9 +487,8 @@ namespace Modsenfy.DataAccessLayer.Migrations
                     b.Property<int>("PlaylistId")
                         .HasColumnType("int");
 
-                    b.Property<string>("UserPlaylistsAdded")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("UserPlaylistsAdded")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("UserId", "PlaylistId");
 
@@ -577,8 +573,8 @@ namespace Modsenfy.DataAccessLayer.Migrations
                         .IsRequired();
 
                     b.HasOne("Modsenfy.DataAccessLayer.Entities.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
+                        .WithMany("Playlists")
+                        .HasForeignKey("PlaylistOwnerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -850,6 +846,8 @@ namespace Modsenfy.DataAccessLayer.Migrations
 
             modelBuilder.Entity("Modsenfy.DataAccessLayer.Entities.User", b =>
                 {
+                    b.Navigation("Playlists");
+
                     b.Navigation("Streams");
 
                     b.Navigation("UserAlbums");

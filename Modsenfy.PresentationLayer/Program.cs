@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Modsenfy.BusinessAccessLayer.Extentions;
+using Modsenfy.BusinessAccessLayer.Services;
 using Modsenfy.DataAccessLayer.Contracts;
 using Modsenfy.DataAccessLayer.Data;
 using Modsenfy.DataAccessLayer.Entities;
@@ -18,6 +19,10 @@ builder.Services.AddScoped<UserRepository>();
 builder.Services.AddScoped<UserInfoRepository>();
 builder.Services.AddScoped<ImageRepository>();
 builder.Services.AddScoped<ImageTypeRepository>();
+builder.Services.AddScoped<RequestRepository>();
+
+
+builder.Services.AddScoped<UserService>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

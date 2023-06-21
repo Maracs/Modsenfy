@@ -10,5 +10,5 @@ public class UserPlaylists
 
     public Playlist Playlist { get; set; }
 
-    public string UserPlaylistsAdded { get; set; }
+    public DateTime UserPlaylistsAdded { get; set; }
 }

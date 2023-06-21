@@ -52,13 +52,15 @@ public class UserRepository:IUserRepository
     public async Task<User> CreateAndGet(User entity)
     {
         var entityEntry = await _databaseContext.AddAsync(entity);
+
+        await _databaseContext.SaveChangesAsync();
         
         return entityEntry.Entity;
     }
 
     public async Task Update(User entity)
     {
-        _databaseContext.Update(entity);
+        _databaseContext.Users.Update(entity);
     }
 
     public  void Delete(User entity)
@@ -73,4 +75,37 @@ public class UserRepository:IUserRepository
             .ThenInclude(userInfo => userInfo.Image).ThenInclude(image => image.ImageType).FirstOrDefaultAsync(user=>user.UserId==id);
        return user;
     }
+
+    public async Task<User> GetUserWithPlaylists(int id)
+    {
+        var user = await _databaseContext.Users
+            .Include(user => user.Playlists)
+            .ThenInclude(playlists => playlists.PlaylistTracks)
+            .ThenInclude(tracks => tracks.Track)
+            .ThenInclude(track => track.Audio)
+            .ThenInclude(audio => audio.AudioFilename)
+            .Include(user => user.Playlists)
+            .ThenInclude(playlists => playlists.PlaylistTracks)
+            .ThenInclude(tracks => tracks.Track)
+            .ThenInclude(track => track.TrackArtists)
+            .ThenInclude(artists => artists.Artist)
+            .ThenInclude(artist => artist.Image)
+            .ThenInclude(image => image.ImageType)
+            .Include(user => user.Playlists)
+            .ThenInclude(playlists => playlists.PlaylistTracks)
+            .ThenInclude(tracks => tracks.Track)
+            .ThenInclude(track => track.TrackArtists)
+            .ThenInclude(artists => artists.Artist)
+            .ThenInclude(artist => artist.UserArtists)
+            .Include(user => user.Playlists)
+            .ThenInclude(playlist => playlist.Image)
+            .ThenInclude(image => image.ImageType)
+            .Include(user => user.UserInfo)
+            .ThenInclude(info => info.Image)
+            .ThenInclude(image => image.ImageType)
+            .FirstOrDefaultAsync(user => user.UserId == id);
+
+        return user;
+    }
+    
 }

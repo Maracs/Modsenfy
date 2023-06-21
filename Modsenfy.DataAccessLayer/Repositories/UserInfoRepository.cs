@@ -19,6 +19,8 @@ public class UserInfoRepository:IUserInfoRepository
     {
         var userInfoEntry= await _databaseContext.UserInfos.AddAsync(entity);
 
+        await _databaseContext.SaveChangesAsync();
+        
         return userInfoEntry.Entity;
     }
 
