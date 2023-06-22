@@ -28,6 +28,7 @@ public class TokenService
         {
             new Claim(JwtRegisteredClaimNames.NameId, user.UserId.ToString()),
             new Claim(JwtRegisteredClaimNames.Name, user.UserNickname),
+            new Claim(ClaimTypes.Role, "User")
         };
 
         var creds = new SigningCredentials(_key, SecurityAlgorithms.HmacSha512Signature);

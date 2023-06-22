@@ -6,7 +6,6 @@ using Modsenfy.DataAccessLayer.Data;
 using Modsenfy.DataAccessLayer.Entities;
 using Modsenfy.DataAccessLayer.Repositories;
 using Modsenfy.PresentationLayer.Converters;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,7 +29,7 @@ builder.Services.AddScoped<AlbumService>();
 builder.Services.AddScoped<UserService>();
 
 builder.Services.AddIdentityServices(builder.Configuration);
-
+builder.Services.AddSwaggerServices(builder.Configuration);
 
 builder.Services.AddControllers()
 	.AddJsonOptions(opts => opts.JsonSerializerOptions.Converters.Add(new DateOnlyJsonConverter()));
