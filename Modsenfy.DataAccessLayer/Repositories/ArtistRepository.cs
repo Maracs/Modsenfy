@@ -32,20 +32,8 @@ namespace Modsenfy.DataAccessLayer.Repositories
                 .Include(a => a.TrackArtists)
                     .ThenInclude(ta => ta.Track)
                         .ThenInclude(t => t.Genre)
-                .Include(a => a.TrackArtists)
-                    .ThenInclude(ta => ta.Track)
-                        .ThenInclude(t => t.Album)
-                            .ThenInclude(al => al.AlbumType)
-                .Include(a => a.TrackArtists)
-                    .ThenInclude(ta => ta.Track)
-                        .ThenInclude(t => t.Album)
-                            .ThenInclude(al => al.Image)
-                                .ThenInclude(ali => ali.ImageType)
                 .Include(a => a.Albums)
-                    .ThenInclude(alb => alb.AlbumType)
-                .Include(a => a.Albums)
-                    .ThenInclude(alb => alb.Image)
-                        .ThenInclude(albi => albi.ImageType)
+                    .ThenInclude(al => al.AlbumType)
                 .FirstOrDefaultAsync(a => a.ArtistId == id);
 
             return artist;

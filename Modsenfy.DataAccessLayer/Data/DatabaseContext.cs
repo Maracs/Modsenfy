@@ -6,8 +6,10 @@ namespace Modsenfy.DataAccessLayer.Data;
 
 public class DatabaseContext : DbContext
 {
-    public DatabaseContext(DbContextOptions<DatabaseContext> options)
-        : base(options) { }
+    public DatabaseContext(DbContextOptions<DatabaseContext> options) : base(options) 
+    {
+        Database.EnsureCreated();
+    }
 
     public DbSet<Track> Tracks { get; set; }
 
@@ -33,11 +35,13 @@ public class DatabaseContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        var connectionString = "Server=.\\SQLEXPRESS;Initial Catalog=Modsenfy;Trusted_Connection=True;TrustServerCertificate=True";
+        var connectionString = "Data Source=34.118.70.5,1433;Initial Catalog=modsenfydb;User ID=sqlserver;Password=password;";
+        Console.WriteLine("aboba");
         if (!optionsBuilder.IsConfigured)
         {
             optionsBuilder.UseSqlServer(connectionString,
                 builder => builder.MigrationsAssembly("Modsenfy.DataAccessLayer"));
+            Console.WriteLine("ne aboba");
         }
     }
 
@@ -157,12 +161,14 @@ public class DatabaseContext : DbContext
         modelBuilder.Entity<UserPlaylists>()
             .HasOne(pt => pt.User)
             .WithMany(p => p.UserPlaylists)
-            .HasForeignKey(pt => pt.UserId);
+            .HasForeignKey(pt => pt.UserId)
+            .OnDelete(DeleteBehavior.NoAction);
 
         modelBuilder.Entity<UserPlaylists>()
             .HasOne(pt => pt.Playlist)
             .WithMany(p => p.UserPlaylists)
-            .HasForeignKey(pt => pt.PlaylistId);
+            .HasForeignKey(pt => pt.PlaylistId)
+            .OnDelete(DeleteBehavior.NoAction);
 
         modelBuilder.Entity<UserTracks>()
             .HasKey(pt => new { pt.UserId, pt.TrackId });
