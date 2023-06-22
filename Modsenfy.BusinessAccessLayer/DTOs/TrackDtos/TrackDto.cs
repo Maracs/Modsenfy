@@ -2,19 +2,7 @@ namespace Modsenfy.BusinessAccessLayer.DTOs;
 
 public class TrackDto
 {
-<<<<<<< HEAD
-	public int TrackId { get; set; }
-	
-	public string TrackName { get; set; }
-	
-	public int TrackStreams { get; set; }
-	
-	public string GenreName { get; set; }
-	
-	public string TrackGenius { get; set; }
-=======
     public int TrackId { get; set; }
->>>>>>> main
 
     public string TrackName { get; set; }
 
