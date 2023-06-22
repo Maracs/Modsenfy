@@ -6,6 +6,7 @@ using Modsenfy.DataAccessLayer.Data;
 using Modsenfy.DataAccessLayer.Entities;
 using Modsenfy.DataAccessLayer.Repositories;
 using Modsenfy.PresentationLayer.Converters;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,9 +27,9 @@ builder.Services.AddScoped<ImageTypeRepository>();
 builder.Services.AddScoped<RequestRepository>();
 builder.Services.AddScoped<AlbumRepository>();
 builder.Services.AddScoped<AlbumService>();
-
 builder.Services.AddScoped<UserService>();
 
+builder.Services.AddIdentityServices(builder.Configuration);
 
 
 builder.Services.AddControllers()
@@ -36,6 +37,7 @@ builder.Services.AddControllers()
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
 
 var app = builder.Build();
 
@@ -48,6 +50,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

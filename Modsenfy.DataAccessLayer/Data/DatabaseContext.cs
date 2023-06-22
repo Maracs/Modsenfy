@@ -40,7 +40,6 @@ public class DatabaseContext : DbContext
                 builder => builder.MigrationsAssembly("Modsenfy.DataAccessLayer"));
         }
     }
-
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Playlist>()

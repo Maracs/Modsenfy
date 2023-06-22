@@ -19,6 +19,8 @@
         </PackageReference>
         <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.0-preview.3.23177.8" />
+		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.29.0" />
     </ItemGroup>
 
     <ItemGroup>
