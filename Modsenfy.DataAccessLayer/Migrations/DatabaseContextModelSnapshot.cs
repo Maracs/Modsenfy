@@ -97,7 +97,7 @@ namespace Modsenfy.DataAccessLayer.Migrations
 
                     b.HasIndex("ImageId");
 
-                    b.ToTable("Artist");
+                    b.ToTable("Artists");
                 });
 
             modelBuilder.Entity("Modsenfy.DataAccessLayer.Entities.Audio", b =>
