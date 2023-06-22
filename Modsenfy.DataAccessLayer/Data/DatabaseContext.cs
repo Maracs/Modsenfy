@@ -6,7 +6,36 @@ namespace Modsenfy.DataAccessLayer.Data;
 
 public class DatabaseContext : DbContext
 {
+<<<<<<< HEAD
     public DatabaseContext(DbContextOptions<DatabaseContext> options) : base(options) 
+=======
+    public DatabaseContext(DbContextOptions<DatabaseContext> options)
+        : base(options) { }
+
+    public DbSet<Track> Tracks { get; set; }
+
+    public DbSet<Request> Requests { get; set; }
+
+    public DbSet<TrackArtists> TrackArtists { get; set; }
+
+    public DbSet<Album> Albums { get; set; }
+
+    public DbSet<Entities.Stream> Streams { get; set; }
+
+    public DbSet<RequestStatus> RequestStatuses { get; set; }
+
+    public DbSet<User> Users { get; set; }
+
+    public DbSet<UserInfo> UserInfos { get; set; }
+
+    public DbSet<Image> Images { get; set; }
+
+    public DbSet<ImageType> ImageTypes { get; set; }
+
+    public DbSet<Artist> Artists { get; set; }
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+>>>>>>> main
     {
         Database.EnsureCreated();
     }
