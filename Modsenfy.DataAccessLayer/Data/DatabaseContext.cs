@@ -52,39 +52,6 @@ public class DatabaseContext : DbContext
 			.HasOne(playlist => playlist.User)
 			.WithMany(user => user.Playlists)
 			.HasForeignKey(playlist=>playlist.PlaylistOwnerId);
-		
-		
-		modelBuilder.Entity<User>()
-			.HasKey(user => user.UserId);
-
-		modelBuilder.Entity<UserInfo>()
-			.HasKey(userInfo => userInfo.UserInfoId);
-		
-		modelBuilder.Entity<UserInfo>()
-			.HasOne(userInfo=>userInfo.User)
-			.WithOne(user=>user.UserInfo)
-			.HasForeignKey<User>(user=>user.UserInfoId)
-			.OnDelete(DeleteBehavior.NoAction);
-
-        modelBuilder.Entity<Playlist>()
-            .HasKey(playlist => playlist.PlaylistId);
-
-        modelBuilder.Entity<Album>()
-            .HasOne(a => a.Artist)
-            .WithMany()
-            .HasForeignKey(a => a.AlbumOwnerId)
-            .OnDelete(DeleteBehavior.Cascade);
-
-        modelBuilder.Entity<Artist>()
-            .HasMany(a => a.Albums)
-            .WithOne(a => a.Artist)
-            .HasForeignKey(a => a.AlbumOwnerId)
-            .OnDelete(DeleteBehavior.NoAction);
-
-        modelBuilder.Entity<Playlist>()
-            .HasOne(playlist => playlist.User)
-            .WithMany(user => user.Playlists)
-            .HasForeignKey(playlist => playlist.PlaylistOwnerId);
 
         modelBuilder.Entity<User>().HasKey(user => user.UserId);
 
@@ -120,9 +87,6 @@ public class DatabaseContext : DbContext
             .WithMany(p => p.PlaylistTracks)
             .HasForeignKey(pt => pt.PlaylistId);
 
-
-	  modelBuilder.Entity<Entities.Stream>()
-			.HasKey(pt => new { pt.UserId, pt.TrackId,pt.StreamDate });
 
         modelBuilder.Entity<PlaylistTracks>()
             .HasOne(pt => pt.Track)
