@@ -36,12 +36,11 @@ public class DatabaseContext : DbContext
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         var connectionString = "Data Source=34.118.70.5,1433;Initial Catalog=modsenfydb;User ID=sqlserver;Password=password;";
-        Console.WriteLine("aboba");
+
         if (!optionsBuilder.IsConfigured)
         {
             optionsBuilder.UseSqlServer(connectionString,
                 builder => builder.MigrationsAssembly("Modsenfy.DataAccessLayer"));
-            Console.WriteLine("ne aboba");
         }
     }
 
