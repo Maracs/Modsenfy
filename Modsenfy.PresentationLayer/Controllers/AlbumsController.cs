@@ -73,15 +73,15 @@ namespace Modsenfy.PresentationLayer.Controllers
 			
 		}
 
-		[HttpGet("/new-releases")]
-		public async Task<ActionResult<IEnumerable<AlbumWithTracksDto>>> GetNewAlbumReleases([FromQuery] int limit, [FromQuery] int offset)
+		[HttpGet("new-releases")]
+		public async Task<ActionResult<IEnumerable<AlbumWithTracksDto>>> GetNewAlbumReleases([FromQuery] int limit = -1, [FromQuery] int offset = 0)
 		{
 			var albumDtos = await _albumService.GetNewAlbumReleases(limit, offset);
 			return Ok(albumDtos);
 		}
 
 		[HttpGet("{id}/streams")]
-		public async Task<ActionResult<IEnumerable<StreamDto>>> GetAlbumStreams([FromRoute] int id, [FromQuery] int limit, [FromQuery] int offset)
+		public async Task<ActionResult<IEnumerable<StreamDto>>> GetAlbumStreams([FromRoute] int id, [FromQuery] int limit = -1, [FromQuery] int offset = 0)
 		{
             await _albumService.GetAlbumStreams(id);
             return Ok();

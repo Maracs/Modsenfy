@@ -10,7 +10,7 @@ using System.Diagnostics;
 
 namespace Modsenfy.PresentationLayer.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [ApiController]
     public class ArtistController : ControllerBase
     {
