@@ -147,8 +147,6 @@ public class UserService
        
         foreach (var playlist in limitedPlaylists)
         {
-            
-            
             var playlistDto = new PlaylistDto()
             {
                 Id = playlist.PlaylistId,

@@ -7,5 +7,4 @@ public class StreamDto
 	public string Date { get; set; }
 	public UserDto Listener { get; set; }
 	public TrackDto Track { get; set; }
-
 }
