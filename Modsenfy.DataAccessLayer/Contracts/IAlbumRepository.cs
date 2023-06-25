@@ -6,7 +6,7 @@ namespace Modsenfy.DataAccessLayer.Contracts;
 
 public interface IAlbumRepository : IRepository<Album>
 {
-	IIncludableQueryable<Album, Artist> GetWithJoins();
+	IIncludableQueryable<Album, ImageType> GetWithJoins();
 	Task<Album> GetByIdWithJoins(int id);
 	Task<IEnumerable<Album>> GetLimited(int limit, int offset);
 
@@ -15,4 +15,7 @@ public interface IAlbumRepository : IRepository<Album>
 	Task<IEnumerable<Album>> GetOrderedByRelease();
 	Task<IEnumerable<Album>> GetOrderedByReleaseAndSkipped(int offset);
 	Task<IEnumerable<Entities.Stream>> GetAlbumStreams(int id);
+
+
+   	Task<Image> CreateAndGet(Album entity);
 }

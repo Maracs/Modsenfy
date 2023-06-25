@@ -20,6 +20,14 @@ public class AlbumRepository : IAlbumRepository
 	{
 		await _databaseContext.AddAsync(album);
 	}
+	
+	public async Task<Album> CreateAndGet(Album entity)
+	{
+		var albumEntry = await _databaseContext.Albums.AddAsync(entity);
+
+		await _databaseContext.SaveChangesAsync();
+		return albumEntry.Entity;
+	}
 
 	public void Delete(Album album)
 	{
@@ -41,23 +49,25 @@ public class AlbumRepository : IAlbumRepository
 		return album;
 	}
 
-	public IIncludableQueryable<Album, Artist> GetWithJoins()
+	public IIncludableQueryable<Album, ImageType> GetWithJoins()
 	{
-		IIncludableQueryable<Album, Artist> albums = _databaseContext.Albums
-			.Include(a => a.AlbumType)
-			.Include(a => a.Artist)
-				.ThenInclude(ar => ar.Image)
-					.ThenInclude(i => i.ImageType)
-			.Include(a => a.Image)
-				.ThenInclude(i => i.ImageType)
-			.Include(a => a.Tracks)
-				.ThenInclude(t => t.Audio)
-			.Include(a => a.Tracks)
-				.ThenInclude(t => t.Genre)
-			.Include(a => a.Tracks)
-				.ThenInclude(t => t.TrackArtists)
-					.ThenInclude(ta => ta.Artist);
-		return albums;
+        IIncludableQueryable<Album, ImageType> albums = _databaseContext.Albums
+            .Include(a => a.AlbumType)
+            .Include(a => a.Artist)
+                .ThenInclude(ar => ar.Image)
+                    .ThenInclude(i => i.ImageType)
+            .Include(a => a.Image)
+                .ThenInclude(i => i.ImageType)
+            .Include(a => a.Tracks)
+                .ThenInclude(t => t.Audio)
+            .Include(a => a.Tracks)
+                .ThenInclude(t => t.Genre)
+            .Include(a => a.Tracks)
+                .ThenInclude(t => t.TrackArtists)
+                    .ThenInclude(ta => ta.Artist)
+                        .ThenInclude(ar => ar.Image)
+                            .ThenInclude(ar => ar.ImageType);
+        return albums;
 	}
 
 	public async Task<Album> GetByIdWithJoins(int id)
@@ -133,5 +143,10 @@ public class AlbumRepository : IAlbumRepository
 			.ToListAsync();
 		return streams;
 
+	}
+
+	Task<Image> IAlbumRepository.CreateAndGet(Album entity)
+	{
+		throw new NotImplementedException();
 	}
 }
