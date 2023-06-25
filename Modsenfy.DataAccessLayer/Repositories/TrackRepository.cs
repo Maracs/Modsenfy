@@ -12,111 +12,118 @@ using System.Threading.Tasks;
 
 namespace Modsenfy.DataAccessLayer.Repositories
 {
-    public class TrackRepository : ITrackRepository
-    {
-        private readonly DatabaseContext _databaseContext;
+	public class TrackRepository : ITrackRepository
+	{
+		private readonly DatabaseContext _databaseContext;
 
-        public TrackRepository(DatabaseContext databaseContext)
-        {
-            _databaseContext = databaseContext;
-        }
+		public TrackRepository(DatabaseContext databaseContext)
+		{
+			_databaseContext = databaseContext;
+		}
 
-        public async Task Create(Track entity)
-        {
-            await _databaseContext.AddAsync(entity);
-        }
+		public async Task Create(Track entity)
+		{
+			await _databaseContext.Tracks.AddAsync(entity);
+		}
 
-        public void Delete(Track entity)
-        {
-            _databaseContext.Remove(entity);
-            return;
-        }
+		public async Task<Track> CreateAndGet(Track entity)
+		{
+			var trackEntry = await _databaseContext.Tracks.AddAsync(entity);
+            await SaveChanges();
+            return trackEntry.Entity;
+		}
 
-        public async Task<IEnumerable<Track>> GetAll()
-        {
-            return await _databaseContext.Tracks.ToListAsync();
-        }
+		public void Delete(Track entity)
+		{
+			_databaseContext.Remove(entity);
+			return;
+		}
 
-        public async Task<Track> GetById(int id)
-        {
-            var track = await _databaseContext.Tracks.FindAsync(id);
-            return track;
-        }
-        
-        public async Task<Track> GetByIdWithJoins(int id)
-        {
-            var track = await _databaseContext.Tracks
-                 .Include(t => t.Audio)
-                 .Include(t => t.Genre)
-                 .Include(t => t.TrackArtists)
-                    .ThenInclude(ta => ta.Artist)
-                        .ThenInclude(a => a.Image)
-                            .ThenInclude(i => i.ImageType)
-                 .Include(t => t.Album)
-                    .ThenInclude(al => al.Image)
-                        .ThenInclude(i => i.ImageType)
-                 .Include(t => t.Album)
-                    .ThenInclude(a => a.AlbumType)
-                 .FirstOrDefaultAsync(t => t.TrackId  == id);
-            return track;
-        }
+		public async Task<IEnumerable<Track>> GetAll()
+		{
+			return await _databaseContext.Tracks.ToListAsync();
+		}
 
-        public async Task<Track> GetByIdWithStreams(int id)
-        {
-            var track = await _databaseContext.Tracks
-                .Include(t => t.Audio)
-                .Include(t => t.Genre)
-                .Include(t => t.TrackArtists)
-                    .ThenInclude(ta => ta.Artist)
-                        .ThenInclude(a => a.Image)
-                            .ThenInclude(i => i.ImageType)
-                .Include(t => t.Streams)
-                    .ThenInclude(st => st.User)
-                        .ThenInclude(u => u.UserInfo)
-                .FirstOrDefaultAsync(t => t.TrackId == id); 
-            return track;
-        }
+		public async Task<Track> GetById(int id)
+		{
+			var track = await _databaseContext.Tracks.FindAsync(id);
+			return track;
+		}
+		
+		public async Task<Track> GetByIdWithJoins(int id)
+		{
+			var track = await _databaseContext.Tracks
+				 .Include(t => t.Audio)
+				 .Include(t => t.Genre)
+				 .Include(t => t.TrackArtists)
+					.ThenInclude(ta => ta.Artist)
+						.ThenInclude(a => a.Image)
+							.ThenInclude(i => i.ImageType)
+				 .Include(t => t.Album)
+					.ThenInclude(al => al.Image)
+						.ThenInclude(i => i.ImageType)
+				 .Include(t => t.Album)
+					.ThenInclude(a => a.AlbumType)
+				 .FirstOrDefaultAsync(t => t.TrackId  == id);
+			return track;
+		}
 
-        public async Task<List<int>> GetFollowersThroughTrack(Track track)
-        {
-            var artists = await _databaseContext.TrackArtists
-                .Where(ta => ta.TrackId == track.TrackId)
-                .Select(ta => ta.Artist).ToListAsync();
-            
-            List<int> followers = new List<int>(artists.Count);
-            for (int i = 0; i < artists.Count; i++)
-            {
-                followers[i] = artists[i].UserArtists.Count;
-            }
+		public async Task<Track> GetByIdWithStreams(int id)
+		{
+			var track = await _databaseContext.Tracks
+				.Include(t => t.Audio)
+				.Include(t => t.Genre)
+				.Include(t => t.TrackArtists)
+					.ThenInclude(ta => ta.Artist)
+						.ThenInclude(a => a.Image)
+							.ThenInclude(i => i.ImageType)
+				.Include(t => t.Streams)
+					.ThenInclude(st => st.User)
+						.ThenInclude(u => u.UserInfo)
+				.FirstOrDefaultAsync(t => t.TrackId == id); 
+			return track;
+		}
 
-            return followers;
-        }
+		public async Task<List<int>> GetFollowersThroughTrack(Track track)
+		{
+			var artists = await _databaseContext.TrackArtists
+				.Where(ta => ta.TrackId == track.TrackId)
+				.Select(ta => ta.Artist).ToListAsync();
+			
+			List<int> followers = new List<int>(artists.Count);
+			for (int i = 0; i < artists.Count; i++)
+			{
+				followers[i] = artists[i].UserArtists.Count;
+			}
 
-        public async Task<IEnumerable<Track>> GetSeverlTracks(List<int> ids)
-        {
-            List<Track> tracks = new List<Track>();
-            foreach (var id in ids)
-            {
-                tracks.Add(await GetByIdWithJoins(id));
-            }
-            return tracks;
-        }
+			return followers;
+		}
 
-        public async Task SaveChanges()
-        {
-            await _databaseContext.SaveChangesAsync();
-        }
+		public async Task<IEnumerable<Track>> GetSeverlTracks(List<int> ids)
+		{
+			List<Track> tracks = new List<Track>();
+			foreach (var id in ids)
+			{
+				tracks.Add(await GetByIdWithJoins(id));
+			}
+			return tracks;
+		}
 
-        public async Task Update(Track entity)
-        {
-            var track = await _databaseContext.Tracks.FindAsync(entity.TrackId);
+		public async Task SaveChanges()
+		{
+			await _databaseContext.SaveChangesAsync();
+		}
 
-            track.TrackArtists = entity.TrackArtists;
-            track.TrackDuration = entity.TrackDuration;
-            track.Audio = entity.Audio;
-            track.Genre = entity.Genre;
-            track.TrackName = entity.TrackName;
-            track.TrackGenius = entity.TrackGenius;
-        }
-    }
+		public async Task Update(Track entity)
+		{
+			var track = await _databaseContext.Tracks.FindAsync(entity.TrackId);
+
+			track.TrackArtists = entity.TrackArtists;
+			track.TrackDuration = entity.TrackDuration;
+			track.Audio = entity.Audio;
+			track.Genre = entity.Genre;
+			track.TrackName = entity.TrackName;
+			track.TrackGenius = entity.TrackGenius;
+		}
+	}
 }
