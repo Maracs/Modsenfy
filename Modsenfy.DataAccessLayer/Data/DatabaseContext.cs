@@ -6,10 +6,9 @@ namespace Modsenfy.DataAccessLayer.Data;
 
 public class DatabaseContext : DbContext
 {
-    public DatabaseContext(DbContextOptions<DatabaseContext> options) : base(options) 
-    {
-        Database.Migrate();
-    }
+	public DatabaseContext(DbContextOptions<DatabaseContext> options) : base(options) 
+	{
+	}
 
     public DbSet<Track> Tracks { get; set; }
 
@@ -21,8 +20,10 @@ public class DatabaseContext : DbContext
 
     public DbSet<Entities.Stream> Streams { get; set; }
 
-
+	public DbSet<Genre> Genres { get; set; }
 	
+	public DbSet<AlbumType> AlbumTypes { get; set; }
+
 	public DbSet<RequestStatus> RequestStatuses { get; set; }
    
 	public DbSet<User> Users { get; set; }
@@ -32,7 +33,9 @@ public class DatabaseContext : DbContext
 	
 	public  DbSet<ImageType> ImageTypes { get; set; }
 
-    public DbSet<Artist> Artists { get; set; }
+	public DbSet<Artist> Artists { get; set; }
+	public DbSet<Audio> Audios { get; set; }
+	
 
 
 	protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
