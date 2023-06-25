@@ -17,5 +17,5 @@ public interface IAlbumRepository : IRepository<Album>
 	Task<IEnumerable<Entities.Stream>> GetAlbumStreams(int id);
 
 
-   	Task<Image> CreateAndGet(Album entity);
+   	Task<Album> CreateAndGet(Album entity);
 }

@@ -145,8 +145,4 @@ public class AlbumRepository : IAlbumRepository
 
 	}
 
-	Task<Image> IAlbumRepository.CreateAndGet(Album entity)
-	{
-		throw new NotImplementedException();
-	}
 }
