@@ -25,14 +25,21 @@ builder.Services.AddScoped<ImageRepository>();
 builder.Services.AddScoped<ImageTypeRepository>();
 builder.Services.AddScoped<RequestRepository>();
 builder.Services.AddScoped<AlbumRepository>();
-builder.Services.AddScoped<AlbumService>();
+builder.Services.AddScoped<AlbumTypeRepository>();
+builder.Services.AddScoped<GenreRepository>();
+builder.Services.AddScoped<TrackArtistsRepository>();
 
+
+builder.Services.AddScoped<AlbumService>();
+builder.Services.AddScoped<TrackService>();
+builder.Services.AddScoped<ArtistService>();
 builder.Services.AddScoped<UserService>();
 
 
 
 builder.Services.AddControllers()
 	.AddJsonOptions(opts => opts.JsonSerializerOptions.Converters.Add(new DateOnlyJsonConverter()));
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
