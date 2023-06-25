@@ -10,11 +10,29 @@ public class AlbumService
 {
 	private readonly AlbumRepository _albumRepository;
 	private readonly TrackRepository _trackRepository;
+	private readonly AlbumTypeRepository _albumTypeRepository;
+	private readonly ImageRepository _imageRepository;
+	private readonly ImageTypeRepository _imageTypeRepository;
+	private readonly TrackService _trackService;
+	private readonly ArtistRepository _artistRepository;
 	private readonly IMapper _mapper;
-	public AlbumService(AlbumRepository albumRepository, TrackRepository trackRepository, IMapper mapper)
+	public AlbumService(
+		AlbumRepository albumRepository, 
+		TrackRepository trackRepository, 
+		AlbumTypeRepository albumTypeRepository,
+		ImageRepository imageRepository, 
+		ImageTypeRepository imageTypeRepository,
+		TrackService trackService,
+		ArtistRepository artistRepository,
+		IMapper mapper)
 	{
 		_albumRepository = albumRepository;
 		_trackRepository = trackRepository;
+		_albumTypeRepository = albumTypeRepository;
+		_imageRepository = imageRepository;
+		_imageTypeRepository = imageTypeRepository;
+		_trackService = trackService;
+		_artistRepository = artistRepository;
 		_mapper = mapper;
 	}
 	
@@ -109,7 +127,43 @@ public class AlbumService
 	{
 		var albumStreams = await _albumRepository.GetAlbumStreams(id);
 		var streamDtos = albumStreams.Select(s => _mapper.Map<StreamDto>(s));
-        Console.WriteLine(JsonConvert.SerializeObject(streamDtos, Formatting.Indented));
-    }
-	
+		Console.WriteLine(JsonConvert.SerializeObject(streamDtos, Formatting.Indented));
+	}
+
+	public async Task<int> CreateAlbum(AlbumCreateDto albumDto)
+	{
+		var albumType = await _albumTypeRepository.GetByName(albumDto.AlbumTypeName);
+		var image = new Image()
+		{
+			ImageFilename = albumDto.Image.ImageFilename,
+			ImageTypeId = (await _imageTypeRepository.GetIfExists(albumDto.Image.ImageTypeName)).ImageTypeId
+		};
+		
+		//artistOwnerId из клейма !TODO;
+		int artistOwnerId = 1;
+		var artistOwner = await _artistRepository.GetById(artistOwnerId);
+		
+
+		var album = new Album()
+		{
+			AlbumName = albumDto.AlbumName,
+			AlbumTypeId = albumType.AlbumTypeId,
+			CoverId = (await _imageRepository.CreateAndGet(image)).ImageId,
+			AlbumOwnerId = artistOwnerId,
+			Artist = artistOwner,
+			AlbumRelease = DateTime.Now,
+			
+		};
+
+		album = await _albumRepository.CreateAndGet(album);
+		
+		foreach (var trackDto in albumDto.Tracks)
+		{
+			await _trackService.CreateTrack(trackDto, album.AlbumId);
+		}
+		
+
+		return album.AlbumId;
+	}
+
 }
