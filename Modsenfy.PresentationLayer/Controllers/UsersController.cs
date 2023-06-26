@@ -83,7 +83,7 @@ public class UsersController:ControllerBase
         if (await _userRepository.GetById(id) == null)
             return BadRequest("User with this Id does not exists");
 
-        if (limit < 0 )
+        if (limit < -1 )
             return BadRequest("Invalid limit value");
         
         if (offset<0)
@@ -112,7 +112,7 @@ public class UsersController:ControllerBase
     [HttpGet("requests/{id}")]
     public async Task<ActionResult<RequestDto>> GetRequest([FromRoute] int id)
     {
-
+        
         var request = await _userService.GetRequest(id);
         
         return Ok(request);

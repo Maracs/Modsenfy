@@ -2,10 +2,11 @@ using Microsoft.EntityFrameworkCore;
 using Modsenfy.DataAccessLayer.Contracts;
 using Modsenfy.DataAccessLayer.Data;
 using Modsenfy.DataAccessLayer.Entities;
+using Stream = Modsenfy.DataAccessLayer.Entities.Stream;
 
 namespace Modsenfy.DataAccessLayer.Repositories;
 
-public class UserRepository:IUserRepository
+public class UserRepository : IUserRepository
 {
     private readonly DatabaseContext _databaseContext;
 
@@ -13,34 +14,41 @@ public class UserRepository:IUserRepository
     {
         _databaseContext = databaseContext;
     }
-    
+
     public async Task SaveChanges()
     {
-         await _databaseContext.SaveChangesAsync();
-        
+        await _databaseContext.SaveChangesAsync();
+
     }
 
     public async Task<User> GetById(int id)
     {
         var user = await _databaseContext.Users.FindAsync(id);
-        
+
         return user;
     }
 
     public async Task<bool> IfNicknameExists(string nickname)
     {
-        return await _databaseContext.Users.AnyAsync(x=>x.UserNickname == nickname);
+        return await _databaseContext.Users.AnyAsync(x => x.UserNickname == nickname);
     }
 
     public async Task<bool> IfEmailExists(string email)
     {
-        return await _databaseContext.Users.AnyAsync(x=>x.UserEmail == email);
+        return await _databaseContext.Users.AnyAsync(x => x.UserEmail == email);
     }
-    
+
+    public async Task<bool> IfUserFollowArtist(int userId, int artistId)
+    {
+
+        return (await _databaseContext.Users.FindAsync(userId)).UserArtists.Any(
+            userArtists => userArtists.ArtistId == artistId);
+    }
+
     public async Task<IEnumerable<User>> GetAll()
     {
         var users = await _databaseContext.Users.ToListAsync();
-        
+
         return users;
     }
 
@@ -54,7 +62,7 @@ public class UserRepository:IUserRepository
         var entityEntry = await _databaseContext.AddAsync(entity);
 
         await _databaseContext.SaveChangesAsync();
-        
+
         return entityEntry.Entity;
     }
 
@@ -63,18 +71,68 @@ public class UserRepository:IUserRepository
         _databaseContext.Users.Update(entity);
     }
 
-    public  void Delete(User entity)
+    public void Delete(User entity)
     {
         _databaseContext.Users.Remove(entity);
     }
 
     public async Task<User> GetByIdWithJoins(int id)
     {
-       var user= await _databaseContext.Users.Include(user => user.Role)
+        var user = await _databaseContext.Users.Include(user => user.Role)
             .Include(user => user.UserInfo)
-            .ThenInclude(userInfo => userInfo.Image).ThenInclude(image => image.ImageType).FirstOrDefaultAsync(user=>user.UserId==id);
-       return user;
+            .ThenInclude(userInfo => userInfo.Image)
+            .ThenInclude(image => image.ImageType)
+            .FirstOrDefaultAsync(user => user.UserId == id);
+        return user;
     }
+
+    public async Task<User> GetUserTopArtists(int id)
+    {
+        var user = await _databaseContext.Users
+            .Include(user => user.Streams)
+            .ThenInclude(stream => stream.Track)
+            .ThenInclude(track => track.TrackArtists)
+            .ThenInclude(trackArtists => trackArtists.Artist)
+            .ThenInclude(artist => artist.Image)
+            .ThenInclude(image => image.ImageType)
+            .Include(user => user.Streams)
+            .ThenInclude(stream => stream.Track)
+            .ThenInclude(track => track.TrackArtists)
+            .ThenInclude(trackArtists => trackArtists.Artist)
+            .ThenInclude(artist => artist.UserArtists)
+            .FirstOrDefaultAsync(user => user.UserId == id);
+        return user;
+    }
+
+    public async Task<User> GetUserTopTracks(int id)
+    {
+        var user = await _databaseContext.Users
+            .Include(user => user.Streams)
+            .ThenInclude(stream => stream.Track)
+            .ThenInclude(track => track.TrackArtists)
+            .ThenInclude(trackArtists => trackArtists.Artist)
+            .ThenInclude(artist => artist.Image)
+            .ThenInclude(image => image.ImageType)
+            .Include(user => user.Streams)
+            .ThenInclude(stream => stream.Track)
+            .ThenInclude(track => track.Album)
+            .ThenInclude(album => album.Artist)
+            .ThenInclude(artist => artist.UserArtists)
+            .Include(user => user.Streams)
+            .ThenInclude(stream => stream.Track)
+            .ThenInclude(track => track.Album)
+            .ThenInclude(album => album.Artist)
+            .ThenInclude(artist => artist.Image)
+            .ThenInclude(image =>image.ImageType)
+            .Include(user => user.Streams)
+            .ThenInclude(stream => stream.Track)
+            .ThenInclude(track => track.Album)
+            .ThenInclude(album =>album.Image)
+            .ThenInclude(image =>image.ImageType)
+            .FirstOrDefaultAsync(user => user.UserId == id);
+        return user;
+    }
+
 
     public async Task<User> GetUserWithPlaylists(int id)
     {
@@ -107,5 +165,69 @@ public class UserRepository:IUserRepository
 
         return user;
     }
+
+    public async Task FollowArtist(UserArtists entity)
+    {
+        await _databaseContext.UserArtists.AddAsync(entity);
+    }
+
+    public async Task UnfollowArtist(UserArtists entity)
+    {
+        _databaseContext.UserArtists.Remove(entity);
+    }
+
+    public async Task<User> GetUserRequests(int id)
+    {
+        var user = await _databaseContext.Users
+            .Include(user => user.Requests)
+            .ThenInclude(request => request.RequestStatus)
+            .Include(user => user.Requests)
+            .ThenInclude(request => request.Image)
+            .ThenInclude(image => image.ImageType)
+            .FirstOrDefaultAsync(user => user.UserId == id);
+        return user;
+    }
     
+    public async Task<User> GetFollowedArtists(int id)
+    {
+        var user = await _databaseContext.Users
+            .Include(user => user.UserArtists)
+            .ThenInclude(userArtists => userArtists.Artist)
+            .ThenInclude(artist => artist.Image)
+            .ThenInclude(image => image.ImageType)
+            .Include(user => user.UserArtists)
+            .ThenInclude(userArtists => userArtists.Artist)
+            .ThenInclude(artist => artist.UserArtists)
+            .FirstOrDefaultAsync(user => user.UserId == id);
+        return user;
+    }
+
+    public async Task<ICollection<Stream>> GetUserStreamHistory(int id)
+    {
+        var streams = await _databaseContext.Streams
+            .Include(stream => stream.User)
+            .ThenInclude(user => user.UserInfo)
+            .ThenInclude(info => info.Image)
+            .ThenInclude(image => image.ImageType)
+            .Include(stream => stream.Track)
+            .ThenInclude(track => track.Genre)
+            .Include(stream => stream.Track)
+            .ThenInclude(track => track.Audio)
+            .Include(stream => stream.Track)
+            .ThenInclude(track => track.TrackArtists)
+            .ThenInclude(artists => artists.Artist)
+            .ThenInclude(artist => artist.Image)
+            .ThenInclude(image => image.ImageType)
+            .Include(stream => stream.Track)
+            .ThenInclude(track => track.TrackArtists)
+            .ThenInclude(artists => artists.Artist)
+            .ThenInclude(artist => artist.UserArtists)
+            .Where(stream => stream.UserId == id).ToListAsync();
+
+        return streams;
+
+
+    }
+
+
 }

@@ -60,7 +60,9 @@ public class RequestRepository:IRequestRepository
             .Include(request => request.User)
             .ThenInclude(user => user.UserInfo)
             .ThenInclude(info => info.Image)
-            .ThenInclude(image => image.ImageType).ToListAsync();
+            .ThenInclude(image => image.ImageType)
+            .Include(request =>request.RequestStatus )
+            .ToListAsync();
         return requests;
     }
 

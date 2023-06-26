@@ -41,4 +41,8 @@ public class User
     [Newtonsoft.Json.JsonIgnore]
     [System.Text.Json.Serialization.JsonIgnore]
     public ICollection<Playlist> Playlists { get; set; }
+    
+    [Newtonsoft.Json.JsonIgnore]
+    [System.Text.Json.Serialization.JsonIgnore]
+    public ICollection<Request> Requests { get; set; }
 }
