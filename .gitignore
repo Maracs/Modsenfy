@@ -5,4 +5,4 @@
 bin/
 .vs/
 obj/
-
+Migrations/
