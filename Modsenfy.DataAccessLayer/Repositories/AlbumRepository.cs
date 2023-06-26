@@ -138,6 +138,10 @@ public class AlbumRepository : IAlbumRepository
 		var streams = await _databaseContext.Streams
 			.Include(s => s.User)
 			.Include(s => s.Track)
+				.ThenInclude(t => t.Audio)
+			.Include(s => s.Track)
+				.ThenInclude(t => t.TrackArtists)
+					.ThenInclude(ta => ta.Artist)
 			.Where(s => s.Track.AlbumId == id)
 			.OrderByDescending(s => s.StreamDate)
 			.ToListAsync();
