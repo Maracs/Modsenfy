@@ -1,11 +1,16 @@
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Modsenfy.BusinessAccessLayer.DTOs;
 using Modsenfy.BusinessAccessLayer.DTOs.RequestDtos;
+using Modsenfy.BusinessAccessLayer.DTOs.UserDtos;
 using Modsenfy.BusinessAccessLayer.Services;
 using Modsenfy.DataAccessLayer.Contracts;
+using Modsenfy.DataAccessLayer.Data;
 using Modsenfy.DataAccessLayer.Entities;
 using Modsenfy.DataAccessLayer.Repositories;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace Modsenfy.PresentationLayer.Controllers;
 
@@ -17,7 +22,7 @@ public class UsersController:ControllerBase
 
     private readonly UserRepository _userRepository;
 
-    
+    private readonly TokenService _tokenService;
 
     private readonly IMapper _mapper;
 
@@ -31,20 +36,36 @@ public class UsersController:ControllerBase
 
         _mapper = mapper;
     }
-    
-    
+
+    [HttpPost("signin")]
+    public async Task<ActionResult<UserTokenDto>> SignInUser(UserSigningDto userDto)
+    {
+        var user = await _userRepository.GetByUsername(userDto.UserNickname);
+        if (user == null) return Unauthorized();
+
+        using var hmac = new HMACSHA512();
+        var computeHash = Convert.ToBase64String(hmac.ComputeHash(Encoding.UTF8.GetBytes(userDto.Password)));
+        if (computeHash != user.UserPasshash)
+            return Unauthorized();
+
+        return new UserTokenDto()
+        {
+            UserNickname = user.UserNickname,
+            UserToken = await _tokenService.GetToken(user)
+        };
+    }
+
     [HttpPost]
-    public async Task<ActionResult<int>> RegisterUser([FromBody] UserWithDetailsAndEmailAndPasshashDto userDto)
+    public async Task<ActionResult<UserTokenDto>> RegisterUser([FromBody] UserWithDetailsAndEmailAndPasshashDto userDto)
     {
         if (await _userRepository.IfNicknameExists(userDto.Nickname) || await _userRepository.IfEmailExists(userDto.Email))
             return BadRequest("This nickname or email is already taken");
 
-        var userId = await _userService.RegisterUser(userDto);
-        
-        
-        return Ok(userId);
+        var userRegDto = await _userService.RegisterUser(userDto);
+        return Ok(userRegDto);
     }
 
+    [Authorize(Roles = "user")]
     [HttpGet("{id}")]
     public async Task<ActionResult<UserWithDetailsAndEmailAndIdAndRoleDto>> GetUserProfile([FromRoute]int id)
     {
@@ -124,6 +145,4 @@ public class UsersController:ControllerBase
         await _userService.AnswerRequest(id, answer);
         return Ok();
     }
-    
-    
 }

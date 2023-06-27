@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Modsenfy.DataAccessLayer.Contracts;
 using Modsenfy.DataAccessLayer.Data;
 using Modsenfy.DataAccessLayer.Entities;
+using System.Reflection.Metadata.Ecma335;
 
 namespace Modsenfy.DataAccessLayer.Repositories;
 
@@ -107,5 +108,16 @@ public class UserRepository:IUserRepository
 
         return user;
     }
-    
+
+    public async Task<User> GetByUsername(string username)
+    {
+        return await _databaseContext.Users.FirstOrDefaultAsync(x => x.UserNickname ==  username);
+    }
+
+    public async Task<string> GetUserRole(User user)
+    {
+        var role = await _databaseContext.Roles.FindAsync(user.UserRoleId);
+        if (role == null) { throw new NullReferenceException(); }
+        return role.RoleName;
+    }
 }

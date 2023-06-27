@@ -31,6 +31,8 @@ public class DatabaseContext : DbContext
 
     public DbSet<Artist> Artists { get; set; }
 
+    public DbSet<Role> Roles { get; set; }
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         var connectionString = "Server=.\\SQLEXPRESS;Initial Catalog=Modsenfy;Trusted_Connection=True;TrustServerCertificate=True";

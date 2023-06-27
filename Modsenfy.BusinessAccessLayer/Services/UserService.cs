@@ -1,8 +1,11 @@
 using AutoMapper;
 using Modsenfy.BusinessAccessLayer.DTOs;
 using Modsenfy.BusinessAccessLayer.DTOs.RequestDtos;
+using Modsenfy.BusinessAccessLayer.DTOs.UserDtos;
 using Modsenfy.DataAccessLayer.Entities;
 using Modsenfy.DataAccessLayer.Repositories;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace Modsenfy.BusinessAccessLayer.Services;
 
@@ -20,6 +23,8 @@ public class UserService
     private readonly RequestRepository _requestRepository;
     
     private readonly IMapper _mapper;
+
+    private readonly TokenService _tokenService;
         
     public UserService( UserRepository userRepository,
         UserInfoRepository userInfoRepository,
@@ -39,7 +44,7 @@ public class UserService
         _requestRepository = requestRepository;
     }
 
-    public async Task<int> RegisterUser(UserWithDetailsAndEmailAndPasshashDto userDto)
+    public async Task<UserTokenDto> RegisterUser(UserWithDetailsAndEmailAndPasshashDto userDto)
     {
 
         var image = new Image()
@@ -49,7 +54,6 @@ public class UserService
         };
         
         var imageId = (await _imageRepository.CreateAndGet(image)).ImageId;
-        
 
         var userInfo = new UserInfo()
         {
@@ -58,24 +62,32 @@ public class UserService
             UserInfoFirstName = userDto.Details.UserInfoFirstname,
             UserInfoLastName = userDto.Details.UserInfoLastname,
             UserInfoMiddleName = userDto.Details.UserInfoMiddlename,
-            UserInfoRegistrationDate = DateTime.Parse(userDto.Details.UserInfoRegistrationDate),
+            UserInfoRegistrationDate = DateTime.Now,
             ImageId = imageId
         };
 
         var userInfoId = (await _userInfoRepository.CreateAndGet(userInfo)).UserInfoId;
-        
+
+        using var hmac = new HMACSHA512();
+
         var user = new User()
         {
             UserEmail = userDto.Email,
             UserNickname = userDto.Nickname,
-            UserPasshash = userDto.Passhash,
+            UserPasshash = Convert.ToBase64String(hmac.ComputeHash(Encoding.UTF8.GetBytes(userDto.Passhash))),
             UserInfoId = userInfoId,
             UserRoleId = 1 // Доработать эту логику
         };
 
         var userId = (await _userRepository.CreateAndGet(user)).UserId;
-        
-        return userId;
+
+        var userRegDto = new UserTokenDto()
+        {
+            UserNickname = user.UserNickname,
+            UserToken = await _tokenService.GetToken(user)
+        };
+
+        return userRegDto;
     }
     
     public async Task DeleteUser(int id)
