@@ -38,6 +38,7 @@ builder.Services.AddScoped<AlbumService>();
 builder.Services.AddScoped<TrackService>();
 builder.Services.AddScoped<ArtistService>();
 builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<SearchService>();
 
 
 
