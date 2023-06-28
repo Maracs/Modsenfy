@@ -35,7 +35,7 @@ public class AlbumRepository : IAlbumRepository
 		_databaseContext.SaveChanges();
 	}
 
-	public async Task<IEnumerable<Album>> GetAll()
+	public async Task<IEnumerable<Album>> GetAllWithJoins()
 	{
 		var albums = await GetWithJoins()
 			.ToListAsync();
@@ -43,7 +43,15 @@ public class AlbumRepository : IAlbumRepository
 		return albums;
 	}
 
-	public async Task<Album> GetById(int id)
+    public async Task<IEnumerable<Album>> GetAll()
+    {
+        var albums = await _databaseContext.Albums.ToListAsync();
+        return albums;
+    }
+
+
+
+    public async Task<Album> GetById(int id)
 	{
 		var album = await _databaseContext.Albums.FindAsync(id);
 		return album;
@@ -149,4 +157,5 @@ public class AlbumRepository : IAlbumRepository
 
 	}
 
+    
 }
