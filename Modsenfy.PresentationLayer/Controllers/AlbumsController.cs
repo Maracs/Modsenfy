@@ -12,13 +12,11 @@ namespace Modsenfy.PresentationLayer.Controllers
 	public class AlbumsController : ControllerBase
 	{
 		private readonly AlbumRepository _albumRepository;
-		private readonly IMapper _mapper;
 		private readonly AlbumService _albumService;
 
-		public AlbumsController(AlbumRepository albumRepository, IMapper mapper, AlbumService albumService)
+		public AlbumsController(AlbumRepository albumRepository,AlbumService albumService)
 		{
 			_albumRepository = albumRepository;
-			_mapper = mapper;
 			_albumService = albumService;
 		}
 		
