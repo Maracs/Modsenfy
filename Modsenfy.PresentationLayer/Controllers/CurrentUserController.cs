@@ -35,9 +35,10 @@ public class CurrentUserController:ControllerBase
 
          var id = 1; // Заглушка для id
         
-        var user = _userRepository.GetByIdWithJoins(id);
+        var user = await _userRepository.GetByIdWithJoins(id);
+        var userDto = _mapper.Map<UserWithDetailsAndEmailAndIdAndRoleDto>(user);
         
-        return Ok(user);
+        return Ok(userDto);
     }
 
     [HttpGet("top/artists")]
@@ -73,15 +74,10 @@ public class CurrentUserController:ControllerBase
     [HttpGet("albums/contains")]
     public async Task<ActionResult<IEnumerable<bool>>> CheckUserSavedAlbums([FromQuery] string ids)
     {
-        
-        
         var id = 1;
-        
         var userFollowAlbums  = await _userService.CheckUserSavedAlbums(id, ids);
         
         return Ok(userFollowAlbums);
-        
-        
     }
 
     [HttpPut("albums")]
@@ -116,7 +112,7 @@ public class CurrentUserController:ControllerBase
         if (offset<0)
             return BadRequest("Invalid offset value");
         
-        var playlists = await _userService.GetUserPlaylists(id, limit, offset);
+        var playlists = await _userService.GetUserSavedPlaylists(id, limit, offset);
         
         return Ok(playlists);
     }
@@ -215,7 +211,7 @@ public class CurrentUserController:ControllerBase
     {
         var userId = 1; // Заглушка для id
 
-        var request = _userService.GetUserRequest(userId, id);
+        var request = await _userService.GetUserRequest(userId, id);
         
         return Ok(request);
     }
@@ -227,7 +223,7 @@ public class CurrentUserController:ControllerBase
 
         var id = 1; // Заглушка для id
         
-        var requestDtos = await _userService.GetSeveralUserRequests(id, offset, limit, status);
+        var requestDtos = await _userService.GetSeveralUserRequests(id, limit,offset , status);
         
         return Ok(requestDtos);
     }

@@ -76,19 +76,16 @@ public class RequestRepository:IRequestRepository
         _databaseContext.Requests.Update(entity);
     }
 
-    public async Task UpdateStatus(int id, string status)
-    {
-        var request = await _databaseContext.Requests.FindAsync(id);
-
-        var requestStatus = await _databaseContext.RequestStatuses.FindAsync(request.RequestStatusId);
-
-        requestStatus.RequestStatusName = status;
-        
-        _databaseContext.RequestStatuses.Update(requestStatus);
-    }
+    
 
     public void Delete(Request entity)
     {
         _databaseContext.Requests.Remove(entity);
+    }
+
+    public async Task<int> GetRequestStatusIdByName(string name)
+    {
+        return (await _databaseContext.RequestStatuses.FirstOrDefaultAsync(requestStatus =>
+            requestStatus.RequestStatusName == name)).RequestStatusId;
     }
 }

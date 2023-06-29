@@ -80,6 +80,9 @@ public class UserTrackRepository:IUserTrackRepository
             .ThenInclude(track => track.Album)
             .ThenInclude(album => album.Image)
             .ThenInclude(image => image.ImageType)
+            .Include(userTracks => userTracks.Track)
+            .ThenInclude(track => track.Album)
+            .ThenInclude(album =>album.AlbumType )
             .Where(userTracks => userTracks.UserId == id).ToListAsync();
 
         return userTracks;

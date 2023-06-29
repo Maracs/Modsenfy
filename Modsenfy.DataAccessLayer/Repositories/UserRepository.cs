@@ -41,8 +41,8 @@ public class UserRepository : IUserRepository
     public async Task<bool> IfUserFollowArtist(int userId, int artistId)
     {
 
-        return (await _databaseContext.Users.FindAsync(userId)).UserArtists.Any(
-            userArtists => userArtists.ArtistId == artistId);
+        return await _databaseContext.UserArtists.AnyAsync(
+            userArtists => userArtists.ArtistId == artistId && userArtists.UserId==userId);
     }
 
     public async Task<IEnumerable<User>> GetAll()
@@ -104,33 +104,40 @@ public class UserRepository : IUserRepository
         return user;
     }
 
-    public async Task<User> GetUserTopTracks(int id)
+    public async Task<List<Stream>> GetUserTopTracks(int id)
     {
-        var user = await _databaseContext.Users
-            .Include(user => user.Streams)
-            .ThenInclude(stream => stream.Track)
+        var streams = await _databaseContext.Streams
+            .Include(stream => stream.Track)
             .ThenInclude(track => track.TrackArtists)
             .ThenInclude(trackArtists => trackArtists.Artist)
             .ThenInclude(artist => artist.Image)
             .ThenInclude(image => image.ImageType)
-            .Include(user => user.Streams)
-            .ThenInclude(stream => stream.Track)
+            .Include(stream => stream.Track)
+            .ThenInclude(track => track.TrackArtists)
+            .ThenInclude(trackArtists => trackArtists.Artist)
+            .ThenInclude(artist =>artist.UserArtists )
+            .Include(stream => stream.Track)
             .ThenInclude(track => track.Album)
             .ThenInclude(album => album.Artist)
             .ThenInclude(artist => artist.UserArtists)
-            .Include(user => user.Streams)
-            .ThenInclude(stream => stream.Track)
+            .Include(stream => stream.Track)
             .ThenInclude(track => track.Album)
             .ThenInclude(album => album.Artist)
             .ThenInclude(artist => artist.Image)
             .ThenInclude(image =>image.ImageType)
-            .Include(user => user.Streams)
-            .ThenInclude(stream => stream.Track)
+            .Include(stream => stream.Track)
             .ThenInclude(track => track.Album)
             .ThenInclude(album =>album.Image)
             .ThenInclude(image =>image.ImageType)
-            .FirstOrDefaultAsync(user => user.UserId == id);
-        return user;
+            .Include(stream => stream.Track)
+            .ThenInclude(track =>track.Audio)
+            .Include(stream => stream.Track)
+            .ThenInclude(track =>track.Genre)
+            .Include(stream => stream.Track)
+            .ThenInclude(track => track.Album)
+            .ThenInclude(album =>album.AlbumType)
+            .Where(stream =>  stream.UserId == id).ToListAsync();
+        return streams;
     }
 
 
@@ -141,7 +148,12 @@ public class UserRepository : IUserRepository
             .ThenInclude(playlists => playlists.PlaylistTracks)
             .ThenInclude(tracks => tracks.Track)
             .ThenInclude(track => track.Audio)
-            .ThenInclude(audio => audio.AudioFilename)
+            .Include(user => user.Playlists)
+            .ThenInclude(playlists => playlists.PlaylistTracks)
+            .ThenInclude(tracks => tracks.Track)
+            .ThenInclude(track =>track.Genre )
+            .Include(user => user.Playlists)
+            .ThenInclude(playlists => playlists.UserPlaylists)
             .Include(user => user.Playlists)
             .ThenInclude(playlists => playlists.PlaylistTracks)
             .ThenInclude(tracks => tracks.Track)
@@ -165,6 +177,45 @@ public class UserRepository : IUserRepository
 
         return user;
     }
+    
+    public async Task<List<UserPlaylists>> GetUserWithSavedPlaylists(int id)
+    {
+        var userPlaylistsList = await _databaseContext.UserPlaylists
+            .Include(playlists =>playlists.Playlist )
+            .ThenInclude(playlists => playlists.PlaylistTracks)
+            .ThenInclude(tracks => tracks.Track)
+            .ThenInclude(track => track.Audio)
+            .Include(playlists =>playlists.Playlist )
+            .ThenInclude(playlists => playlists.PlaylistTracks)
+            .ThenInclude(tracks => tracks.Track)
+            .ThenInclude(track =>track.Genre )
+            .Include(playlists =>playlists.Playlist )
+            .ThenInclude(playlists => playlists.UserPlaylists)
+            .Include(playlists =>playlists.Playlist )
+            .ThenInclude(playlists => playlists.PlaylistTracks)
+            .ThenInclude(tracks => tracks.Track)
+            .ThenInclude(track => track.TrackArtists)
+            .ThenInclude(artists => artists.Artist)
+            .ThenInclude(artist => artist.Image)
+            .ThenInclude(image => image.ImageType)
+            .Include(playlists =>playlists.Playlist )
+            .ThenInclude(playlists => playlists.PlaylistTracks)
+            .ThenInclude(tracks => tracks.Track)
+            .ThenInclude(track => track.TrackArtists)
+            .ThenInclude(artists => artists.Artist)
+            .ThenInclude(artist => artist.UserArtists)
+            .Include(playlists =>playlists.Playlist )
+            .ThenInclude(playlist => playlist.Image)
+            .ThenInclude(image => image.ImageType)
+            .Include(playlists =>playlists.Playlist )
+            .ThenInclude(playlist =>playlist.User)
+            .ThenInclude(user1 =>user1.UserInfo )
+            .ThenInclude(info => info.Image)
+            .ThenInclude(image => image.ImageType)
+            .Where(user => user.UserId == id).ToListAsync();
+
+        return userPlaylistsList;
+    }
 
     public async Task FollowArtist(UserArtists entity)
     {
@@ -184,6 +235,9 @@ public class UserRepository : IUserRepository
             .Include(user => user.Requests)
             .ThenInclude(request => request.Image)
             .ThenInclude(image => image.ImageType)
+            .Include(user =>user.UserInfo )
+            .ThenInclude(info =>info.Image )
+            .ThenInclude(image =>image.ImageType )
             .FirstOrDefaultAsync(user => user.UserId == id);
         return user;
     }

@@ -42,6 +42,8 @@ public class DatabaseContext : DbContext
     public DbSet<AlbumType> AlbumTypes { get; set; }
     
     public DbSet<Audio> Audios { get; set; }
+    
+    public DbSet<UserPlaylists> UserPlaylists { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {

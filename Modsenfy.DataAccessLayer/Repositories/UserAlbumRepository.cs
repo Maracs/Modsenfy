@@ -79,6 +79,9 @@ public class UserAlbumRepository:IUserAlbumRepository
                             .ThenInclude(artist => artist.UserArtists)
             .Include(userAlbums => userAlbums.Album)
                 .ThenInclude(album =>album.AlbumType)
+            .Include(userAlbums => userAlbums.Album)
+                .ThenInclude(album => album.Tracks)
+                    .ThenInclude(track =>track.Genre )
             .Where(userAlbums => userAlbums.UserId == id).ToListAsync();
 
         return albums;

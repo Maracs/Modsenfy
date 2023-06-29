@@ -80,8 +80,8 @@ namespace Modsenfy.PresentationLayer.Controllers
 		[HttpGet("{id}/streams")]
 		public async Task<ActionResult<IEnumerable<StreamDto>>> GetAlbumStreams([FromRoute] int id, [FromQuery] int limit = -1, [FromQuery] int offset = 0)
 		{
-			await _albumService.GetAlbumStreams(id);
-			return Ok();
+			var streams = await _albumService.GetAlbumStreams(id);
+			return Ok(streams);
 		}
 	}
 }

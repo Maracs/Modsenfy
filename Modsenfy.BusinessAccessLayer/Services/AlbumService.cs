@@ -123,11 +123,11 @@ public class AlbumService
 		return albumDtos;
 	}
 	
-	public async Task GetAlbumStreams(int id)
+	public async Task<IEnumerable<StreamDto>> GetAlbumStreams(int id)
 	{
 		var albumStreams = await _albumRepository.GetAlbumStreams(id);
 		var streamDtos = albumStreams.Select(s => _mapper.Map<StreamDto>(s));
-		Console.WriteLine(JsonConvert.SerializeObject(streamDtos, Formatting.Indented));
+		return streamDtos;
 	}
 
 	public async Task<int> CreateAlbum(AlbumCreateDto albumDto)

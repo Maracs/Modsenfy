@@ -4,6 +4,7 @@ using Modsenfy.BusinessAccessLayer.DTOs;
 using Modsenfy.BusinessAccessLayer.DTOs.RequestDtos;
 using Modsenfy.DataAccessLayer.Entities;
 using Modsenfy.DataAccessLayer.Repositories;
+using Newtonsoft.Json;
 
 namespace Modsenfy.BusinessAccessLayer.Services;
 
@@ -137,36 +138,27 @@ public class UserService
     public async Task<List<TrackWithAlbumDto>> GetUserTopTracks(int id)
     {
         var topTrackCount = 5;
-
-        var user = await _userRepository.GetUserTopTracks(id);
-
-        var streams = user.Streams;
-
-        
-
+        var streams = await _userRepository.GetUserTopTracks(id);
         var tracksMap = new Dictionary<Track, int>();
         
         foreach (var stream in streams)
         {
-            
-                if (tracksMap.ContainsKey(stream.Track))
-                {
-                    tracksMap[stream.Track]++;
-                }
-                else
-                {
-                    tracksMap.Add(stream.Track,0);
-                }
+            if (tracksMap.ContainsKey(stream.Track))
+            {
+                tracksMap[stream.Track]++; }
+            else
+            {
+                tracksMap.Add(stream.Track,0); 
+            }
         }
 
         var topTracks =  tracksMap.OrderByDescending(pair => pair.Value).Take(topTrackCount);
-
         var topTracksDto = new List<TrackWithAlbumDto>();
 
         foreach (var topTrack in topTracks)
         {
             var topTrackDto = _mapper.Map<TrackWithAlbumDto>(topTrack.Key);
-          
+            
             topTracksDto.Add(topTrackDto);
         }
         
@@ -220,6 +212,8 @@ public class UserService
                 };
                 await _userRepository.FollowArtist(userArtist);
             }
+
+            await _userRepository.SaveChanges();
     }
     
     public async Task UnfollowArtists(int id, string ids)
@@ -240,6 +234,7 @@ public class UserService
             };
             await _userRepository.UnfollowArtist(userArtist);
         }
+        await _userRepository.SaveChanges();
     }
 
 
@@ -247,15 +242,13 @@ public class UserService
     {
         var splittedIds = ids.Split(',');
 
-        IEnumerable<int> artistIntIds;
-
-        artistIntIds = splittedIds.Select(id => int.Parse(id));
+        
         
         var followings =new List<bool>();
 
-        foreach (var intId in artistIntIds)
+        foreach (var artistId in splittedIds)
         {
-            followings.Add(await _userRepository.IfUserFollowArtist(id,intId));
+            followings.Add(await _userRepository.IfUserFollowArtist(id,int.Parse(artistId)));
         }
         
         return followings;
@@ -320,50 +313,55 @@ public class UserService
     public async Task<List<PlaylistDto>> GetUserPlaylists(int id,int limit,int offset)
     {
         var user = await _userRepository.GetUserWithPlaylists(id);
-
+        
        var limitedPlaylists= user.Playlists
             .OrderBy(playlist => playlist.PlaylistId)
-            .SkipWhile((playlist, i) => i < offset)
+            .Skip(offset)
             .Take(limit);
 
        var playlistDtoList = new List<PlaylistDto>();
        
         foreach (var playlist in limitedPlaylists)
         {
+            var owner = new UserDto()
+            {
+                UserId = user.UserId,
+                UserNickname = user.UserNickname,
+                Image = _mapper.Map<ImageDto>(user.UserInfo.Image),
+            };
+
+            var followers = new PlaylistFollowersDto()
+            {
+                Total = playlist.UserPlaylists.Count,
+                Url = playlist.PlaylistId.ToString(),
+            };
             var playlistDto = new PlaylistDto()
             {
                 Id = playlist.PlaylistId,
                 Name = playlist.PlaylistName,
                 Release = playlist.PlaylistRelease.ToString(),
-                Owner = new UserDto()
-                {
-                    UserId = user.UserId,
-                    UserNickname = user.UserNickname,
-                    Image = _mapper.Map<ImageDto>(user.UserInfo.Image),
-                },
-                Followers = new PlaylistFollowersDto()
-                {
-                    Total = playlist.UserPlaylists.Count,
-                    Url = playlist.PlaylistId.ToString(),
-                },
+                Owner = owner,
+                Followers = followers,
                 Tracks = new List<TrackDto>(),
                 Image = _mapper.Map<ImageDto>(playlist.Image)
             };
 
             foreach (var track in playlist.PlaylistTracks)
             {
+                
+                var audio  = new AudioDto()
+                {
+                    AudioFilename = track.Track.Audio.AudioFilename
+                };
                 var trackDto = new TrackDto()
                 {
                     TrackId = track.Track.TrackId,
                     TrackName = track.Track.TrackName,
-                    TrackStreams = track.Track.Streams.Count,
+                    TrackStreams = track.Track.TrackStreams,
                     GenreName = track.Track.Genre.GenreName,
                     TrackDuration = track.Track.TrackDuration,
                     TrackGenius = track.Track.TrackGenius,
-                    Audio = new AudioDto()
-                    {
-                        AudioFilename = track.Track.Audio.AudioFilename
-                    },
+                    Audio = audio,
                     Artists = new List<ArtistDto>()
 
                 };
@@ -382,10 +380,10 @@ public class UserService
                             Url = artist.Artist.ArtistId.ToString(),
                         }
                     };
-                    trackDto.Artists.Append(artistDto);
+                    trackDto.Artists =  trackDto.Artists.Append(artistDto);
                 }
 
-                playlistDto.Tracks.Append(trackDto);
+                playlistDto.Tracks =  playlistDto.Tracks.Append(trackDto);
             }
             
             playlistDtoList.Add(playlistDto);
@@ -394,6 +392,88 @@ public class UserService
         return playlistDtoList;
     }
 
+     public async Task<List<PlaylistDto>> GetUserSavedPlaylists(int id,int limit,int offset)
+    {
+        var userPlaylists = await _userRepository.GetUserWithSavedPlaylists(id);
+        
+       var limitedPlaylists= userPlaylists
+            .OrderBy(playlist => playlist.PlaylistId)
+            .Skip(offset)
+            .Take(limit);
+
+       var playlistDtoList = new List<PlaylistDto>();
+       
+        foreach (var playlist in limitedPlaylists)
+        {
+            var owner = new UserDto()
+            {
+                UserId = playlist.UserId,
+                UserNickname = playlist.User.UserNickname,
+                Image = _mapper.Map<ImageDto>( playlist.User.UserInfo.Image),
+            };
+
+            var followers = new PlaylistFollowersDto()
+            {
+                Total = playlist.Playlist.UserPlaylists.Count,
+                Url = playlist.PlaylistId.ToString(),
+            };
+            var playlistDto = new PlaylistDto()
+            {
+                Id = playlist.PlaylistId,
+                Name =  playlist.Playlist.PlaylistName,
+                Release =  playlist.Playlist.PlaylistRelease.ToString(),
+                Owner = owner,
+                Followers = followers,
+                Tracks = new List<TrackDto>(),
+                Image = _mapper.Map<ImageDto>( playlist.Playlist.Image)
+            };
+
+            foreach (var track in  playlist.Playlist.PlaylistTracks)
+            {
+                
+                var audio  = new AudioDto()
+                {
+                    AudioFilename = track.Track.Audio.AudioFilename
+                };
+                var trackDto = new TrackDto()
+                {
+                    TrackId = track.Track.TrackId,
+                    TrackName = track.Track.TrackName,
+                    TrackStreams = track.Track.TrackStreams,
+                    GenreName = track.Track.Genre.GenreName,
+                    TrackDuration = track.Track.TrackDuration,
+                    TrackGenius = track.Track.TrackGenius,
+                    Audio = audio,
+                    Artists = new List<ArtistDto>()
+
+                };
+
+                foreach (var artist in track.Track.TrackArtists)
+                {
+                    var artistDto = new ArtistDto()
+                    {
+                        ArtistId  = artist.Artist.ArtistId,
+                        ArtistName = artist.Artist.ArtistName,
+                        ArtistBio = artist.Artist.ArtistBio,
+                        Image = _mapper.Map<ImageDto>(artist.Artist.Image),
+                        Followers = new ArtistFollowersDto()
+                        {
+                            Total = artist.Artist.UserArtists.Count,
+                            Url = artist.Artist.ArtistId.ToString(),
+                        }
+                    };
+                    trackDto.Artists =  trackDto.Artists.Append(artistDto);
+                }
+
+                playlistDto.Tracks =  playlistDto.Tracks.Append(trackDto);
+            }
+            
+            playlistDtoList.Add(playlistDto);
+        }
+
+        return playlistDtoList;
+    }
+    
     public async Task<RequestDto> GetRequest(int id)
     {
         var request = await _requestRepository.GetWithJoins(id);
@@ -403,6 +483,7 @@ public class UserService
             Id = request.RequestId,
             Name = request.RequestArtistName,
             Bio = request.RequestArtistBio,
+            Time = request.RequestTime.ToString(),
             Image = _mapper.Map<ImageDto>(request.Image),
             User = _mapper.Map<UserWithIdAndDetailsAndEmailDto>(request.User)
         };
@@ -428,6 +509,7 @@ public class UserService
                 Id = request.RequestId,
                 Name = request.RequestArtistName,
                 Bio = request.RequestArtistBio,
+                Time = request.RequestTime.ToString(),
                 Image = _mapper.Map<ImageDto>(request.Image),
                 User = _mapper.Map<UserWithIdAndDetailsAndEmailDto>(request.User)
             };
@@ -439,7 +521,16 @@ public class UserService
 
     public async Task AnswerRequest(int id, string status)
     {
-       await _requestRepository.UpdateStatus(id, status);
+       
+       
+       var request = await _requestRepository.GetById(id);
+        
+       var requestStatus = await _requestRepository.GetRequestStatusIdByName(status);
+
+       request.RequestStatusId = requestStatus;
+
+       await _requestRepository.Update(request);
+       await _requestRepository.SaveChanges();
 
        //Добавить логику обновления роли
        
@@ -468,6 +559,7 @@ public class UserService
                 Id = request.RequestId,
                 Name = request.RequestArtistName,
                 Bio = request.RequestArtistBio,
+                Time = request.RequestTime.ToString(),
                 Image = _mapper.Map<ImageDto>(request.Image),
                 User = _mapper.Map<UserWithIdAndDetailsAndEmailDto>(request.User)
             };
@@ -490,6 +582,7 @@ public class UserService
            Id = request.RequestId,
            Name = request.RequestArtistName,
            Bio = request.RequestArtistBio,
+           Time = request.RequestTime.ToString(),
            Image = _mapper.Map<ImageDto>(request.Image),
            User = _mapper.Map<UserWithIdAndDetailsAndEmailDto>(request.User)
        };
@@ -504,9 +597,10 @@ public class UserService
         
         foreach (var trackId in trackIds)
         {
-            await _userTrackRepository.Create(new UserTracks() { TrackId =int.Parse(trackId), UserId = id });
+            var entity = new UserTracks() { TrackId = int.Parse(trackId), UserId = id, UserTrackAdded = DateTime.Now };
+            await _userTrackRepository.Create(entity);
         }
-        
+        await _userTrackRepository.SaveChanges();
     }
 
     public async Task DeleteUserSavedTracks(int id, string ids)
@@ -516,7 +610,9 @@ public class UserService
         foreach (var trackId in trackIds)
         {
              _userTrackRepository.Delete(new UserTracks() { TrackId =int.Parse(trackId), UserId = id });
+            
         }
+        await _userTrackRepository.SaveChanges();
     }
 
     public async Task<List<bool>> CheckUserSavedTracks(int id, string ids)
@@ -578,7 +674,12 @@ public class UserService
 
     public async Task CreateRequest(int id, RequestWithoutIdAndTimeDto requestDto)
     {
-        var image = _mapper.Map<Image>(requestDto.Image);
+        var image = new Image()
+        {
+            ImageFilename = requestDto.Image.ImageFilename,
+            ImageTypeId = (await _imageTypeRepository.GetIfExists(requestDto.Image.ImageTypeName)).ImageTypeId
+        };
+        
         var imageWithId = await _imageRepository.CreateAndGet(image);
         var request = new Request()
         {
@@ -591,6 +692,7 @@ public class UserService
         };
 
         await _requestRepository.Create(request);
+        await _requestRepository.SaveChanges();
     }
 
     public async  Task<List<AlbumWithTracksDto>> GetUserSavedAlbums(int id, int limit, int offset)
