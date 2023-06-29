@@ -41,7 +41,7 @@ public class Searchable
         {
             foreach (var queryWord in queryWords)
             {
-                while (!nameWord.Contains(queryWord))
+                while (!nameWord.Contains(queryWord) && queryWord.Length > 0)
                 {
                     queryWord.Remove(queryWord.Length - 1);
                 }
