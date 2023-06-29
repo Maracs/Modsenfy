@@ -116,7 +116,7 @@ public class UserRepository:IUserRepository
 
     public async Task<string> GetUserRole(User user)
     {
-        var role = await _databaseContext.Roles.FindAsync(user.UserRoleId);
+        var role = await _databaseContext.Role.FindAsync(user.UserRoleId);
         if (role == null) { throw new NullReferenceException(); }
         return role.RoleName;
     }

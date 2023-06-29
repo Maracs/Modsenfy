@@ -12,6 +12,8 @@ public class User
 
     public string UserPasshash { get; set; }
 
+    public string UserPasshashSalt { get; set; }
+
     public int UserRoleId { get; set; }
 
     public Role Role { get; set; }

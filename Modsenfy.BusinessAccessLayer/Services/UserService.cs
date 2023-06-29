@@ -25,16 +25,16 @@ public class UserService
     private readonly IMapper _mapper;
 
     private readonly TokenService _tokenService;
-        
-    public UserService( UserRepository userRepository,
+
+    public UserService(UserRepository userRepository,
         UserInfoRepository userInfoRepository,
         ImageRepository imageRepository,
-        ImageTypeRepository imageTypeRepository,RequestRepository requestRepository,IMapper mapper)
+        ImageTypeRepository imageTypeRepository, RequestRepository requestRepository, IMapper mapper, TokenService tokenService)
     {
         _userRepository = userRepository;
-        
+
         _userInfoRepository = userInfoRepository;
-        
+
         _imageRepository = imageRepository;
 
         _imageTypeRepository = imageTypeRepository;
@@ -42,6 +42,25 @@ public class UserService
         _mapper = mapper;
 
         _requestRepository = requestRepository;
+
+        _tokenService = tokenService;
+    }
+
+    public async Task<UserTokenDto> SignInUser(UserSigningDto userDto)
+    {
+        var user = await _userRepository.GetByUsername(userDto.UserNickname);
+        if (user == null)  return new UserTokenDto() { UserToken = "None"};
+
+        using var hmac = new HMACSHA512(Convert.FromBase64String(user.UserPasshashSalt));
+        var computeHash = Convert.ToBase64String(hmac.ComputeHash(Encoding.UTF8.GetBytes(userDto.Password)));
+        if (computeHash != user.UserPasshash)
+            return new UserTokenDto() { UserToken = "None" };
+
+        return new UserTokenDto()
+        {
+            UserNickname = user.UserNickname,
+            UserToken = await _tokenService.GetToken(user)
+        };
     }
 
     public async Task<UserTokenDto> RegisterUser(UserWithDetailsAndEmailAndPasshashDto userDto)
@@ -75,11 +94,13 @@ public class UserService
             UserEmail = userDto.Email,
             UserNickname = userDto.Nickname,
             UserPasshash = Convert.ToBase64String(hmac.ComputeHash(Encoding.UTF8.GetBytes(userDto.Passhash))),
+            UserPasshashSalt = Convert.ToBase64String(hmac.Key),
             UserInfoId = userInfoId,
             UserRoleId = 1 // Доработать эту логику
         };
 
         var userId = (await _userRepository.CreateAndGet(user)).UserId;
+        user.UserId = userId;
 
         var userRegDto = new UserTokenDto()
         {

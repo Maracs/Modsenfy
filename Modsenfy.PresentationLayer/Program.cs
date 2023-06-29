@@ -27,6 +27,7 @@ builder.Services.AddScoped<RequestRepository>();
 builder.Services.AddScoped<AlbumRepository>();
 builder.Services.AddScoped<AlbumService>();
 builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<TokenService>();
 
 builder.Services.AddIdentityServices(builder.Configuration);
 builder.Services.AddSwaggerServices(builder.Configuration);

@@ -31,11 +31,11 @@ public class DatabaseContext : DbContext
 
     public DbSet<Artist> Artists { get; set; }
 
-    public DbSet<Role> Roles { get; set; }
+    public DbSet<Role> Role { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        var connectionString = "Server=.\\SQLEXPRESS;Initial Catalog=Modsenfy;Trusted_Connection=True;TrustServerCertificate=True";
+        var connectionString = "Data Source=34.118.70.5,1433;Initial Catalog=modsenfydb;User ID=sqlserver;Password=password;";
         if (!optionsBuilder.IsConfigured)
         {
             optionsBuilder.UseSqlServer(connectionString,

@@ -40,19 +40,11 @@ public class UsersController:ControllerBase
     [HttpPost("signin")]
     public async Task<ActionResult<UserTokenDto>> SignInUser(UserSigningDto userDto)
     {
-        var user = await _userRepository.GetByUsername(userDto.UserNickname);
-        if (user == null) return Unauthorized();
-
-        using var hmac = new HMACSHA512();
-        var computeHash = Convert.ToBase64String(hmac.ComputeHash(Encoding.UTF8.GetBytes(userDto.Password)));
-        if (computeHash != user.UserPasshash)
-            return Unauthorized();
-
-        return new UserTokenDto()
-        {
-            UserNickname = user.UserNickname,
-            UserToken = await _tokenService.GetToken(user)
-        };
+        var userToken = await _userService.SignInUser(userDto);
+      
+        if (userToken.UserToken == "None") { return Unauthorized(); }
+        
+        return Ok(userToken);
     }
 
     [HttpPost]
@@ -65,7 +57,7 @@ public class UsersController:ControllerBase
         return Ok(userRegDto);
     }
 
-    [Authorize(Roles = "user")]
+    [Authorize(Roles = "User")]
     [HttpGet("{id}")]
     public async Task<ActionResult<UserWithDetailsAndEmailAndIdAndRoleDto>> GetUserProfile([FromRoute]int id)
     {
