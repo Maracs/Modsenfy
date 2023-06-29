@@ -12,14 +12,15 @@ namespace Modsenfy.PresentationLayer.Controllers
     public class ArtistController : ControllerBase
     {
         private readonly ArtistRepository _artistRepository;
-        private readonly IMapper _mapper;
         private readonly ArtistService _artistService;
+        private readonly IMapper _mapper;
+        
 
-        public ArtistController(IMapper mapper, ArtistRepository artistRepository, ArtistService artistService)
+        public ArtistController(ArtistRepository artistRepository, ArtistService artistService, IMapper mapper)
         {
-            _mapper = mapper;
             _artistRepository = artistRepository;
             _artistService = artistService;
+            _mapper = mapper;
         }
 
         [HttpGet("{id}")]
@@ -50,7 +51,7 @@ namespace Modsenfy.PresentationLayer.Controllers
             await _artistRepository.Create(artist);
             await _artistRepository.SaveChanges();
 
-            return Ok(artist.ArtistId);
+            return Ok();
         }
 
         [HttpPut("{id}")]

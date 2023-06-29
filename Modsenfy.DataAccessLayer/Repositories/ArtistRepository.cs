@@ -69,12 +69,8 @@ namespace Modsenfy.DataAccessLayer.Repositories
 
         public async Task Update(Artist entity)
         {
-            var artist = await _databaseContext.Artists.FindAsync(entity.ArtistId);
-
-            artist.ArtistName = entity.ArtistName;
-            artist.ArtistBio = entity.ArtistBio;
-            artist.Image = entity.Image;
-            artist.ImageId = entity.ImageId;
+            // _databaseContext.Entry(entity).State = EntityState.Modified;
+            _databaseContext.Artists.Update(entity);
         }
 
         public void Delete(Artist entity) 
