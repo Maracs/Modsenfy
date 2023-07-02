@@ -29,11 +29,12 @@ public class AlbumRepository : IAlbumRepository
 		return albumEntry.Entity;
 	}
 
-	public void DeleteAsync(Album album)
+	public void Delete(Album album)
 	{
 		_databaseContext.Remove(album);
 		_databaseContext.SaveChanges();
 	}
+
 
 	public async Task<IEnumerable<Album>> GetAllAsync()
 	{
@@ -128,9 +129,11 @@ public class AlbumRepository : IAlbumRepository
 		await _databaseContext.SaveChangesAsync();
 	}
 
-	public Task UpdateAsync(Album album)
+
+	public async Task UpdateAsync(Album album)
 	{
-		throw new NotImplementedException();
+		_databaseContext.Albums.Update(album);
+		await SaveChangesAsync();
 	}
 
 	public async Task<IEnumerable<Entities.Stream>> GetAlbumStreams(int id)
@@ -155,4 +158,5 @@ public class AlbumRepository : IAlbumRepository
 
 	}
 
+	
 }

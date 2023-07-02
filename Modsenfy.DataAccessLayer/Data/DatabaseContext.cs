@@ -46,6 +46,9 @@ public class DatabaseContext : DbContext
     public DbSet<UserPlaylists> UserPlaylists { get; set; }
     
     public DbSet<Playlist> Playlist { get; set; }
+    
+    public DbSet<Role> Role { get; set; }
+
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -64,7 +67,7 @@ public class DatabaseContext : DbContext
             .HasForeignKey(a => a.AlbumOwnerId)
             .OnDelete(DeleteBehavior.NoAction);
 
-     modelBuilder.Entity<Playlist>()
+        modelBuilder.Entity<Playlist>()
             .HasOne(playlist => playlist.User)
             .WithMany(user => user.Playlists)
             .HasForeignKey(playlist => playlist.PlaylistOwnerId);
@@ -96,119 +99,126 @@ public class DatabaseContext : DbContext
               .HasKey(pt => new { pt.PlaylistId, pt.TrackId });
 
         modelBuilder.Entity<PlaylistTracks>()
-            .HasOne(pt => pt.Playlist)
-            .WithMany(p => p.PlaylistTracks)
-            .HasForeignKey(pt => pt.PlaylistId);
+          .HasOne(pt => pt.Playlist)
+          .WithMany(p => p.PlaylistTracks)
+          .HasForeignKey(pt => pt.PlaylistId);
 
         modelBuilder.Entity<PlaylistTracks>()
-            .HasOne(pt => pt.Track)
-            .WithMany(p => p.PlaylistTracks)
-            .HasForeignKey(pt => pt.TrackId);
+          .HasOne(pt => pt.Track)
+          .WithMany(p => p.PlaylistTracks)
+          .HasForeignKey(pt => pt.TrackId);
 
         modelBuilder.Entity<Entities.Stream>()
-              .HasKey(pt => new { pt.UserId, pt.TrackId, pt.StreamDate });
+            .HasKey(pt => new { pt.UserId, pt.TrackId, pt.StreamDate });
 
         modelBuilder.Entity<Entities.Stream>()
-            .HasOne(pt => pt.Track)
-            .WithMany(p => p.Streams)
-            .HasForeignKey(pt => pt.TrackId);
+          .HasOne(pt => pt.Track)
+          .WithMany(p => p.Streams)
+          .HasForeignKey(pt => pt.TrackId);
 
         modelBuilder.Entity<Entities.Stream>()
-            .HasOne(pt => pt.User)
-            .WithMany(p => p.Streams)
-            .HasForeignKey(pt => pt.UserId);
+          .HasOne(pt => pt.User)
+          .WithMany(p => p.Streams)
+          .HasForeignKey(pt => pt.UserId);
 
         modelBuilder.Entity<TrackArtists>()
-            .HasKey(pt => new { pt.ArtistId, pt.TrackId });
+          .HasKey(pt => new { pt.ArtistId, pt.TrackId });
 
         modelBuilder.Entity<TrackArtists>()
-            .HasOne(pt => pt.Track)
-            .WithMany(p => p.TrackArtists)
-            .HasForeignKey(pt => pt.TrackId);
+          .HasOne(pt => pt.Track)
+          .WithMany(p => p.TrackArtists)
+          .HasForeignKey(pt => pt.TrackId);
 
         modelBuilder.Entity<TrackArtists>()
-            .HasOne(pt => pt.Artist)
-            .WithMany(p => p.TrackArtists)
-            .HasForeignKey(pt => pt.ArtistId);
+          .HasOne(pt => pt.Artist)
+          .WithMany(p => p.TrackArtists)
+          .HasForeignKey(pt => pt.ArtistId);
 
         modelBuilder.Entity<UserAlbums>()
-            .HasKey(pt => new { pt.UserId, pt.AlbumId });
+          .HasKey(pt => new { pt.UserId, pt.AlbumId });
 
         modelBuilder.Entity<UserAlbums>()
-            .HasOne(pt => pt.User)
-            .WithMany(p => p.UserAlbums)
-            .HasForeignKey(pt => pt.UserId);
+          .HasOne(pt => pt.User)
+          .WithMany(p => p.UserAlbums)
+          .HasForeignKey(pt => pt.UserId);
 
         modelBuilder.Entity<UserAlbums>()
-            .HasOne(pt => pt.Album)
-            .WithMany(p => p.UserAlbums)
-            .HasForeignKey(pt => pt.AlbumId);
+          .HasOne(pt => pt.Album)
+          .WithMany(p => p.UserAlbums)
+          .HasForeignKey(pt => pt.AlbumId);
 
         modelBuilder.Entity<UserArtists>()
             .HasKey(pt => new { pt.UserId, pt.ArtistId });
 
         modelBuilder.Entity<UserArtists>()
-            .HasOne(pt => pt.User)
-            .WithMany(p => p.UserArtists)
-            .HasForeignKey(pt => pt.UserId);
+          .HasOne(pt => pt.User)
+          .WithMany(p => p.UserArtists)
+          .HasForeignKey(pt => pt.UserId);
 
         modelBuilder.Entity<UserArtists>()
-            .HasOne(pt => pt.Artist)
-            .WithMany(p => p.UserArtists)
-            .HasForeignKey(pt => pt.ArtistId);
+          .HasOne(pt => pt.Artist)
+          .WithMany(p => p.UserArtists)
+          .HasForeignKey(pt => pt.ArtistId);
 
         modelBuilder.Entity<UserPlaylists>()
-            .HasKey(pt => new { pt.UserId, pt.PlaylistId });
+          .HasKey(pt => new { pt.UserId, pt.PlaylistId });
 
         modelBuilder.Entity<UserPlaylists>()
-            .HasOne(pt => pt.User)
-            .WithMany(p => p.UserPlaylists)
-            .HasForeignKey(pt => pt.UserId)
-            .OnDelete(DeleteBehavior.NoAction);
+          .HasOne(pt => pt.User)
+          .WithMany(p => p.UserPlaylists)
+          .HasForeignKey(pt => pt.UserId)
+          .OnDelete(DeleteBehavior.NoAction);
 
         modelBuilder.Entity<UserPlaylists>()
-            .HasOne(pt => pt.Playlist)
-            .WithMany(p => p.UserPlaylists)
-            .HasForeignKey(pt => pt.PlaylistId);
+          .HasOne(pt => pt.Playlist)
+          .WithMany(p => p.UserPlaylists)
+          .HasForeignKey(pt => pt.PlaylistId)
+          .OnDelete(DeleteBehavior.NoAction);
 
         modelBuilder.Entity<UserTracks>()
-            .HasKey(pt => new { pt.UserId, pt.TrackId });
+          .HasKey(pt => new { pt.UserId, pt.TrackId });
 
         modelBuilder.Entity<UserTracks>()
-            .HasOne(pt => pt.User)
-            .WithMany(p => p.UserTracks)
-            .HasForeignKey(pt => pt.UserId);
+          .HasOne(pt => pt.User)
+          .WithMany(p => p.UserTracks)
+          .HasForeignKey(pt => pt.UserId);
 
         modelBuilder.Entity<UserTracks>()
-            .HasOne(pt => pt.Track)
-            .WithMany(p => p.UserTracks)
-            .HasForeignKey(pt => pt.TrackId);
+          .HasOne(pt => pt.Track)
+          .WithMany(p => p.UserTracks)
+          .HasForeignKey(pt => pt.TrackId);
 
         modelBuilder.Entity<Album>()
-            .HasKey(a => a.AlbumId);
+          .HasKey(a => a.AlbumId);
 
         modelBuilder.Entity<Album>()
-            .HasOne(a => a.Image)
-            .WithMany()
-            .HasForeignKey(a => a.CoverId)
-            .OnDelete(DeleteBehavior.NoAction);
+          .HasOne(a => a.Image)
+          .WithMany()
+          .HasForeignKey(a => a.CoverId)
+          .OnDelete(DeleteBehavior.NoAction);
 
         modelBuilder.Entity<Album>()
-            .HasOne(a => a.Artist)
-            .WithMany()
-            .HasForeignKey(a => a.AlbumOwnerId)
-            .OnDelete(DeleteBehavior.Cascade);
+          .HasOne(a => a.Artist)
+          .WithMany()
+          .HasForeignKey(a => a.AlbumOwnerId)
+          .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<Artist>()
-            .HasMany(a => a.Albums)
-            .WithOne(a => a.Artist)
-            .HasForeignKey(a => a.AlbumOwnerId)
-            .OnDelete(DeleteBehavior.NoAction);
+          .HasMany(a => a.Albums)
+          .WithOne(a => a.Artist)
+          .HasForeignKey(a => a.AlbumOwnerId)
+          .OnDelete(DeleteBehavior.NoAction);
 
         modelBuilder.Entity<Playlist>()
-            .HasOne(a => a.Image)
-            .WithMany()
-            .HasForeignKey(a => a.CoverId)
-            .OnDelete(DeleteBehavior.NoAction);
+          .HasOne(a => a.Image)
+          .WithMany()
+          .HasForeignKey(a => a.CoverId)
+          .OnDelete(DeleteBehavior.NoAction);
+
+        modelBuilder.Entity<Audio>()
+            .HasOne(a => a.Track)
+            .WithOne(t => t.Audio)
+            .HasForeignKey<Track>(t => t.AudioId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

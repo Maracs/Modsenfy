@@ -4,6 +4,9 @@ using Modsenfy.DataAccessLayer.Data;
 using Modsenfy.DataAccessLayer.Entities;
 using Stream = Modsenfy.DataAccessLayer.Entities.Stream;
 
+
+
+
 namespace Modsenfy.DataAccessLayer.Repositories;
 
 public class UserRepository : IUserRepository
@@ -177,6 +180,7 @@ public class UserRepository : IUserRepository
 
         return user;
     }
+
     
     public async Task<List<UserPlaylists>> GetUserWithSavedPlaylistsAsync(int id)
     {
@@ -292,4 +296,17 @@ public class UserRepository : IUserRepository
         return entityEntry.Entity;
     }
 
+
+
+    public async Task<User> GetByUsername(string username)
+    {
+        return await _databaseContext.Users.FirstOrDefaultAsync(x => x.UserNickname ==  username);
+    }
+
+    public async Task<string> GetUserRoleAsync(User user)
+    {
+        var role = await _databaseContext.Role.FindAsync(user.UserRoleId);
+        if (role == null) { throw new NullReferenceException(); }
+        return role.RoleName;
+    }
 }
