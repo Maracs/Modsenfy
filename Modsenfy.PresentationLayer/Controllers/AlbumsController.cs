@@ -7,8 +7,6 @@ using Modsenfy.BusinessAccessLayer.Services;
 
 namespace Modsenfy.PresentationLayer.Controllers
 {
-   
-
 	[Route("[controller]")]
 	[ApiController]
 	public class AlbumsController : ControllerBase
@@ -36,9 +34,8 @@ namespace Modsenfy.PresentationLayer.Controllers
 		[HttpPost]
 		public async Task<ActionResult<int>> CreateAlbum([FromBody] AlbumCreateDto albumCreateDto)
 		{
-			Console.WriteLine(JsonConvert.SerializeObject(albumCreateDto));
-
-			return Ok();
+            var id = await _albumService.CreateAlbum(albumCreateDto);
+            return Ok(id);
 		}
 
 		[HttpPut("{id}")]
@@ -52,9 +49,9 @@ namespace Modsenfy.PresentationLayer.Controllers
 		[HttpDelete("{id}")]
 		public async Task<ActionResult> DeleteAlbum([FromRoute] int id)
 		{
-			var album = await _albumRepository.GetById(id);
-            _albumRepository.Delete(album);
-            return Ok();
+			var album = await _albumRepository.GetByIdAsync(id);
+			_albumRepository.DeleteAsync(album);
+			return Ok();
 		}
 
 		[HttpGet]
@@ -73,18 +70,18 @@ namespace Modsenfy.PresentationLayer.Controllers
 			
 		}
 
-		[HttpGet("/new-releases")]
-		public async Task<ActionResult<IEnumerable<AlbumWithTracksDto>>> GetNewAlbumReleases([FromQuery] int limit, [FromQuery] int offset)
+		[HttpGet("new-releases")]
+		public async Task<ActionResult<IEnumerable<AlbumWithTracksDto>>> GetNewAlbumReleases([FromQuery] int limit = -1, [FromQuery] int offset = 0)
 		{
 			var albumDtos = await _albumService.GetNewAlbumReleases(limit, offset);
 			return Ok(albumDtos);
 		}
 
 		[HttpGet("{id}/streams")]
-		public async Task<ActionResult<IEnumerable<StreamDto>>> GetAlbumStreams([FromRoute] int id, [FromQuery] int limit, [FromQuery] int offset)
+		public async Task<ActionResult<IEnumerable<StreamDto>>> GetAlbumStreams([FromRoute] int id, [FromQuery] int limit = -1, [FromQuery] int offset = 0)
 		{
-            await _albumService.GetAlbumStreams(id);
-            return Ok();
+			var streams = await _albumService.GetAlbumStreams(id);
+			return Ok(streams);
 		}
 	}
 }

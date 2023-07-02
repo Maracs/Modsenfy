@@ -4,32 +4,32 @@ namespace Modsenfy.DataAccessLayer.Contracts;
 
 public interface IRequestRepository:IRepository<Request>
 {
-    async Task IRepository<Request>.SaveChanges()
+    async Task IRepository<Request>.SaveChangesAsync()
     {
         throw new NotImplementedException();
     }
 
-    async Task<Request> IRepository<Request>.GetById(int id)
+    async Task<Request> IRepository<Request>.GetByIdAsync(int id)
     {
         throw new NotImplementedException();
     }
 
-    async Task<IEnumerable<Request>> IRepository<Request>.GetAll()
+    async Task<IEnumerable<Request>> IRepository<Request>.GetAllAsync()
     {
         throw new NotImplementedException();
     }
 
-    async Task IRepository<Request>.Create(Request entity)
+    async Task IRepository<Request>.CreateAsync(Request entity)
     {
         throw new NotImplementedException();
     }
 
-    async Task IRepository<Request>.Update(Request entity)
+    async Task IRepository<Request>.UpdateAsync(Request entity)
     {
         throw new NotImplementedException();
     }
 
-    void IRepository<Request>.Delete(Request entity)
+    void IRepository<Request>.DeleteAsync(Request entity)
     {
         throw new NotImplementedException();
     }

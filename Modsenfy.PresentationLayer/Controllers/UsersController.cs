@@ -50,9 +50,9 @@ public class UsersController:ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<UserTokenDto>> RegisterUser([FromBody] UserWithDetailsAndEmailAndPasshashDto userDto)
+    public async Task<ActionResult<int>> RegisterUserAsync([FromBody] UserWithDetailsAndEmailAndPasshashDto userDto)
     {
-        if (await _userRepository.IfNicknameExists(userDto.Nickname) || await _userRepository.IfEmailExists(userDto.Email))
+        if (await _userRepository.IfNicknameExistsAsync(userDto.Nickname) || await _userRepository.IfEmailExistsAsync(userDto.Email))
             return BadRequest("This nickname or email is already taken");
 
         var userRegDto = await _userService.RegisterUserAsync(userDto);
@@ -61,9 +61,9 @@ public class UsersController:ControllerBase
 
     [Authorize(Roles = "User,Admin,Artist")]
     [HttpGet("{id}")]
-    public async Task<ActionResult<UserWithDetailsAndEmailAndIdAndRoleDto>> GetUserProfile([FromRoute]int id)
+    public async Task<ActionResult<UserWithDetailsAndEmailAndIdAndRoleDto>> GetUserProfileAsync([FromRoute]int id)
     {
-        var user = await _userRepository.GetByIdWithJoins(id);
+        var user = await _userRepository.GetByIdWithJoinsAsync(id);
 
         var userDto = _mapper.Map<UserWithDetailsAndEmailAndIdAndRoleDto>(user);
         
@@ -71,73 +71,82 @@ public class UsersController:ControllerBase
     }
 
     [HttpPut("{id}")]
-    public async Task<ActionResult> UpdateUser([FromRoute] int id,[FromBody] UserWithDetailsAndEmailDto userDto)
+    public async Task<ActionResult> UpdateUserAsync([FromRoute] int id,[FromBody] UserWithDetailsAndEmailDto userDto)
     {
 
-        if (!await _userService.UpdateUser(id, userDto))
+        if (!await _userService.UpdateUserAsync(id, userDto))
             return BadRequest("Incorrect image type");
         
         return Ok();
     }
 
     [HttpDelete("{id}")]
-    public async Task<ActionResult> DeleteUser([FromRoute] int id)
+    public async Task<ActionResult> DeleteUserAsync([FromRoute] int id)
     {
-        if (await _userRepository.GetById(id) == null)
+        if (await _userRepository.GetByIdAsync(id) == null)
             return BadRequest("User with this Id does not exists");
         
-        await _userService.DeleteUser(id);
+        await _userService.DeleteUserAsync(id);
         
         return Ok();
     }
 
     [HttpGet("{id}/playlists")]
-    public async Task<ActionResult<IEnumerable<PlaylistDto>>> GetUserPlaylists([FromRoute] int id, [FromQuery] int limit,
+    public async Task<ActionResult<IEnumerable<PlaylistDto>>> GetUserPlaylistsAsync([FromRoute] int id, [FromQuery] int limit,
         [FromQuery] int offset)
     {
-        if (await _userRepository.GetById(id) == null)
+        if (await _userRepository.GetByIdAsync(id) == null)
             return BadRequest("User with this Id does not exists");
 
-        if (limit < 0 )
+        if (limit < -1 )
             return BadRequest("Invalid limit value");
         
         if (offset<0)
             return BadRequest("Invalid offset value");
         
-        var playlists = await _userService.GetUserPlaylists(id, limit, offset);
+        var playlists = await _userService.GetUserPlaylistsAsync(id, limit, offset);
         
         return Ok(playlists);
     }
 
     [HttpPost("{id}/playlists")]
-    public async Task<ActionResult> CreateUserPlaylist([FromRoute] int id, [FromBody] PlaylistDto playlistDto)
+    public async Task<ActionResult<int>> CreateUserPlaylistAsync([FromRoute] int id, [FromBody] PlaylistWithNameAndImage playlistDto)
     {
+        var playlistId = await _userService.CreateUserPlaylistAsync(id, playlistDto);
         
-        return Ok();
+        return Ok(playlistId);
     }
 
+    [HttpGet("playlists/{playlistId}/followers/contains")]
+    public async Task<ActionResult<IEnumerable<bool>>> CheckIfUsersFollowUserPlaylistAsync(int playlistId,[FromQuery] string ids)
+    {
+        var followings =  await _userService.CheckIfUsersFollowPlaylistAsync(playlistId,ids);
+
+        return Ok(followings);
+    }
+    
     [HttpGet("requests")]
-    public async Task<ActionResult<IEnumerable<RequestDto>>> GetSeveralRequests([FromQuery] int limit,
+    public async Task<ActionResult<IEnumerable<RequestDto>>> GetSeveralRequestsAsync([FromQuery] int limit,
         [FromQuery] int offset, [FromQuery] string status)
     {
-        var requests = await _userService.GetSeveralRequests(limit, offset, status);
+        var requests = await _userService.GetSeveralRequestsAsync(limit, offset, status);
        
         return Ok(requests);
     }
 
     [HttpGet("requests/{id}")]
-    public async Task<ActionResult<RequestDto>> GetRequest([FromRoute] int id)
+    public async Task<ActionResult<RequestDto>> GetRequestAsync([FromRoute] int id)
     {
-
-        var request = await _userService.GetRequest(id);
+        
+        var request = await _userService.GetRequestAsync(id);
         
         return Ok(request);
     }
 
     [HttpPost("requests/{id}/managing")]
-    public async Task<ActionResult> AnswerRequest([FromRoute] int id,[FromBody] string answer)
+    public async Task<ActionResult> AnswerRequestAsync([FromRoute] int id,[FromBody] string answer)
     {
-        await _userService.AnswerRequest(id, answer);
+        await _userService.AnswerRequestAsync(id, answer);
         return Ok();
     }
 }

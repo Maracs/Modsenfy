@@ -31,13 +31,30 @@ public class DatabaseContext : DbContext
 
     public DbSet<Artist> Artists { get; set; }
 
+    public DbSet<UserArtists> UserArtists { get; set; }
+    
+    public DbSet<UserTracks> UserTracks { get; set; }
+    
+    public DbSet<UserAlbums> UserAlbums { get; set; }
+    
+    public DbSet<Genre> Genres { get; set; }
+    
+    public DbSet<AlbumType> AlbumTypes { get; set; }
+    
+    public DbSet<Audio> Audios { get; set; }
+    
+    public DbSet<UserPlaylists> UserPlaylists { get; set; }
+    
+    public DbSet<Playlist> Playlist { get; set; }
+    
     public DbSet<Role> Role { get; set; }
+
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Playlist>()
             .HasKey(playlist => playlist.PlaylistId);
-
+        
         modelBuilder.Entity<Album>()
             .HasOne(a => a.Artist)
             .WithMany()
@@ -50,7 +67,7 @@ public class DatabaseContext : DbContext
             .HasForeignKey(a => a.AlbumOwnerId)
             .OnDelete(DeleteBehavior.NoAction);
 
-        modelBuilder.Entity<Playlist>()
+     modelBuilder.Entity<Playlist>()
             .HasOne(playlist => playlist.User)
             .WithMany(user => user.Playlists)
             .HasForeignKey(playlist => playlist.PlaylistOwnerId);
@@ -149,7 +166,8 @@ public class DatabaseContext : DbContext
         modelBuilder.Entity<UserPlaylists>()
             .HasOne(pt => pt.User)
             .WithMany(p => p.UserPlaylists)
-            .HasForeignKey(pt => pt.UserId);
+            .HasForeignKey(pt => pt.UserId)
+            .OnDelete(DeleteBehavior.NoAction);
 
         modelBuilder.Entity<UserPlaylists>()
             .HasOne(pt => pt.Playlist)
