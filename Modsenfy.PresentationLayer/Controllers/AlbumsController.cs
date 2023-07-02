@@ -39,11 +39,10 @@ namespace Modsenfy.PresentationLayer.Controllers
 		}
 
 		[HttpPut("{id}")]
-		public async Task<ActionResult> UpdateAlbum([FromRoute] int id, [FromBody] AlbumCreateDto albumCreateDto)
+		public async Task<ActionResult> UpdateAlbum([FromRoute] int id, [FromBody] AlbumUpdateDto albumUpdateDto)
 		{
-			Console.WriteLine(id);
-			Console.WriteLine(JsonConvert.SerializeObject(albumCreateDto));
-			return Ok();
+            await _albumService.UpdateAlbum(id, albumUpdateDto);
+            return Ok();
 		}
 
 		[HttpDelete("{id}")]
