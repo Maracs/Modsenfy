@@ -43,15 +43,15 @@ public class AlbumRepository : IAlbumRepository
 		return albums;
 	}
 
-    public async Task<IEnumerable<Album>> GetAll()
-    {
-        var albums = await _databaseContext.Albums.ToListAsync();
-        return albums;
-    }
+	public async Task<IEnumerable<Album>> GetAll()
+	{
+		var albums = await _databaseContext.Albums.ToListAsync();
+		return albums;
+	}
 
 
 
-    public async Task<Album> GetById(int id)
+	public async Task<Album> GetById(int id)
 	{
 		var album = await _databaseContext.Albums.FindAsync(id);
 		return album;
@@ -136,9 +136,10 @@ public class AlbumRepository : IAlbumRepository
 		await _databaseContext.SaveChangesAsync();
 	}
 
-	public Task Update(Album album)
+	public async Task Update(Album album)
 	{
-		throw new NotImplementedException();
+		_databaseContext.Albums.Update(album);
+		await SaveChanges();
 	}
 
 	public async Task<IEnumerable<Entities.Stream>> GetAlbumStreams(int id)
@@ -163,5 +164,5 @@ public class AlbumRepository : IAlbumRepository
 
 	}
 
-    
+	
 }
