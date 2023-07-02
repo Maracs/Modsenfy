@@ -94,7 +94,7 @@ public class AlbumService
 		if (ids.Equals("all"))
 		{
 			if (limit == -1 && offset == 0)
-				albums = await _albumRepository.GetAll();
+				albums = await _albumRepository.GetAllWithJoins();
 			else if (limit == -1)
 				albums = await _albumRepository.GetSkipped(offset);
 			else
@@ -209,27 +209,22 @@ public class AlbumService
 		
 		var artistOwner = await _artistRepository.GetById(artistOwnerId);
 		
-		var newAlbum = new Album()
-		{
-			AlbumName = albumDto.AlbumName,
-			AlbumTypeId = albumType.AlbumTypeId,
-			CoverId = (await _imageRepository.CreateAndGet(image)).ImageId,
-			AlbumOwnerId = artistOwnerId,
-			Artist = artistOwner,
-			AlbumRelease = album.AlbumRelease,	
-		};
 		
+		album.AlbumName = albumDto.AlbumName;
+		album.CoverId = (await _imageRepository.CreateAndGet(image)).ImageId;
+
 		foreach (var deleteTrackId in albumDto.DeleteTracks)
 		{
 			var deleteTrack = await _trackRepository.GetById(deleteTrackId);
 			if (deleteTrack == null)
 				throw new Exception("n");
-			 _trackRepository.Delete(deleteTrack);
+			_trackRepository.Delete(deleteTrack);
+			await _trackRepository.SaveChanges();
 		}
 
-        _imageRepository.Delete(album.Image);
+		//_imageRepository.Delete(album.Image);
 
-        await _albumRepository.Update(newAlbum);
+		await _albumRepository.Update(album);
 		
 		foreach (var trackDto in albumDto.AddTracks)
 		{
