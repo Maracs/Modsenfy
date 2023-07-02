@@ -47,7 +47,7 @@ namespace Modsenfy.PresentationLayer.Controllers
 		public async Task<ActionResult> DeleteAlbum([FromRoute] int id)
 		{
 			var album = await _albumRepository.GetByIdAsync(id);
-			_albumRepository.DeleteAsync(album);
+			_albumRepository.Delete(album);
 			return Ok();
 		}
 

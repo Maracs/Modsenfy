@@ -29,7 +29,7 @@ public interface IUserAlbumRepository:IRepository<UserAlbums>
         throw new NotImplementedException();
     }
 
-    void IRepository<UserAlbums>.DeleteAsync(UserAlbums entity)
+    void IRepository<UserAlbums>.Delete(UserAlbums entity)
     {
         throw new NotImplementedException();
     }

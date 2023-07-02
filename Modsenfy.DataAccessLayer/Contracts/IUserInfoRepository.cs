@@ -29,7 +29,7 @@ public interface IUserInfoRepository:IRepository<UserInfo>
         throw new NotImplementedException();
     }
 
-    void IRepository<UserInfo>.DeleteAsync(UserInfo entity)
+    void IRepository<UserInfo>.Delete(UserInfo entity)
     {
         throw new NotImplementedException();
     }

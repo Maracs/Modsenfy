@@ -131,10 +131,7 @@ public class AlbumService
 	}
 
 	public async Task<int> CreateAlbum(AlbumCreateDto albumDto)
-	{
-		//artistOwnerId из клейма !TODO;
-		int artistOwnerId = 1;
-		
+	{		
 		foreach(var trackDto in albumDto.Tracks)
 		{
 			foreach(var artistId in trackDto.Artists)
@@ -186,7 +183,7 @@ public class AlbumService
 		//artistOwnerId из клейма !TODO;
 		int artistOwnerId = 1;
 
-		var album = await _albumRepository.GetById(id);
+		var album = await _albumRepository.GetByIdAsync(id);
 		if (album == null)
 			throw new Exception("n");
 		if (album.AlbumOwnerId != artistOwnerId)
@@ -217,16 +214,16 @@ public class AlbumService
 
 		foreach (var deleteTrackId in albumDto.DeleteTracks)
 		{
-			var deleteTrack = await _trackRepository.GetById(deleteTrackId);
+			var deleteTrack = await _trackRepository.GetByIdAsync(deleteTrackId);
 			if (deleteTrack == null)
 				throw new Exception("n");
 			_trackRepository.Delete(deleteTrack);
-			await _trackRepository.SaveChanges();
+			await _trackRepository.SaveChangesAsync();
 		}
 
 		//_imageRepository.Delete(album.Image);
 
-		await _albumRepository.Update(album);
+		await _albumRepository.UpdateAsync(album);
 		
 		foreach (var trackDto in albumDto.AddTracks)
 		{

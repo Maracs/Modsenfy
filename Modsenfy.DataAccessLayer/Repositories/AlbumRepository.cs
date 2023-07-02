@@ -29,7 +29,7 @@ public class AlbumRepository : IAlbumRepository
 		return albumEntry.Entity;
 	}
 
-	public void DeleteAsync(Album album)
+	public void Delete(Album album)
 	{
 		_databaseContext.Remove(album);
 		_databaseContext.SaveChanges();
@@ -133,7 +133,7 @@ public class AlbumRepository : IAlbumRepository
 	public async Task UpdateAsync(Album album)
 	{
 		_databaseContext.Albums.Update(album);
-		await SaveChanges();
+		await SaveChangesAsync();
 	}
 
 	public async Task<IEnumerable<Entities.Stream>> GetAlbumStreams(int id)

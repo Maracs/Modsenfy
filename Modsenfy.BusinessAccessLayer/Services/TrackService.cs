@@ -38,7 +38,7 @@ public class TrackService
 			AudioFilename = trackDto.Audio.AudioFilename
 		};
 
-        var addedAudio = await _audioRepository.CreateAndGet(audio);
+        var addedAudio = await _audioRepository.CreateAndGetAsync(audio);
 
         var track = new Track()
 		{

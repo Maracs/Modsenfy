@@ -27,7 +27,7 @@ public class SearchService
 
     public async Task<SearchDto> Search(string query)
     {
-        var albums = await _albumRepository.GetAll();
+        var albums = await _albumRepository.GetAllAsync();
     
         IEnumerable<Searchable> albumSearchables = new List<Searchable>();
         foreach (var album in albums)
@@ -36,7 +36,7 @@ public class SearchService
         }
         albumSearchables = albumSearchables.OrderByDescending(a => a.Rate);
 
-        var tracks = await _trackRepository.GetAll();
+        var tracks = await _trackRepository.GetAllAsync();
 
 		IEnumerable<Searchable> trackSearchables = new List<Searchable>();
 		

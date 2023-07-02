@@ -29,7 +29,7 @@ public interface IUserTrackRepository:IRepository<UserTracks>
         throw new NotImplementedException();
     }
 
-    void IRepository<UserTracks>.DeleteAsync(UserTracks entity)
+    void IRepository<UserTracks>.Delete(UserTracks entity)
     {
         throw new NotImplementedException();
     }

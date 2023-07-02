@@ -18,7 +18,7 @@ public class TrackArtistsRepository : ITrackArtistsRepository
 		await SaveChangesAsync();
 	}
 
-	public void DeleteAsync(TrackArtists entity)
+	public void Delete(TrackArtists entity)
 	{
 		_databaseContext.Remove(entity);
 		_databaseContext.SaveChanges();

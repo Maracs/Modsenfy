@@ -29,7 +29,7 @@ public interface IRequestRepository:IRepository<Request>
         throw new NotImplementedException();
     }
 
-    void IRepository<Request>.DeleteAsync(Request entity)
+    void IRepository<Request>.Delete(Request entity)
     {
         throw new NotImplementedException();
     }

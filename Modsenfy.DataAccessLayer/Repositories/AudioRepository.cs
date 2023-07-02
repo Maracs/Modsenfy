@@ -13,15 +13,15 @@ public class AudioRepository : IAudioRepository
 		_databaseContext = databaseContext;
 	}
 	
-	public async Task Create(Audio entity)
+	public async Task CreateAsync(Audio entity)
 	{
 		await _databaseContext.AddAsync(entity);
 	}
 	
-	public async Task<Audio> CreateAndGet(Audio entity)
+	public async Task<Audio> CreateAndGetAsync(Audio entity)
 	{
 		var audioEntry =  await _databaseContext.AddAsync(entity);
-		await SaveChanges();
+		await SaveChangesAsync();
         return audioEntry.Entity;
     }
 
@@ -30,22 +30,22 @@ public class AudioRepository : IAudioRepository
 		throw new NotImplementedException();
 	}
 
-	public Task<IEnumerable<Audio>> GetAll()
+	public Task<IEnumerable<Audio>> GetAllAsync()
 	{
 		throw new NotImplementedException();
 	}
 
-	public Task<Audio> GetById(int id)
+	public Task<Audio> GetByIdAsync(int id)
 	{
 		throw new NotImplementedException();
 	}
 
-	public async Task SaveChanges()
+	public async Task SaveChangesAsync()
 	{
 		await _databaseContext.SaveChangesAsync();
 	}
 
-	public Task Update(Audio entity)
+	public Task UpdateAsync(Audio entity)
 	{
 		throw new NotImplementedException();
 	}
