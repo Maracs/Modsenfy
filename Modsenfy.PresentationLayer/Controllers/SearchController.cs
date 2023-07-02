@@ -17,9 +17,9 @@ public class SearchController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<SearchDto>> Search([FromQuery] string query)
+    public async Task<ActionResult<SearchDto>> Search([FromQuery] string q)
     {
-        var searchDto = await _searchService.Search(query);
+        var searchDto = await _searchService.Search(q);
         return Ok(searchDto);
     }
 }
