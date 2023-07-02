@@ -56,7 +56,7 @@ public class TrackService
 		trackDto.Artists.Append(artistOwnerId);
 		foreach (var artistId in trackDto.Artists)
 		{
-			var artist = await _artistRepository.GetById(artistId);
+			var artist = await _artistRepository.GetByIdAsync(artistId);
 			if (artist == null)
 				throw new Exception("artist not found");
 
@@ -65,8 +65,8 @@ public class TrackService
 				TrackId = addedTrack.TrackId,
 				ArtistId = artistId
 			};
-			await _trackArtistsRepository.Create(trackArtists);
 
+      await _trackArtistsRepository.CreateAsync(trackArtists);
 		}
 	}
 }

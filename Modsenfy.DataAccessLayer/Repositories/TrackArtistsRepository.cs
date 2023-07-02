@@ -12,36 +12,36 @@ public class TrackArtistsRepository : ITrackArtistsRepository
 	{
 		_databaseContext = databaseContext;
 	}
-	public async Task Create(TrackArtists entity)
+	public async Task CreateAsync(TrackArtists entity)
 	{
 		await _databaseContext.TrackArtists.AddAsync(entity);
-		await SaveChanges();
+		await SaveChangesAsync();
 	}
 
-	public void Delete(TrackArtists entity)
+	public void DeleteAsync(TrackArtists entity)
 	{
 		_databaseContext.Remove(entity);
 		_databaseContext.SaveChanges();
 	}
 
-	public Task<IEnumerable<TrackArtists>> GetAll()
+	public Task<IEnumerable<TrackArtists>> GetAllAsync()
 	{
 		throw new NotImplementedException();
 	}
 
-	public Task<TrackArtists> GetById(int id)
+	public Task<TrackArtists> GetByIdAsync(int id)
 	{
 		throw new NotImplementedException();
 	}
 
-	public async Task SaveChanges()
+	public async Task SaveChangesAsync()
 	{
 		await _databaseContext.SaveChangesAsync();
 	}
 
-	public async Task Update(TrackArtists entity)
+	public async Task UpdateAsync(TrackArtists entity)
 	{
 		_databaseContext.Update(entity);
-        await SaveChanges();
+        await SaveChangesAsync();
     }
 }

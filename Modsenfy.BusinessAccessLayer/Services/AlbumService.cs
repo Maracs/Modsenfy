@@ -94,7 +94,7 @@ public class AlbumService
 		if (ids.Equals("all"))
 		{
 			if (limit == -1 && offset == 0)
-				albums = await _albumRepository.GetAll();
+				albums = await _albumRepository.GetAllAsync();
 			else if (limit == -1)
 				albums = await _albumRepository.GetSkipped(offset);
 			else
@@ -123,11 +123,11 @@ public class AlbumService
 		return albumDtos;
 	}
 	
-	public async Task GetAlbumStreams(int id)
+	public async Task<IEnumerable<StreamDto>> GetAlbumStreams(int id)
 	{
 		var albumStreams = await _albumRepository.GetAlbumStreams(id);
 		var streamDtos = albumStreams.Select(s => _mapper.Map<StreamDto>(s));
-		Console.WriteLine(JsonConvert.SerializeObject(streamDtos, Formatting.Indented));
+		return streamDtos;
 	}
 
 	public async Task<int> CreateAlbum(AlbumCreateDto albumDto)
@@ -152,9 +152,11 @@ public class AlbumService
 			ImageTypeId = (await _imageTypeRepository.GetIfExists(albumDto.Image.ImageTypeName)).ImageTypeId
 		};
 		
-		
-		var artistOwner = await _artistRepository.GetById(artistOwnerId);
-		
+
+		//artistOwnerId из клейма !TODO;
+		int artistOwnerId = 1;
+		var artistOwner = await _artistRepository.GetByIdAsync(artistOwnerId);
+	
 
 		var album = new Album()
 		{

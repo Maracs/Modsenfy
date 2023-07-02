@@ -9,18 +9,7 @@ namespace Modsenfy.DataAccessLayer.Contracts
 {
 	internal interface ITrackRepository : IRepository<Track>
 	{
-		Task SaveChanges();
-
-		Task<Track> GetById(int id);
-
-		Task<IEnumerable<Track>> GetAll();
-
-		Task Create(Track entity);
-
-		Task Update(Track entity);
-
-		void Delete(Track entity);
-
+	
 		Task<IEnumerable<Track>> GetSeverlTracks(List<int> ids);
 
 		Task<Track> GetByIdWithJoins(int id);

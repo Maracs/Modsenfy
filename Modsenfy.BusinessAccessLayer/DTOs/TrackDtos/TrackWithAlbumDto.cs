@@ -12,6 +12,8 @@ public class TrackWithAlbumDto
 
 	public string TrackGenius { get; set; }
 
+	public DateTime TrackDuration { get; set; } 
+	
 	public IEnumerable<ArtistDto> Artists { get; set; }
 
 	public AudioDto Audio { get; set; }

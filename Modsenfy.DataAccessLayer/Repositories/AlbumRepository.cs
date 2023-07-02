@@ -16,7 +16,7 @@ public class AlbumRepository : IAlbumRepository
 		_databaseContext = databaseContext;
 	}
 
-	public async Task Create(Album album)
+	public async Task CreateAsync(Album album)
 	{
 		await _databaseContext.AddAsync(album);
 	}
@@ -29,13 +29,14 @@ public class AlbumRepository : IAlbumRepository
 		return albumEntry.Entity;
 	}
 
-	public void Delete(Album album)
+	public void DeleteAsync(Album album)
 	{
 		_databaseContext.Remove(album);
 		_databaseContext.SaveChanges();
 	}
 
-	public async Task<IEnumerable<Album>> GetAllWithJoins()
+
+	public async Task<IEnumerable<Album>> GetAllAsync()
 	{
 		var albums = await GetWithJoins()
 			.ToListAsync();
@@ -43,15 +44,7 @@ public class AlbumRepository : IAlbumRepository
 		return albums;
 	}
 
-	public async Task<IEnumerable<Album>> GetAll()
-	{
-		var albums = await _databaseContext.Albums.ToListAsync();
-		return albums;
-	}
-
-
-
-	public async Task<Album> GetById(int id)
+	public async Task<Album> GetByIdAsync(int id)
 	{
 		var album = await _databaseContext.Albums.FindAsync(id);
 		return album;
@@ -131,12 +124,13 @@ public class AlbumRepository : IAlbumRepository
 		return albums;
 	}
 
-	public async Task SaveChanges()
+	public async Task SaveChangesAsync()
 	{
 		await _databaseContext.SaveChangesAsync();
 	}
 
-	public async Task Update(Album album)
+
+	public async Task UpdateAsync(Album album)
 	{
 		_databaseContext.Albums.Update(album);
 		await SaveChanges();
