@@ -15,5 +15,6 @@ namespace Modsenfy.DataAccessLayer.Contracts
         Task<IEnumerable<Album>> GetArtistAlbums(int id);
         Task<IEnumerable<Track>> GetArtistTracks(int id);
         Task<IEnumerable<Artist>> GetArtistStreams(int id);
+        
     }
 }

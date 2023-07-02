@@ -35,6 +35,7 @@ public class AlbumRepository : IAlbumRepository
 		_databaseContext.SaveChanges();
 	}
 
+
 	public async Task<IEnumerable<Album>> GetAllAsync()
 	{
 		var albums = await GetWithJoins()
@@ -51,23 +52,23 @@ public class AlbumRepository : IAlbumRepository
 
 	public IIncludableQueryable<Album, ImageType> GetWithJoins()
 	{
-        IIncludableQueryable<Album, ImageType> albums = _databaseContext.Albums
-            .Include(a => a.AlbumType)
-            .Include(a => a.Artist)
-                .ThenInclude(ar => ar.Image)
-                    .ThenInclude(i => i.ImageType)
-            .Include(a => a.Image)
-                .ThenInclude(i => i.ImageType)
-            .Include(a => a.Tracks)
-                .ThenInclude(t => t.Audio)
-            .Include(a => a.Tracks)
-                .ThenInclude(t => t.Genre)
-            .Include(a => a.Tracks)
-                .ThenInclude(t => t.TrackArtists)
-                    .ThenInclude(ta => ta.Artist)
-                        .ThenInclude(ar => ar.Image)
-                            .ThenInclude(ar => ar.ImageType);
-        return albums;
+		IIncludableQueryable<Album, ImageType> albums = _databaseContext.Albums
+			.Include(a => a.AlbumType)
+			.Include(a => a.Artist)
+				.ThenInclude(ar => ar.Image)
+					.ThenInclude(i => i.ImageType)
+			.Include(a => a.Image)
+				.ThenInclude(i => i.ImageType)
+			.Include(a => a.Tracks)
+				.ThenInclude(t => t.Audio)
+			.Include(a => a.Tracks)
+				.ThenInclude(t => t.Genre)
+			.Include(a => a.Tracks)
+				.ThenInclude(t => t.TrackArtists)
+					.ThenInclude(ta => ta.Artist)
+						.ThenInclude(ar => ar.Image)
+							.ThenInclude(ar => ar.ImageType);
+		return albums;
 	}
 
 	public async Task<Album> GetByIdWithJoins(int id)
@@ -128,9 +129,11 @@ public class AlbumRepository : IAlbumRepository
 		await _databaseContext.SaveChangesAsync();
 	}
 
-	public Task UpdateAsync(Album album)
+
+	public async Task UpdateAsync(Album album)
 	{
-		throw new NotImplementedException();
+		_databaseContext.Albums.Update(album);
+		await SaveChanges();
 	}
 
 	public async Task<IEnumerable<Entities.Stream>> GetAlbumStreams(int id)
@@ -138,6 +141,16 @@ public class AlbumRepository : IAlbumRepository
 		var streams = await _databaseContext.Streams
 			.Include(s => s.User)
 			.Include(s => s.Track)
+				.ThenInclude(t => t.Audio)
+			.Include(s => s.Track)
+				.ThenInclude(t => t.Audio)
+			.Include(s => s.Track)
+				.ThenInclude(t => t.Genre)
+			.Include(s => s.Track)
+				.ThenInclude(t => t.TrackArtists)
+					.ThenInclude(ta => ta.Artist)
+						.ThenInclude(ar => ar.Image)
+							.ThenInclude(ar => ar.ImageType)
 			.Where(s => s.Track.AlbumId == id)
 			.OrderByDescending(s => s.StreamDate)
 			.ToListAsync();
@@ -145,4 +158,5 @@ public class AlbumRepository : IAlbumRepository
 
 	}
 
+	
 }
