@@ -14,7 +14,7 @@ namespace Modsenfy.DataAccessLayer.Repositories
             _databaseContext = databaseContext;
         }
 
-        public async Task<Artist> GetById(int id)
+        public async Task<Artist> GetByIdAsync(int id)
         {
             var artist = await _databaseContext.Artists.FindAsync(id);
 
@@ -39,22 +39,38 @@ namespace Modsenfy.DataAccessLayer.Repositories
             return artist;
         }
 
-        public async Task<IEnumerable<Artist>> GetAll()
+        public async Task<IEnumerable<Artist>> GetAllAsync()
         {
             return await _databaseContext.Artists.ToListAsync();
         }
 
-        public async Task SaveChanges()
+        public async Task SaveChangesAsync()
         {
             await _databaseContext.SaveChangesAsync();
         }
 
-        public async Task Create(Artist entity)
+        public async Task CreateAsync(Artist entity)
         {
             await _databaseContext.AddAsync(entity);
         }
 
-        public async Task Update(Artist entity)
+        public async Task CreateWithId(Artist entity)
+        {
+             await _databaseContext.Database.OpenConnectionAsync();
+            try
+            {
+               await _databaseContext.Database.ExecuteSqlRawAsync("SET IDENTITY_INSERT dbo.Artists ON");
+               await _databaseContext.AddAsync(entity);
+               await _databaseContext.SaveChangesAsync();
+               await _databaseContext.Database.ExecuteSqlRawAsync("SET IDENTITY_INSERT dbo.Artists OFF");
+            }
+            finally
+            {
+                await _databaseContext.Database.CloseConnectionAsync();
+            }
+        }
+        
+        public async Task UpdateAsync(Artist entity)
         {
             var artist = await _databaseContext.Artists.FindAsync(entity.ArtistId);
 
@@ -64,7 +80,7 @@ namespace Modsenfy.DataAccessLayer.Repositories
             artist.ImageId = entity.ImageId;
         }
 
-        public void Delete(Artist entity) 
+        public void DeleteAsync(Artist entity) 
         {
             _databaseContext.Remove(entity);
             _databaseContext.SaveChanges();

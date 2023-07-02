@@ -4,32 +4,32 @@ namespace Modsenfy.DataAccessLayer.Contracts;
 
 public interface IImageRepository:IRepository<Image>
 {
-    async Task IRepository<Image>.SaveChanges()
+    async Task IRepository<Image>.SaveChangesAsync()
     {
         throw new NotImplementedException();
     }
 
-    async Task<Image> IRepository<Image>.GetById(int id)
+    async Task<Image> IRepository<Image>.GetByIdAsync(int id)
     {
         throw new NotImplementedException();
     }
 
-    async Task<IEnumerable<Image>> IRepository<Image>.GetAll()
+    async Task<IEnumerable<Image>> IRepository<Image>.GetAllAsync()
     {
         throw new NotImplementedException();
     }
 
-    async Task IRepository<Image>.Create(Image entity)
+    async Task IRepository<Image>.CreateAsync(Image entity)
     {
         throw new NotImplementedException();
     }
 
-    async Task IRepository<Image>.Update(Image entity)
+    async Task IRepository<Image>.UpdateAsync(Image entity)
     {
         throw new NotImplementedException();
     }
 
-    void IRepository<Image>.Delete(Image entity)
+    void IRepository<Image>.DeleteAsync(Image entity)
     {
         throw new NotImplementedException();
     }

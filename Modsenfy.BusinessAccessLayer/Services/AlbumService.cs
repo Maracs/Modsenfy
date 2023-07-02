@@ -94,7 +94,7 @@ public class AlbumService
 		if (ids.Equals("all"))
 		{
 			if (limit == -1 && offset == 0)
-				albums = await _albumRepository.GetAll();
+				albums = await _albumRepository.GetAllAsync();
 			else if (limit == -1)
 				albums = await _albumRepository.GetSkipped(offset);
 			else
@@ -141,7 +141,7 @@ public class AlbumService
 		
 		//artistOwnerId из клейма !TODO;
 		int artistOwnerId = 1;
-		var artistOwner = await _artistRepository.GetById(artistOwnerId);
+		var artistOwner = await _artistRepository.GetByIdAsync(artistOwnerId);
 		
 
 		var album = new Album()

@@ -21,7 +21,7 @@ namespace Modsenfy.DataAccessLayer.Repositories
 			_databaseContext = databaseContext;
 		}
 
-		public async Task Create(Track entity)
+		public async Task CreateAsync(Track entity)
 		{
 			await _databaseContext.Tracks.AddAsync(entity);
 		}
@@ -29,22 +29,22 @@ namespace Modsenfy.DataAccessLayer.Repositories
 		public async Task<Track> CreateAndGet(Track entity)
 		{
 			var trackEntry = await _databaseContext.Tracks.AddAsync(entity);
-            await SaveChanges();
+            await SaveChangesAsync();
             return trackEntry.Entity;
 		}
 
-		public void Delete(Track entity)
+		public void DeleteAsync(Track entity)
 		{
 			_databaseContext.Remove(entity);
 			return;
 		}
 
-		public async Task<IEnumerable<Track>> GetAll()
+		public async Task<IEnumerable<Track>> GetAllAsync()
 		{
 			return await _databaseContext.Tracks.ToListAsync();
 		}
 
-		public async Task<Track> GetById(int id)
+		public async Task<Track> GetByIdAsync(int id)
 		{
 			var track = await _databaseContext.Tracks.FindAsync(id);
 			return track;
@@ -109,12 +109,12 @@ namespace Modsenfy.DataAccessLayer.Repositories
 			return tracks;
 		}
 
-		public async Task SaveChanges()
+		public async Task SaveChangesAsync()
 		{
 			await _databaseContext.SaveChangesAsync();
 		}
 
-		public async Task Update(Track entity)
+		public async Task UpdateAsync(Track entity)
 		{
 			var track = await _databaseContext.Tracks.FindAsync(entity.TrackId);
 

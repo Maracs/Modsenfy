@@ -15,49 +15,49 @@ public class UserRepository : IUserRepository
         _databaseContext = databaseContext;
     }
 
-    public async Task SaveChanges()
+    public async Task SaveChangesAsync()
     {
         await _databaseContext.SaveChangesAsync();
 
     }
 
-    public async Task<User> GetById(int id)
+    public async Task<User> GetByIdAsync(int id)
     {
         var user = await _databaseContext.Users.FindAsync(id);
 
         return user;
     }
 
-    public async Task<bool> IfNicknameExists(string nickname)
+    public async Task<bool> IfNicknameExistsAsync(string nickname)
     {
         return await _databaseContext.Users.AnyAsync(x => x.UserNickname == nickname);
     }
 
-    public async Task<bool> IfEmailExists(string email)
+    public async Task<bool> IfEmailExistsAsync(string email)
     {
         return await _databaseContext.Users.AnyAsync(x => x.UserEmail == email);
     }
 
-    public async Task<bool> IfUserFollowArtist(int userId, int artistId)
+    public async Task<bool> IfUserFollowArtistAsync(int userId, int artistId)
     {
 
         return await _databaseContext.UserArtists.AnyAsync(
             userArtists => userArtists.ArtistId == artistId && userArtists.UserId==userId);
     }
 
-    public async Task<IEnumerable<User>> GetAll()
+    public async Task<IEnumerable<User>> GetAllAsync()
     {
         var users = await _databaseContext.Users.ToListAsync();
 
         return users;
     }
 
-    public async Task Create(User entity)
+    public async Task CreateAsync(User entity)
     {
         await _databaseContext.AddAsync(entity);
     }
 
-    public async Task<User> CreateAndGet(User entity)
+    public async Task<User> CreateAndGetAsync(User entity)
     {
         var entityEntry = await _databaseContext.AddAsync(entity);
 
@@ -66,17 +66,17 @@ public class UserRepository : IUserRepository
         return entityEntry.Entity;
     }
 
-    public async Task Update(User entity)
+    public async Task UpdateAsync(User entity)
     {
         _databaseContext.Users.Update(entity);
     }
 
-    public void Delete(User entity)
+    public void DeleteAsync(User entity)
     {
         _databaseContext.Users.Remove(entity);
     }
 
-    public async Task<User> GetByIdWithJoins(int id)
+    public async Task<User> GetByIdWithJoinsAsync(int id)
     {
         var user = await _databaseContext.Users.Include(user => user.Role)
             .Include(user => user.UserInfo)
@@ -86,7 +86,7 @@ public class UserRepository : IUserRepository
         return user;
     }
 
-    public async Task<User> GetUserTopArtists(int id)
+    public async Task<User> GetUserTopArtistsAsync(int id)
     {
         var user = await _databaseContext.Users
             .Include(user => user.Streams)
@@ -104,7 +104,7 @@ public class UserRepository : IUserRepository
         return user;
     }
 
-    public async Task<List<Stream>> GetUserTopTracks(int id)
+    public async Task<List<Stream>> GetUserTopTracksAsync(int id)
     {
         var streams = await _databaseContext.Streams
             .Include(stream => stream.Track)
@@ -141,7 +141,7 @@ public class UserRepository : IUserRepository
     }
 
 
-    public async Task<User> GetUserWithPlaylists(int id)
+    public async Task<User> GetUserWithPlaylistsAsync(int id)
     {
         var user = await _databaseContext.Users
             .Include(user => user.Playlists)
@@ -178,7 +178,7 @@ public class UserRepository : IUserRepository
         return user;
     }
     
-    public async Task<List<UserPlaylists>> GetUserWithSavedPlaylists(int id)
+    public async Task<List<UserPlaylists>> GetUserWithSavedPlaylistsAsync(int id)
     {
         var userPlaylistsList = await _databaseContext.UserPlaylists
             .Include(playlists =>playlists.Playlist )
@@ -217,17 +217,17 @@ public class UserRepository : IUserRepository
         return userPlaylistsList;
     }
 
-    public async Task FollowArtist(UserArtists entity)
+    public async Task FollowArtistAsync(UserArtists entity)
     {
         await _databaseContext.UserArtists.AddAsync(entity);
     }
 
-    public async Task UnfollowArtist(UserArtists entity)
+    public async Task UnfollowArtistAsync(UserArtists entity)
     {
         _databaseContext.UserArtists.Remove(entity);
     }
 
-    public async Task<User> GetUserRequests(int id)
+    public async Task<User> GetUserRequestsAsync(int id)
     {
         var user = await _databaseContext.Users
             .Include(user => user.Requests)
@@ -242,7 +242,7 @@ public class UserRepository : IUserRepository
         return user;
     }
     
-    public async Task<User> GetFollowedArtists(int id)
+    public async Task<User> GetFollowedArtistsAsync(int id)
     {
         var user = await _databaseContext.Users
             .Include(user => user.UserArtists)
@@ -256,7 +256,7 @@ public class UserRepository : IUserRepository
         return user;
     }
 
-    public async Task<ICollection<Stream>> GetUserStreamHistory(int id)
+    public async Task<ICollection<Stream>> GetUserStreamHistoryAsync(int id)
     {
         var streams = await _databaseContext.Streams
             .Include(stream => stream.User)
@@ -283,5 +283,13 @@ public class UserRepository : IUserRepository
 
     }
 
+    public async Task<Playlist> CreateAndGetPlaylistAsync(Playlist entity)
+    {
+        var entityEntry = await _databaseContext.Playlist.AddAsync(entity);
+
+        await _databaseContext.SaveChangesAsync();
+
+        return entityEntry.Entity;
+    }
 
 }

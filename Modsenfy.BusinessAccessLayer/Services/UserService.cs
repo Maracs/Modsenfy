@@ -24,29 +24,29 @@ public class UserService
     private readonly UserTrackRepository _userTrackRepository;
 
     private readonly UserAlbumRepository _userAlbumRepository;
+
+    private readonly UserPlaylistRepository _userPlaylistRepository;
+
+    private readonly ArtistRepository _artistRepository;
     
     private readonly IMapper _mapper;
         
-    public UserService( UserRepository userRepository,
-        UserInfoRepository userInfoRepository,
-        ImageRepository imageRepository,
-        ImageTypeRepository imageTypeRepository,RequestRepository requestRepository,UserTrackRepository userTrackRepository,UserAlbumRepository userAlbumRepository,IMapper mapper)
+    public UserService( UserRepository userRepository, UserInfoRepository userInfoRepository,
+        ImageRepository imageRepository, ImageTypeRepository imageTypeRepository,
+        RequestRepository requestRepository, UserTrackRepository userTrackRepository,
+        UserAlbumRepository userAlbumRepository, UserPlaylistRepository userPlaylistRepository,
+        ArtistRepository artistRepository,IMapper mapper)
     {
         _userRepository = userRepository;
-        
         _userInfoRepository = userInfoRepository;
-        
         _imageRepository = imageRepository;
-
         _imageTypeRepository = imageTypeRepository;
-
         _mapper = mapper;
-
         _requestRepository = requestRepository;
-
         _userTrackRepository = userTrackRepository;
-
         _userAlbumRepository = userAlbumRepository;
+        _userPlaylistRepository = userPlaylistRepository;
+         _artistRepository =   artistRepository;
     }
 
     public async Task<int> RegisterUser(UserWithDetailsAndEmailAndPasshashDto userDto)
@@ -72,7 +72,7 @@ public class UserService
             ImageId = imageId
         };
 
-        var userInfoId = (await _userInfoRepository.CreateAndGet(userInfo)).UserInfoId;
+        var userInfoId = (await _userInfoRepository.CreateAndGetAsync(userInfo)).UserInfoId;
         
         var user = new User()
         {
@@ -80,19 +80,19 @@ public class UserService
             UserNickname = userDto.Nickname,
             UserPasshash = userDto.Passhash,
             UserInfoId = userInfoId,
-            UserRoleId = 1 // Доработать эту логику
+            UserRoleId = 1 
         };
 
-        var userId = (await _userRepository.CreateAndGet(user)).UserId;
+        var userId = (await _userRepository.CreateAndGetAsync(user)).UserId;
         
         return userId;
     }
 
-    public async Task<List<ArtistDto>> GetUserTopArtists(int id)
+    public async Task<List<ArtistDto>> GetUserTopArtistsAsync(int id)
     {
         var topArtistsCount = 5;
 
-        var user = await _userRepository.GetUserTopArtists(id);
+        var user = await _userRepository.GetUserTopArtistsAsync(id);
 
         var streams = user.Streams;
 
@@ -135,10 +135,10 @@ public class UserService
         return topArtistsDto;
     }
 
-    public async Task<List<TrackWithAlbumDto>> GetUserTopTracks(int id)
+    public async Task<List<TrackWithAlbumDto>> GetUserTopTracksAsync(int id)
     {
         var topTrackCount = 5;
-        var streams = await _userRepository.GetUserTopTracks(id);
+        var streams = await _userRepository.GetUserTopTracksAsync(id);
         var tracksMap = new Dictionary<Track, int>();
         
         foreach (var stream in streams)
@@ -165,9 +165,9 @@ public class UserService
         return topTracksDto;
     }
 
-    public async Task<List<ArtistDto>> GetFollowedArtists(int id, int limit, int offset)
+    public async Task<List<ArtistDto>> GetFollowedArtistsAsync(int id, int limit, int offset)
     {
-        var user = await _userRepository.GetFollowedArtists(id);
+        var user = await _userRepository.GetFollowedArtistsAsync(id);
 
         var allArtists = new List<Artist>();
 
@@ -194,7 +194,7 @@ public class UserService
         return artistsDto;
     }
 
-    public async Task FollowArtists(int id, string ids)
+    public async Task FollowArtistsAsync(int id, string ids)
     {
        
             var splittedIds = ids.Split(',');
@@ -210,13 +210,13 @@ public class UserService
                     ArtistId = intId,
                     UserId = id,
                 };
-                await _userRepository.FollowArtist(userArtist);
+                await _userRepository.FollowArtistAsync(userArtist);
             }
 
-            await _userRepository.SaveChanges();
+            await _userRepository.SaveChangesAsync();
     }
     
-    public async Task UnfollowArtists(int id, string ids)
+    public async Task UnfollowArtistsAsync(int id, string ids)
     {
        
         var splittedIds = ids.Split(',');
@@ -232,13 +232,13 @@ public class UserService
                 ArtistId = intId,
                 UserId = id,
             };
-            await _userRepository.UnfollowArtist(userArtist);
+            await _userRepository.UnfollowArtistAsync(userArtist);
         }
-        await _userRepository.SaveChanges();
+        await _userRepository.SaveChangesAsync();
     }
 
 
-    public async Task<IEnumerable<bool>> CheckUserFollowsArtists(int id,string ids)
+    public async Task<IEnumerable<bool>> CheckUserFollowsArtistsAsync(int id,string ids)
     {
         var splittedIds = ids.Split(',');
 
@@ -248,40 +248,40 @@ public class UserService
 
         foreach (var artistId in splittedIds)
         {
-            followings.Add(await _userRepository.IfUserFollowArtist(id,int.Parse(artistId)));
+            followings.Add(await _userRepository.IfUserFollowArtistAsync(id,int.Parse(artistId)));
         }
         
         return followings;
     }
 
-    public async Task DeleteUser(int id)
+    public async Task DeleteUserAsync(int id)
     {
-        var user =  await _userRepository.GetById(id);
+        var user =  await _userRepository.GetByIdAsync(id);
 
-        var userInfo = await _userInfoRepository.GetById(user.UserInfoId);
+        var userInfo = await _userInfoRepository.GetByIdAsync(user.UserInfoId);
 
-        var image = await _imageRepository.GetById(userInfo.ImageId);
+        var image = await _imageRepository.GetByIdAsync(userInfo.ImageId);
          
-        _userRepository.Delete(user);
+        _userRepository.DeleteAsync(user);
 
-        await _userRepository.SaveChanges();
+        await _userRepository.SaveChangesAsync();
          
-        _userInfoRepository.Delete(userInfo);
+        _userInfoRepository.DeleteAsync(userInfo);
 
-        await _userInfoRepository.SaveChanges();
+        await _userInfoRepository.SaveChangesAsync();
          
-        _imageRepository.Delete(image);
+        _imageRepository.DeleteAsync(image);
 
-        await _imageRepository.SaveChanges();
+        await _imageRepository.SaveChangesAsync();
     }
 
-    public async Task<bool> UpdateUser(int id, UserWithDetailsAndEmailDto userDto)
+    public async Task<bool> UpdateUserAsync(int id, UserWithDetailsAndEmailDto userDto)
     {
-        var user = await _userRepository.GetById(id);
+        var user = await _userRepository.GetByIdAsync(id);
         user.UserNickname = userDto.Nickname;
         user.UserEmail = userDto.Email;
         
-        var userInfo = await _userInfoRepository.GetById(user.UserInfoId);
+        var userInfo = await _userInfoRepository.GetByIdAsync(user.UserInfoId);
         userInfo.UserInfoAddress = userDto.Details.UserInfoAddress;
         userInfo.UserInfoPhone = userDto.Details.UserInfoPhone;
         userInfo.UserInfoFirstName = userDto.Details.UserInfoFirstname;
@@ -289,7 +289,7 @@ public class UserService
         userInfo.UserInfoMiddleName = userDto.Details.UserInfoMiddlename;
         userInfo.UserInfoRegistrationDate =  DateTime.Parse(userDto.Details.UserInfoRegistrationDate );
 
-        var image = await _imageRepository.GetById(userInfo.ImageId);
+        var image = await _imageRepository.GetByIdAsync(userInfo.ImageId);
         image.ImageFilename = userDto.Image.ImageFilename;
 
         var imageType = await _imageTypeRepository.GetIfExists(userDto.Image.ImageTypeName);
@@ -297,22 +297,22 @@ public class UserService
             return false;
         image.ImageTypeId = imageType.ImageTypeId;
 
-        await _userRepository.Update(user);
-        await _userRepository.SaveChanges();
+        await _userRepository.UpdateAsync(user);
+        await _userRepository.SaveChangesAsync();
 
-        await _userInfoRepository.Update(userInfo);
-        await _userInfoRepository.SaveChanges();
+        await _userInfoRepository.UpdateAsync(userInfo);
+        await _userInfoRepository.SaveChangesAsync();
 
-        await _imageRepository.Update(image);
-        await _imageRepository.SaveChanges();
+        await _imageRepository.UpdateAsync(image);
+        await _imageRepository.SaveChangesAsync();
 
 
         return true;
     }
 
-    public async Task<List<PlaylistDto>> GetUserPlaylists(int id,int limit,int offset)
+    public async Task<List<PlaylistDto>> GetUserPlaylistsAsync(int id,int limit,int offset)
     {
-        var user = await _userRepository.GetUserWithPlaylists(id);
+        var user = await _userRepository.GetUserWithPlaylistsAsync(id);
         
        var limitedPlaylists= user.Playlists
             .OrderBy(playlist => playlist.PlaylistId)
@@ -392,9 +392,9 @@ public class UserService
         return playlistDtoList;
     }
 
-     public async Task<List<PlaylistDto>> GetUserSavedPlaylists(int id,int limit,int offset)
+     public async Task<List<PlaylistDto>> GetUserSavedPlaylistsAsync(int id,int limit,int offset)
     {
-        var userPlaylists = await _userRepository.GetUserWithSavedPlaylists(id);
+        var userPlaylists = await _userRepository.GetUserWithSavedPlaylistsAsync(id);
         
        var limitedPlaylists= userPlaylists
             .OrderBy(playlist => playlist.PlaylistId)
@@ -474,7 +474,7 @@ public class UserService
         return playlistDtoList;
     }
     
-    public async Task<RequestDto> GetRequest(int id)
+    public async Task<RequestDto> GetRequestAsync(int id)
     {
         var request = await _requestRepository.GetWithJoins(id);
 
@@ -490,7 +490,7 @@ public class UserService
         return requestDto;
     }
 
-    public async Task<List<RequestDto>> GetSeveralRequests(int limit, int offset, string status)
+    public async Task<List<RequestDto>> GetSeveralRequestsAsync(int limit, int offset, string status)
     {
         var requests = await _requestRepository.GetAllWithJoins();
 
@@ -519,28 +519,46 @@ public class UserService
         return requestDtoList;
     }
 
-    public async Task AnswerRequest(int id, string status)
+    public async Task AnswerRequestAsync(int id, string status)
     {
        
        
-       var request = await _requestRepository.GetById(id);
+       var request = await _requestRepository.GetByIdAsync(id);
         
        var requestStatus = await _requestRepository.GetRequestStatusIdByName(status);
 
        request.RequestStatusId = requestStatus;
 
-       await _requestRepository.Update(request);
-       await _requestRepository.SaveChanges();
+       await _requestRepository.UpdateAsync(request);
+       await _requestRepository.SaveChangesAsync();
 
-       //Добавить логику обновления роли
+       if (status == "accepted")
+       {
+           var user = await _userRepository.GetByIdAsync(request.UserId);
+
+           user.UserRoleId = 2;
+
+           await _userRepository.UpdateAsync(user);
+           await _userRepository.SaveChangesAsync();
+         
+           
+           var artist = new Artist()
+           {
+               ArtistId = request.UserId,
+               ArtistBio = request.RequestArtistBio,
+               ArtistName = request.RequestArtistName,
+               ImageId = request.ImageId,
+           };
+           await _artistRepository.CreateWithId(artist);
+           await _artistRepository.SaveChangesAsync();
+       }
        
-       await _requestRepository.SaveChanges();
     }
 
-    public async Task<List<RequestDto>> GetSeveralUserRequests(int id, int limit, int offset, string status)
+    public async Task<List<RequestDto>> GetSeveralUserRequestsAsync(int id, int limit, int offset, string status)
     {
 
-        var user = await _userRepository.GetUserRequests(id);
+        var user = await _userRepository.GetUserRequestsAsync(id);
 
         var requests = user.Requests;
 
@@ -569,9 +587,9 @@ public class UserService
         return requestDtoList;
     }
 
-    public async Task<RequestDto> GetUserRequest(int userId, int requestId)
+    public async Task<RequestDto> GetUserRequestAsync(int userId, int requestId)
     {
-        var user = await _userRepository.GetUserRequests(userId);
+        var user = await _userRepository.GetUserRequestsAsync(userId);
 
         var requests = user.Requests;
 
@@ -591,31 +609,31 @@ public class UserService
     }
 
 
-    public async Task SaveTracksForUser(int id, string ids)
+    public async Task SaveTracksForUserAsync(int id, string ids)
     {
         var trackIds = ids.Split(",");
         
         foreach (var trackId in trackIds)
         {
             var entity = new UserTracks() { TrackId = int.Parse(trackId), UserId = id, UserTrackAdded = DateTime.Now };
-            await _userTrackRepository.Create(entity);
+            await _userTrackRepository.CreateAsync(entity);
         }
-        await _userTrackRepository.SaveChanges();
+        await _userTrackRepository.SaveChangesAsync();
     }
 
-    public async Task DeleteUserSavedTracks(int id, string ids)
+    public async Task DeleteUserSavedTracksAsync(int id, string ids)
     {
         var trackIds = ids.Split(",");
         
         foreach (var trackId in trackIds)
         {
-             _userTrackRepository.Delete(new UserTracks() { TrackId =int.Parse(trackId), UserId = id });
+             _userTrackRepository.DeleteAsync(new UserTracks() { TrackId =int.Parse(trackId), UserId = id });
             
         }
-        await _userTrackRepository.SaveChanges();
+        await _userTrackRepository.SaveChangesAsync();
     }
 
-    public async Task<List<bool>> CheckUserSavedTracks(int id, string ids)
+    public async Task<List<bool>> CheckUserSavedTracksAsync(int id, string ids)
     {
         var trackIds = ids.Split(",");
 
@@ -623,14 +641,14 @@ public class UserService
         
         foreach (var trackId in trackIds)
         {
-           var userFollowTrack = await  _userTrackRepository.IfUserFollowTrack( id,int.Parse(trackId) );
+           var userFollowTrack = await  _userTrackRepository.IfUserFollowTrackAsync( id,int.Parse(trackId) );
            userFollowTracks.Add(userFollowTrack);
         }
 
         return userFollowTracks;
     }
 
-    public async Task<List<bool>> CheckUserSavedAlbums(int id, string ids)
+    public async Task<List<bool>> CheckUserSavedAlbumsAsync(int id, string ids)
     {
         var albumIds = ids.Split(",");
 
@@ -638,7 +656,7 @@ public class UserService
         
         foreach (var albumId in albumIds)
         {
-            var userFollowAlbum = await  _userAlbumRepository.IfUserFollowAlbum( id,int.Parse(albumId) );
+            var userFollowAlbum = await  _userAlbumRepository.IfUserFollowAlbumAsync( id,int.Parse(albumId) );
             userFollowAlbums.Add(userFollowAlbum);
         }
 
@@ -646,33 +664,33 @@ public class UserService
     }
     
     
-    public async Task SaveAlbumsForUser(int id, string ids)
+    public async Task SaveAlbumsForUserAsync(int id, string ids)
     {
         var albumIds = ids.Split(",");
 
         foreach (var albumId in albumIds)
         {
-            await _userAlbumRepository.Create(new UserAlbums() {UserId = id,AlbumId = int.Parse(albumId),UserAlbumsAdded =DateTime.Now});
+            await _userAlbumRepository.CreateAsync(new UserAlbums() {UserId = id,AlbumId = int.Parse(albumId),UserAlbumsAdded =DateTime.Now});
         }
 
-        await _userAlbumRepository.SaveChanges();
+        await _userAlbumRepository.SaveChangesAsync();
     }
 
-    public async Task DeleteUserSavedAlbums(int id, string ids)
+    public async Task DeleteUserSavedAlbumsAsync(int id, string ids)
     {
         var albumIds = ids.Split(",");
 
         foreach (var albumId in albumIds)
         {
-            var entity = await _userAlbumRepository.GetById(id, int.Parse(albumId));
+            var entity = await _userAlbumRepository.GetByIdAsync(id, int.Parse(albumId));
             
-            _userAlbumRepository.Delete(entity);
+            _userAlbumRepository.DeleteAsync(entity);
         }
 
-        await _userAlbumRepository.SaveChanges();
+        await _userAlbumRepository.SaveChangesAsync();
     }
 
-    public async Task CreateRequest(int id, RequestWithoutIdAndTimeDto requestDto)
+    public async Task CreateRequestAsync(int id, RequestWithoutIdAndTimeDto requestDto)
     {
         var image = new Image()
         {
@@ -691,11 +709,11 @@ public class UserService
             UserId = id
         };
 
-        await _requestRepository.Create(request);
-        await _requestRepository.SaveChanges();
+        await _requestRepository.CreateAsync(request);
+        await _requestRepository.SaveChangesAsync();
     }
 
-    public async  Task<List<AlbumWithTracksDto>> GetUserSavedAlbums(int id, int limit, int offset)
+    public async  Task<List<AlbumWithTracksDto>> GetUserSavedAlbumsAsync(int id, int limit, int offset)
     {
         var userAlbums = await _userAlbumRepository.GetUserSavedAlbums(id);
 
@@ -714,9 +732,9 @@ public class UserService
         return albumDtos;
     }
 
-    public async Task<List<TrackWithAlbumDto>> GetUserTracks(int id, int limit, int offset)
+    public async Task<List<TrackWithAlbumDto>> GetUserTracksAsync(int id, int limit, int offset)
     {
-        var userTracks = await _userTrackRepository.GetUserTracks(id);
+        var userTracks = await _userTrackRepository.GetUserTracksAsync(id);
 
         var limitedUserTracks = userTracks
             .OrderBy(tracks =>tracks.TrackId )
@@ -732,18 +750,83 @@ public class UserService
         return trackDtos;
     }
 
-    public async Task<List<UserStreamDto>> GetUserStreamHistory(int id, int limit, int offset)
+    public async Task<UserStreamDto> GetUserStreamHistoryAsync(int id, int limit, int offset)
     {
-        var streams = await _userRepository.GetUserStreamHistory(id);
+        var streams = await _userRepository.GetUserStreamHistoryAsync(id);
 
         var limitedStreams = streams.Skip(offset).Take(limit);
 
-        var streamDtos = new List<UserStreamDto>();
+        var streamDto = new UserStreamDto()
+        {
+            Listener = _mapper.Map<UserDto>(limitedStreams.First().User),
+            Streams = new List<InnerStreamWithTrackDto>()
+        };
 
+        foreach (var stream in limitedStreams)
+        {
+
+            streamDto.Streams = streamDto.Streams.Append(new InnerStreamWithTrackDto()
+            {
+                Date = stream.StreamDate.ToString(),
+                Track = _mapper.Map<TrackDto>(stream.Track)
+            });
+
+        }
         
         
-        
-        return streamDtos;
+        return streamDto;
     }
 
+    public async Task FollowPlaylistAsync(int id, int playlistId)
+    {
+        await _userPlaylistRepository.FollowPlaylistAsync(id, playlistId);
+        await _userPlaylistRepository.SaveChangesAsync();
+    }
+
+    public async Task UnfollowPlaylistAsync(int id, int playlistId)
+    {
+        await _userPlaylistRepository.UnfollowPlaylistAsync(id, playlistId);
+        await _userPlaylistRepository.SaveChangesAsync();
+    }
+
+    public async Task<List<bool>> CheckIfUsersFollowPlaylistAsync(int playlistId, string ids)
+    {
+        var userIds = ids.Split(",");
+        
+        var userFollowPlaylists = new List<bool>();
+        
+        foreach (var userId in userIds)
+        {
+            var userFollowPlaylist = await  _userPlaylistRepository.IfUserFollowPlaylistAsync( playlistId,int.Parse(userId) );
+            userFollowPlaylists.Add(userFollowPlaylist);
+        }
+
+        return userFollowPlaylists;
+    }
+
+    public async Task<int> CreateUserPlaylistAsync(int id, PlaylistWithNameAndImage playlistDto)
+    {
+       
+
+        var imageType = await _imageTypeRepository.GetIfExists(playlistDto.Image.ImageTypeName);
+        if (imageType == null)
+            return -1;
+        var image = new Image()
+        {
+            ImageFilename = playlistDto.Image.ImageFilename,
+            ImageTypeId = imageType.ImageTypeId
+        };
+        var savedImage = await _imageRepository.CreateAndGet(image);
+
+        var playlist = new Playlist()
+        {
+            PlaylistOwnerId = id,
+            PlaylistName = playlistDto.Name,
+            PlaylistRelease = DateTime.Now,
+            CoverId = savedImage.ImageId
+        };
+        var savedPlaylist =await _userRepository.CreateAndGetPlaylistAsync(playlist);
+
+        return savedPlaylist.PlaylistId;
+    }
 }

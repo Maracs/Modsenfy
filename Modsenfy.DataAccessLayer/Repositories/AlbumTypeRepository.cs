@@ -14,23 +14,23 @@ public class AlbumTypeRepository : IAlbumTypeRepository
 		_databaseContext = databaseContext;
 	}
 	
-	public Task Create(AlbumType entity)
+	public Task CreateAsync(AlbumType entity)
 	{
 		throw new NotImplementedException();
 	}
 
-	public void Delete(AlbumType entity)
+	public void DeleteAsync(AlbumType entity)
 	{
 		throw new NotImplementedException();
 	}
 
-	public async Task<IEnumerable<AlbumType>> GetAll()
+	public async Task<IEnumerable<AlbumType>> GetAllAsync()
 	{
 		var types = await _databaseContext.AlbumTypes.ToListAsync();
 		return types;
 	}
 
-	public async Task<AlbumType> GetById(int id)
+	public async Task<AlbumType> GetByIdAsync(int id)
 	{
 		var type = await _databaseContext.AlbumTypes.FindAsync(id);
 		return type;
@@ -42,12 +42,12 @@ public class AlbumTypeRepository : IAlbumTypeRepository
         return type;
     }
 
-	public Task SaveChanges()
+	public Task SaveChangesAsync()
 	{
 		throw new NotImplementedException();
 	}
 
-	public Task Update(AlbumType entity)
+	public Task UpdateAsync(AlbumType entity)
 	{
 		throw new NotImplementedException();
 	}

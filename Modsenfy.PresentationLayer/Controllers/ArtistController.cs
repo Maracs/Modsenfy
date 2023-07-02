@@ -44,8 +44,8 @@ namespace Modsenfy.PresentationLayer.Controllers
                 return BadRequest();
             }
 
-            await _artistRepository.Create(artist);
-            await _artistRepository.SaveChanges();
+            await _artistRepository.CreateAsync(artist);
+            await _artistRepository.SaveChangesAsync();
 
             return Ok(artist.ArtistId);
         }
@@ -60,8 +60,8 @@ namespace Modsenfy.PresentationLayer.Controllers
                 return BadRequest();
             }
             
-            await _artistRepository.Update(artist);
-            await _artistRepository.SaveChanges();
+            await _artistRepository.UpdateAsync(artist);
+            await _artistRepository.SaveChangesAsync();
 
             return Ok(artist.ArtistId);
         }
@@ -69,15 +69,15 @@ namespace Modsenfy.PresentationLayer.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteArtist(int id)
         {
-            var artist = await _artistRepository.GetById(id);
+            var artist = await _artistRepository.GetByIdAsync(id);
 
             if (artist is null)
             {
                 return BadRequest();
             }
             
-            _artistRepository.Delete(artist);
-            await _artistRepository.SaveChanges();
+            _artistRepository.DeleteAsync(artist);
+            await _artistRepository.SaveChangesAsync();
 
             return Ok(artist.ArtistId);
         }

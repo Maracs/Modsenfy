@@ -4,32 +4,32 @@ namespace Modsenfy.DataAccessLayer.Contracts;
 
 public interface IUserTrackRepository:IRepository<UserTracks>
 {
-    async Task IRepository<UserTracks>.SaveChanges()
+    async Task IRepository<UserTracks>.SaveChangesAsync()
     {
         throw new NotImplementedException();
     }
 
-    async Task<UserTracks> IRepository<UserTracks>.GetById(int id)
+    async Task<UserTracks> IRepository<UserTracks>.GetByIdAsync(int id)
     {
         throw new NotImplementedException();
     }
 
-    async Task<IEnumerable<UserTracks>> IRepository<UserTracks>.GetAll()
+    async Task<IEnumerable<UserTracks>> IRepository<UserTracks>.GetAllAsync()
     {
         throw new NotImplementedException();
     }
 
-    async Task IRepository<UserTracks>.Create(UserTracks entity)
+    async Task IRepository<UserTracks>.CreateAsync(UserTracks entity)
     {
         throw new NotImplementedException();
     }
 
-    async Task IRepository<UserTracks>.Update(UserTracks entity)
+    async Task IRepository<UserTracks>.UpdateAsync(UserTracks entity)
     {
         throw new NotImplementedException();
     }
 
-    void IRepository<UserTracks>.Delete(UserTracks entity)
+    void IRepository<UserTracks>.DeleteAsync(UserTracks entity)
     {
         throw new NotImplementedException();
     }

@@ -44,6 +44,8 @@ public class DatabaseContext : DbContext
     public DbSet<Audio> Audios { get; set; }
     
     public DbSet<UserPlaylists> UserPlaylists { get; set; }
+    
+    public DbSet<Playlist> Playlist { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -59,7 +61,7 @@ public class DatabaseContext : DbContext
     {
         modelBuilder.Entity<Playlist>()
             .HasKey(playlist => playlist.PlaylistId);
-
+        
         modelBuilder.Entity<Album>()
             .HasOne(a => a.Artist)
             .WithMany()

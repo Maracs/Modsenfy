@@ -43,8 +43,8 @@ namespace Modsenfy.PresentationLayer.Controllers
              
             };
 
-            await _trackRepository.Create(track);
-            await _trackRepository.SaveChanges();
+            await _trackRepository.CreateAsync(track);
+            await _trackRepository.SaveChangesAsync();
 
             return Ok(track.TrackId);
         }
@@ -53,8 +53,8 @@ namespace Modsenfy.PresentationLayer.Controllers
         public async Task<ActionResult> UpdateTrack(TrackDto trackDto)
         {
             var track = _mapper.Map<Track>(trackDto);
-            await _trackRepository.Update(track);
-            await _trackRepository.SaveChanges();
+            await _trackRepository.UpdateAsync(track);
+            await _trackRepository.SaveChangesAsync();
 
             return Ok(track.TrackId);
         }
@@ -62,9 +62,9 @@ namespace Modsenfy.PresentationLayer.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteTrack(int id)
         {
-            var track = await _trackRepository.GetById(id);
-            _trackRepository.Delete(track);
-            await _trackRepository.SaveChanges();
+            var track = await _trackRepository.GetByIdAsync(id);
+            _trackRepository.DeleteAsync(track);
+            await _trackRepository.SaveChangesAsync();
             return Ok(track.TrackId);
         }
 
