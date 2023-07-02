@@ -9,7 +9,6 @@ public interface IAlbumRepository : IRepository<Album>
 	IIncludableQueryable<Album, ImageType> GetWithJoins();
 	Task<Album> GetByIdWithJoins(int id);
 	Task<IEnumerable<Album>> GetLimited(int limit, int offset);
-    Task<IEnumerable<Album>> GetAllWithJoins();
     Task<IEnumerable<Album>> GetSkipped(int offset);
 	Task<IEnumerable<Album>> GetOrderedByReleaseAndLimited(int limit, int offset);
 	Task<IEnumerable<Album>> GetOrderedByRelease();

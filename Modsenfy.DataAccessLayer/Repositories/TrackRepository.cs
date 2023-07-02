@@ -33,7 +33,7 @@ namespace Modsenfy.DataAccessLayer.Repositories
             return trackEntry.Entity;
 		}
 
-		public void DeleteAsync(Track entity)
+		public void Delete(Track entity)
 		{
 			_databaseContext.Remove(entity);
 			return;

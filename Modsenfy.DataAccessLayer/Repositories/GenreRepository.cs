@@ -18,7 +18,7 @@ public class GenreRepository : IGenreRepository
 		throw new NotImplementedException();
 	}
 
-	public void DeleteAsync(Genre entity)
+	public void Delete(Genre entity)
 	{
 		throw new NotImplementedException();
 	}

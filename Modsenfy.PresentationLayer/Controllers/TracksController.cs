@@ -63,7 +63,7 @@ namespace Modsenfy.PresentationLayer.Controllers
         public async Task<ActionResult> DeleteTrack(int id)
         {
             var track = await _trackRepository.GetByIdAsync(id);
-            _trackRepository.DeleteAsync(track);
+            _trackRepository.Delete(track);
             await _trackRepository.SaveChangesAsync();
             return Ok(track.TrackId);
         }

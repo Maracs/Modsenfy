@@ -15,5 +15,5 @@ public interface IRepository <T> where T : class
 
     Task UpdateAsync(T entity);
 
-    void DeleteAsync(T entity);
+    void Delete(T entity);
 }

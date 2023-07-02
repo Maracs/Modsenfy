@@ -29,7 +29,7 @@ public interface IUserRepository:IRepository<User>
         throw new NotImplementedException();
     }
 
-    void IRepository<User>.DeleteAsync(User entity)
+    void IRepository<User>.Delete(User entity)
     {
         throw new NotImplementedException();
     }

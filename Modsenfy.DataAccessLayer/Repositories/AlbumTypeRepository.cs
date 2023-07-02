@@ -19,7 +19,7 @@ public class AlbumTypeRepository : IAlbumTypeRepository
 		throw new NotImplementedException();
 	}
 
-	public void DeleteAsync(AlbumType entity)
+	public void Delete(AlbumType entity)
 	{
 		throw new NotImplementedException();
 	}

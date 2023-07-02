@@ -29,7 +29,7 @@ public interface IImageRepository:IRepository<Image>
         throw new NotImplementedException();
     }
 
-    void IRepository<Image>.DeleteAsync(Image entity)
+    void IRepository<Image>.Delete(Image entity)
     {
         throw new NotImplementedException();
     }

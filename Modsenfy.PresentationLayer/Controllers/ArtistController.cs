@@ -76,7 +76,7 @@ namespace Modsenfy.PresentationLayer.Controllers
                 return BadRequest();
             }
             
-            _artistRepository.DeleteAsync(artist);
+            _artistRepository.Delete(artist);
             await _artistRepository.SaveChangesAsync();
 
             return Ok(artist.ArtistId);
@@ -85,7 +85,7 @@ namespace Modsenfy.PresentationLayer.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Artist>>> GetSeveralArtists(List<int> ids)
         {
-            var artists = await _artistRepository.GetSeveralArtists(ids);
+            var artists = await _artistRepository.GetSeveralArtists(ids); 
 
             if (artists is null)
             {
