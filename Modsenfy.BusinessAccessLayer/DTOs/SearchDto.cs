@@ -7,3 +7,6 @@ public class SearchDto
 	public IEnumerable<ArtistDto> Artists { get; set; }
 	public IEnumerable<PlaylistDto> Playlists { get; set; }
 }
+
+
+
