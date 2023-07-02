@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Modsenfy.BusinessAccessLayer.Extentions;
 using Modsenfy.DataAccessLayer.Repositories;
+using Microsoft.Extensions.Options;
 
 namespace Modsenfy.BusinessAccessLayer.Services;
 
@@ -18,14 +19,16 @@ public class TokenService
 {
     private readonly SymmetricSecurityKey _key;
     private readonly UserRepository _userRepository;
+    private readonly IOptions<Extentions.AuthenticationOptions> _authOptions;
 
-    public TokenService(IConfiguration config, UserRepository userRepository)
+    public TokenService(IConfiguration config, UserRepository userRepository, IOptions<Extentions.AuthenticationOptions> authenticationOptions)
     {
-        _key = Extentions.AuthenticationOptions.GetSymmetricSecurityKey();
+        _key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(authenticationOptions.Value.Key));
         _userRepository = userRepository;
+        _authOptions = authenticationOptions;
     }
 
-    public async Task<string> GetToken(User user)
+    private async Task<List<Claim>> GetClaimsAsync(User user)
     {
         var claims = new List<Claim>
         {
@@ -33,21 +36,37 @@ public class TokenService
             new Claim(JwtRegisteredClaimNames.Name, user.UserNickname),
         };
 
-        var role = await _userRepository.GetUserRole(user);
+        var role = await _userRepository.GetUserRoleAsync(user);
         claims.Add(new Claim(ClaimTypes.Role, role));
 
-        var creds = new SigningCredentials(_key, SecurityAlgorithms.HmacSha512Signature);
+        return claims;
+    }
+
+    private SecurityTokenDescriptor GetTokenDescriptor(List<Claim> claims, SigningCredentials creds)
+    {
         var tokenDescriptor = new SecurityTokenDescriptor
         {
             Subject = new ClaimsIdentity(claims),
             Expires = DateTime.Now.AddDays(1),
             SigningCredentials = creds,
-            Audience = Extentions.AuthenticationOptions.Audience,
-            Issuer = Extentions.AuthenticationOptions.Issuer,
+            Audience = _authOptions.Value.Audience,
+            Issuer = _authOptions.Value.Issuer,
         };
+        return tokenDescriptor;
+    }
+
+    public async Task<string> GetTokenAsync(User user)
+    {
+        var claims = await GetClaimsAsync(user);
+
+        var creds = new SigningCredentials(_key, SecurityAlgorithms.HmacSha512Signature);
+
+        var tokenDescriptor = GetTokenDescriptor(claims, creds);
 
         var tokenHandler = new JwtSecurityTokenHandler();
+
         var token = tokenHandler.CreateToken(tokenDescriptor);
+
         return tokenHandler.WriteToken(token);
     }
 }
