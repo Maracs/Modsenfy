@@ -46,7 +46,7 @@ public class UserService
         _tokenService = tokenService;
     }
 
-    public async Task<UserTokenDto> SignInUser(UserSigningDto userDto)
+    public async Task<UserTokenDto> SignInUserAsync(UserSigningDto userDto)
     {
         var user = await _userRepository.GetByUsername(userDto.UserNickname);
         if (user == null)  return new UserTokenDto() { UserToken = "None"};
@@ -59,11 +59,11 @@ public class UserService
         return new UserTokenDto()
         {
             UserNickname = user.UserNickname,
-            UserToken = await _tokenService.GetToken(user)
+            UserToken = await _tokenService.GetTokenAsync(user)
         };
     }
 
-    public async Task<UserTokenDto> RegisterUser(UserWithDetailsAndEmailAndPasshashDto userDto)
+    public async Task<UserTokenDto> RegisterUserAsync(UserWithDetailsAndEmailAndPasshashDto userDto)
     {
 
         var image = new Image()
@@ -105,7 +105,7 @@ public class UserService
         var userRegDto = new UserTokenDto()
         {
             UserNickname = user.UserNickname,
-            UserToken = await _tokenService.GetToken(user)
+            UserToken = await _tokenService.GetTokenAsync(user)
         };
 
         return userRegDto;

@@ -5,7 +5,7 @@ namespace Modsenfy.DataAccessLayer.Contracts;
 public interface IUserRepository:IRepository<User>
 {
 
-    Task<string> GetUserRole(User user);
+    Task<string> GetUserRoleAsync(User user);
 
     async Task IRepository<User>.SaveChanges()
     {

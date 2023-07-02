@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
@@ -16,24 +17,24 @@ public static class AuthenticationExtention
     public static IServiceCollection AddIdentityServices
             (this IServiceCollection services, IConfiguration configuration)
     {
+        services.Configure<AuthenticationOptions>(configuration.GetSection("AuthenticationOptions"));
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(options =>
-                options.TokenValidationParameters = new TokenValidationParameters
-                {
+            {
+                 var serviceProvider = services.BuildServiceProvider();
+                 var authenticationOptions = serviceProvider.GetRequiredService<IOptions<AuthenticationOptions>>().Value;
+
+                 options.TokenValidationParameters = new TokenValidationParameters
+                 {
                     ValidateIssuerSigningKey = true,
-                    
-                    IssuerSigningKey = AuthenticationOptions.GetSymmetricSecurityKey(),
-                    
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(authenticationOptions.Key)),
                     ValidateIssuer = true,
-
-                    ValidIssuer = AuthenticationOptions.Issuer,
-
+                    ValidIssuer = authenticationOptions.Issuer,
                     ValidateAudience = true,
-
-                    ValidAudience = AuthenticationOptions.Audience,
-
+                    ValidAudience = authenticationOptions.Audience,
                     ValidateLifetime = true
-                });
+                 };
+        });
 
         return services;
     }

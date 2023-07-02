@@ -33,15 +33,6 @@ public class DatabaseContext : DbContext
 
     public DbSet<Role> Role { get; set; }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        var connectionString = "Data Source=34.118.70.5,1433;Initial Catalog=modsenfydb;User ID=sqlserver;Password=password;";
-        if (!optionsBuilder.IsConfigured)
-        {
-            optionsBuilder.UseSqlServer(connectionString,
-                builder => builder.MigrationsAssembly("Modsenfy.DataAccessLayer"));
-        }
-    }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Playlist>()

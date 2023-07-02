@@ -17,6 +17,7 @@ namespace Modsenfy.PresentationLayer.Controllers;
 
 
 [Route("[controller]")]
+
 [ApiController]
 public class UsersController:ControllerBase
 {
@@ -41,7 +42,7 @@ public class UsersController:ControllerBase
     [HttpPost("signin")]
     public async Task<ActionResult<UserTokenDto>> SignInUser(UserSigningDto userDto)
     {
-        var userToken = await _userService.SignInUser(userDto);
+        var userToken = await _userService.SignInUserAsync(userDto);
       
         if (userToken.UserToken == "None") { return Unauthorized(); }
         
@@ -54,11 +55,11 @@ public class UsersController:ControllerBase
         if (await _userRepository.IfNicknameExists(userDto.Nickname) || await _userRepository.IfEmailExists(userDto.Email))
             return BadRequest("This nickname or email is already taken");
 
-        var userRegDto = await _userService.RegisterUser(userDto);
+        var userRegDto = await _userService.RegisterUserAsync(userDto);
         return Ok(userRegDto);
     }
 
-    [Authorize(Roles = "User")]
+    [Authorize(Roles = "User,Admin,Artist")]
     [HttpGet("{id}")]
     public async Task<ActionResult<UserWithDetailsAndEmailAndIdAndRoleDto>> GetUserProfile([FromRoute]int id)
     {
