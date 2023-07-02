@@ -94,7 +94,7 @@ public class AlbumService
 		if (ids.Equals("all"))
 		{
 			if (limit == -1 && offset == 0)
-				albums = await _albumRepository.GetAllWithJoins();
+				albums = await _albumRepository.GetAll();
 			else if (limit == -1)
 				albums = await _albumRepository.GetSkipped(offset);
 			else
