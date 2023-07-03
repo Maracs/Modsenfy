@@ -32,7 +32,7 @@ public class SearchService
         IEnumerable<Searchable> albumSearchables = new List<Searchable>();
         foreach (var album in albums)
         {
-            albumSearchables.Append(new Searchable(album, album.GetType().GetProperty(nameof(Album.AlbumName)), query));
+	        albumSearchables =  albumSearchables.Append(new Searchable(album, album.GetType().GetProperty(nameof(Album.AlbumName)), query));
         }
         albumSearchables = albumSearchables.OrderByDescending(a => a.Rate);
 
@@ -42,7 +42,7 @@ public class SearchService
 		
 		foreach (var track in tracks)
 		{
-			trackSearchables.Append(new Searchable(track, track.GetType().GetProperty(nameof(Track.TrackName)), query));
+			trackSearchables =	trackSearchables.Append(new Searchable(track, track.GetType().GetProperty(nameof(Track.TrackName)), query));
 		}
 		trackSearchables = trackSearchables.OrderByDescending(t => t.Rate);
 
@@ -52,7 +52,7 @@ public class SearchService
 		IEnumerable<Searchable> artistSearchables = new List<Searchable>();
 		foreach (var artist in artists)
 		{
-			artistSearchables.Append(new Searchable(artist, artist.GetType().GetProperty(nameof(Artist.ArtistName)), query));
+			artistSearchables = artistSearchables.Append(new Searchable(artist, artist.GetType().GetProperty(nameof(Artist.ArtistName)), query));
 		}
         artistSearchables = artistSearchables.OrderByDescending(a => a.Rate);
 

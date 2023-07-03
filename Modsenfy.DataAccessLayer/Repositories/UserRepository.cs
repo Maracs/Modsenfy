@@ -309,4 +309,12 @@ public class UserRepository : IUserRepository
         if (role == null) { throw new NullReferenceException(); }
         return role.RoleName;
     }
+    
+    public async Task<string> GetUserRoleByIdAsync(int userId)
+    {
+        var user = await _databaseContext.Users.FindAsync(userId);
+        var role = await _databaseContext.Role.FindAsync(user.UserRoleId);
+        if (role == null) { throw new NullReferenceException(); }
+        return role.RoleName;
+    }
 }
