@@ -9,13 +9,10 @@ namespace Modsenfy.DataAccessLayer.Contracts
 {
 	internal interface ITrackRepository : IRepository<Track>
 	{
-	
-		Task<IEnumerable<Track>> GetSeverlTracks(List<int> ids);
+		Task<Track> GetByIdWithJoinsAsync(int id);
 
-		Task<Track> GetByIdWithJoins(int id);
+		Task<Track> GetByIdWithStreamsAsync(int id);
 
-		Task<Track> GetByIdWithStreams(int id);
-
-        Task<Track> CreateAndGet(Track entity);
+        Task<Track> CreateAndGetAsync(Track entity);
     }
 }

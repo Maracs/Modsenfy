@@ -21,10 +21,7 @@ namespace Modsenfy.PresentationLayer.Controllers;
 [ApiController]
 public class UsersController:ControllerBase
 {
-
     private readonly UserRepository _userRepository;
-
-    private readonly TokenService _tokenService;
 
     private readonly IMapper _mapper;
 
