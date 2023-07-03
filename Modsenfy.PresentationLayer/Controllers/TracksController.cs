@@ -15,6 +15,7 @@ namespace Modsenfy.PresentationLayer.Controllers
 {
     [Route("[controller]")]
     [ApiController]
+    [Authorize(Roles = "Artist")]
     public class TracksController : ControllerBase
     {
         private readonly TrackRepository _trackRepository;
@@ -41,7 +42,6 @@ namespace Modsenfy.PresentationLayer.Controllers
             return Ok(trackDto);
         }
 
-        [Authorize(Roles = "Artist")]
         [HttpPut]
         public async Task<ActionResult> UpdateTrack([FromBody]TrackDto trackDto)
         {
@@ -54,7 +54,6 @@ namespace Modsenfy.PresentationLayer.Controllers
             return Ok(track.TrackId);
         }
 
-        [Authorize(Roles = "Artist")]
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteTrack([FromQuery]int id)
         {
@@ -76,7 +75,6 @@ namespace Modsenfy.PresentationLayer.Controllers
             return Ok(tracks);
         }
         
-        [Authorize(Roles = "Artist")]
         [HttpGet("{id}/streams")]
         public async Task<ActionResult<TrackWithStreamsDto>> GetTrackStreams(int id)
         {
