@@ -10,11 +10,29 @@ public class AlbumService
 {
 	private readonly AlbumRepository _albumRepository;
 	private readonly TrackRepository _trackRepository;
+	private readonly AlbumTypeRepository _albumTypeRepository;
+	private readonly ImageRepository _imageRepository;
+	private readonly ImageTypeRepository _imageTypeRepository;
+	private readonly TrackService _trackService;
+	private readonly ArtistRepository _artistRepository;
 	private readonly IMapper _mapper;
-	public AlbumService(AlbumRepository albumRepository, TrackRepository trackRepository, IMapper mapper)
+	public AlbumService(
+		AlbumRepository albumRepository, 
+		TrackRepository trackRepository, 
+		AlbumTypeRepository albumTypeRepository,
+		ImageRepository imageRepository, 
+		ImageTypeRepository imageTypeRepository,
+		TrackService trackService,
+		ArtistRepository artistRepository,
+		IMapper mapper)
 	{
 		_albumRepository = albumRepository;
 		_trackRepository = trackRepository;
+		_albumTypeRepository = albumTypeRepository;
+		_imageRepository = imageRepository;
+		_imageTypeRepository = imageTypeRepository;
+		_trackService = trackService;
+		_artistRepository = artistRepository;
 		_mapper = mapper;
 	}
 	
@@ -76,7 +94,7 @@ public class AlbumService
 		if (ids.Equals("all"))
 		{
 			if (limit == -1 && offset == 0)
-				albums = await _albumRepository.GetAll();
+				albums = await _albumRepository.GetAllAsync();
 			else if (limit == -1)
 				albums = await _albumRepository.GetSkipped(offset);
 			else
@@ -105,11 +123,112 @@ public class AlbumService
 		return albumDtos;
 	}
 	
-	public async Task GetAlbumStreams(int id)
+	public async Task<IEnumerable<StreamDto>> GetAlbumStreams(int id)
 	{
 		var albumStreams = await _albumRepository.GetAlbumStreams(id);
 		var streamDtos = albumStreams.Select(s => _mapper.Map<StreamDto>(s));
-        Console.WriteLine(JsonConvert.SerializeObject(streamDtos, Formatting.Indented));
-    }
+		return streamDtos;
+	}
+
+	public async Task<int> CreateAlbum(AlbumCreateDto albumDto)
+	{		
+		foreach(var trackDto in albumDto.Tracks)
+		{
+			foreach(var artistId in trackDto.Artists)
+			{
+				var res = await _artistRepository.Exists(artistId);
+				if (!res)
+					throw new Exception("artists not found");
+			}
+		}
+		
+		var albumType = await _albumTypeRepository.GetByName(albumDto.AlbumTypeName);
+		var image = new Image()
+		{
+			ImageFilename = albumDto.Image.ImageFilename,
+			ImageTypeId = (await _imageTypeRepository.GetIfExists(albumDto.Image.ImageTypeName)).ImageTypeId
+		};
+		
+
+		//artistOwnerId из клейма !TODO;
+		int artistOwnerId = 1;
+		var artistOwner = await _artistRepository.GetByIdAsync(artistOwnerId);
 	
+
+		var album = new Album()
+		{
+			AlbumName = albumDto.AlbumName,
+			AlbumTypeId = albumType.AlbumTypeId,
+			CoverId = (await _imageRepository.CreateAndGet(image)).ImageId,
+			AlbumOwnerId = artistOwnerId,
+			Artist = artistOwner,
+			AlbumRelease = DateTime.Now,	
+		};
+		
+		
+
+		album = await _albumRepository.CreateAndGet(album);
+		
+		foreach (var trackDto in albumDto.Tracks)
+		{
+			await _trackService.CreateTrack(trackDto, album.AlbumId, artistOwnerId);
+		}
+		
+
+		return album.AlbumId;
+	}
+
+	public async Task UpdateAlbum(int id, AlbumUpdateDto albumDto)
+	{
+		//artistOwnerId из клейма !TODO;
+		int artistOwnerId = 1;
+
+		var album = await _albumRepository.GetByIdAsync(id);
+		if (album == null)
+			throw new Exception("n");
+		if (album.AlbumOwnerId != artistOwnerId)
+			throw new Exception("n");
+			
+		foreach(var trackDto in albumDto.AddTracks)
+		{
+			foreach(var artistId in trackDto.Artists)
+			{
+				var res = await _artistRepository.Exists(artistId);
+				if (!res)
+					throw new Exception("artists not found");
+			}
+		}
+			
+		var albumType = await _albumTypeRepository.GetByName(albumDto.AlbumTypeName);
+		var image = new Image()
+		{
+			ImageFilename = albumDto.Image.ImageFilename,
+			ImageTypeId = (await _imageTypeRepository.GetIfExists(albumDto.Image.ImageTypeName)).ImageTypeId
+		};
+		
+		var artistOwner = await _artistRepository.GetById(artistOwnerId);
+		
+		
+		album.AlbumName = albumDto.AlbumName;
+		album.CoverId = (await _imageRepository.CreateAndGet(image)).ImageId;
+
+		foreach (var deleteTrackId in albumDto.DeleteTracks)
+		{
+			var deleteTrack = await _trackRepository.GetByIdAsync(deleteTrackId);
+			if (deleteTrack == null)
+				throw new Exception("n");
+			_trackRepository.Delete(deleteTrack);
+			await _trackRepository.SaveChangesAsync();
+		}
+
+		//_imageRepository.Delete(album.Image);
+
+		await _albumRepository.UpdateAsync(album);
+		
+		foreach (var trackDto in albumDto.AddTracks)
+		{
+			await _trackService.CreateTrack(trackDto, id, artistOwnerId);
+		}
+
+	}
 }

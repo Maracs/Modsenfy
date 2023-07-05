@@ -13,6 +13,6 @@ namespace Modsenfy.DataAccessLayer.Contracts
         void Delete(Artist entity);
         Task<IEnumerable<Album>> GetArtistAlbums(int id);
         Task<IEnumerable<Track>> GetArtistTracks(int id);
-        Task<IEnumerable<Entities.Stream>> GetArtistStreams(int id);
+        Task<IEnumerable<Artist>> GetArtistStreams(int id);
     }
 }

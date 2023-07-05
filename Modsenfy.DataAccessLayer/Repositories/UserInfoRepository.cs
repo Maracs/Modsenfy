@@ -15,7 +15,7 @@ public class UserInfoRepository:IUserInfoRepository
         _databaseContext = databaseContext;
     }
     
-    public async Task<UserInfo> CreateAndGet(UserInfo entity)
+    public async Task<UserInfo> CreateAndGetAsync(UserInfo entity)
     {
         var userInfoEntry= await _databaseContext.UserInfos.AddAsync(entity);
 
@@ -24,12 +24,12 @@ public class UserInfoRepository:IUserInfoRepository
         return userInfoEntry.Entity;
     }
 
-    public async Task SaveChanges()
+    public async Task SaveChangesAsync()
     {
         await _databaseContext.SaveChangesAsync();
     }
 
-    public async Task<UserInfo> GetById(int id)
+    public async Task<UserInfo> GetByIdAsync(int id)
     {
         var userInfo = await _databaseContext.UserInfos.FindAsync(id);
 
@@ -37,24 +37,24 @@ public class UserInfoRepository:IUserInfoRepository
 
     }
 
-    public async Task<IEnumerable<UserInfo>> GetAll()
+    public async Task<IEnumerable<UserInfo>> GetAllAsync()
     {
         var userInfoList = await _databaseContext.UserInfos.ToListAsync();
         
         return userInfoList;
     }
 
-    public async Task Create(UserInfo entity)
+    public async Task CreateAsync(UserInfo entity)
     {
         await _databaseContext.UserInfos.AddAsync(entity);
     }
 
-    public async Task Update(UserInfo entity)
+    public async Task UpdateAsync(UserInfo entity)
     {
         _databaseContext.Update(entity);
     }
 
-    public void Delete(UserInfo entity)
+    public void DeleteAsync(UserInfo entity)
     {
         _databaseContext.UserInfos.Remove(entity);
     }

@@ -4,27 +4,27 @@ namespace Modsenfy.DataAccessLayer.Contracts;
 
 public interface IUserInfoRepository:IRepository<UserInfo>
 {
-    async Task IRepository<UserInfo>.SaveChanges()
+    async Task IRepository<UserInfo>.SaveChangesAsync()
     {
         throw new NotImplementedException();
     }
 
-    async Task<UserInfo> IRepository<UserInfo>.GetById(int id)
+    async Task<UserInfo> IRepository<UserInfo>.GetByIdAsync(int id)
     {
         throw new NotImplementedException();
     }
 
-    async Task<IEnumerable<UserInfo>> IRepository<UserInfo>.GetAll()
+    async Task<IEnumerable<UserInfo>> IRepository<UserInfo>.GetAllAsync()
     {
         throw new NotImplementedException();
     }
 
-    async Task IRepository<UserInfo>.Create(UserInfo entity)
+    async Task IRepository<UserInfo>.CreateAsync(UserInfo entity)
     {
         throw new NotImplementedException();
     }
 
-    async Task IRepository<UserInfo>.Update(UserInfo entity)
+    async Task IRepository<UserInfo>.UpdateAsync(UserInfo entity)
     {
         throw new NotImplementedException();
     }
@@ -34,7 +34,7 @@ public interface IUserInfoRepository:IRepository<UserInfo>
         throw new NotImplementedException();
     }
     
-    public async Task<UserInfo> CreateAndGet(UserInfo entity)
+    public async Task<UserInfo> CreateAndGetAsync(UserInfo entity)
     {
         throw new NotImplementedException();
     }
