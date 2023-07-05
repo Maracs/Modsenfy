@@ -11,5 +11,8 @@ namespace Modsenfy.DataAccessLayer.Contracts
         Task Create(Artist entity);
         Task Update(Artist entity);
         void Delete(Artist entity);
+        Task<IEnumerable<Album>> GetArtistAlbums(int id);
+        Task<IEnumerable<Track>> GetArtistTracks(int id);
+        Task<IEnumerable<Entities.Stream>> GetArtistStreams(int id);
     }
 }

@@ -1,8 +1,6 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Modsenfy.BusinessAccessLayer.DTOs;
-using Modsenfy.DataAccessLayer.Entities;
-using Modsenfy.DataAccessLayer.Repositories;
 using Modsenfy.BusinessAccessLayer.Services;
 
 namespace Modsenfy.PresentationLayer.Controllers
@@ -11,28 +9,24 @@ namespace Modsenfy.PresentationLayer.Controllers
     [ApiController]
     public class PlaylistController : ControllerBase
     {
-        private readonly PlaylistRepository _playlistRepository;
         private readonly PlaylistService _playlistService;
         private readonly IMapper _mapper;
 
-        public PlaylistController(PlaylistRepository playlistRepository, PlaylistService playlistService, IMapper mapper)
+        public PlaylistController(PlaylistService playlistService, IMapper mapper)
         {
-            _playlistRepository = playlistRepository;
             _playlistService = playlistService;
             _mapper = mapper;
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<PlaylistDto>> GetArtist(int id)
+        public async Task<ActionResult<PlaylistDto>> GetPlaylist(int id)
         {
-            var playlist = await _playlistRepository.GetByIdWithJoins(id);
+            var playlistDto = await _playlistService.GetPlaylist(id);
 
-            if (playlist is null)
+            if (playlistDto is null)
             {
                 return BadRequest();
             }
-
-            var playlistDto = _mapper.Map<ArtistDto>(playlist);
 
             return Ok(playlistDto);
         }
@@ -40,47 +34,38 @@ namespace Modsenfy.PresentationLayer.Controllers
         [HttpPost]
         public async Task<ActionResult> CreatePlaylist(PlaylistDto playlistDto)
         {
-            var playlist = _mapper.Map<Playlist>(playlistDto);
+            playlistDto = await _playlistService.CreatePlaylist(playlistDto);
 
-            if (playlist is null)
+            if (playlistDto is null)
             {
                 return BadRequest();
             }
 
-            await _playlistRepository.Create(playlist);
-            await _playlistRepository.SaveChanges();
-
-            return Ok();
+            return Ok(playlistDto);
         }
 
         [HttpPut("{id}")]
         public async Task<ActionResult> UpdatePlaylist(PlaylistDto playlistDto)
         {
-            var playlist = _mapper.Map<Playlist>(playlistDto);
+            playlistDto = await _playlistService.UpdatePlaylist(playlistDto);
 
-            if (playlist is null)
+            if (playlistDto is null)
             {
                 return BadRequest();
             }
-            
-            await _playlistRepository.Update(playlist);
-            await _playlistRepository.SaveChanges();
 
-            return Ok();
+            return Ok(playlistDto);
         }
 
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeletePlaylist(int id)
         {
-            var playlist = await _playlistRepository.GetById(id);
+            var playlistDto = await _playlistService.DeletePlaylist(id);
 
-            if (playlist is null)
+            if (playlistDto is null)
             {
                 return BadRequest();
             }
-            
-            _playlistRepository.Delete(playlist);
-            await _playlistRepository.SaveChanges();
 
             return Ok();
         }

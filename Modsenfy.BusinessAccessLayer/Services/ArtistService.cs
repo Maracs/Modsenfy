@@ -1,9 +1,7 @@
 using Modsenfy.DataAccessLayer.Entities;
-using Modsenfy.DataAccessLayer.Data;
 using Modsenfy.DataAccessLayer.Repositories;
 using Modsenfy.BusinessAccessLayer.DTOs;
 using AutoMapper;
-using Microsoft.EntityFrameworkCore;
 
 namespace Modsenfy.BusinessAccessLayer.Services;
 
@@ -11,24 +9,65 @@ public class ArtistService
 {
     private readonly ArtistRepository _artistRepository;
     private readonly IMapper _mapper;
-    private readonly DatabaseContext _databaseContext;
 
-    public ArtistService(ArtistRepository artistRepository, IMapper mapper, DatabaseContext databaseContext)
+    public ArtistService(ArtistRepository artistRepository, IMapper mapper)
     {
         _artistRepository = artistRepository;
 		_mapper = mapper;
-        _databaseContext = databaseContext;
+    }
+
+    public async Task<ArtistDto> GetArtist(int id)
+    {
+        var artist = await _artistRepository.GetByIdWithJoins(id);
+        var artistDto = _mapper.Map<ArtistDto>(artist);
+
+        return artistDto;
+    }
+
+    public async Task<ArtistDto> CreateArtist(ArtistDto artistDto)
+    {
+        var artist = _mapper.Map<Artist>(artistDto);
+
+        await _artistRepository.Create(artist);
+        await _artistRepository.SaveChanges();
+
+        return artistDto;
+    }
+
+    public async Task<ArtistDto> UpdateArtist(ArtistDto artistDto)
+    {
+        var artist = _mapper.Map<Artist>(artistDto);
+
+        if (artist is null)
+        {
+            return null;
+        }
+
+        await _artistRepository.Update(artist);
+        await _artistRepository.SaveChanges();
+
+        return artistDto;
+    }
+
+    public async Task<ArtistDto> DeleteArtist(int id)
+    {
+        var artist = await _artistRepository.GetById(id);
+        var artistDto = _mapper.Map<ArtistDto>(artist);
+
+        if (artist is null)
+        {
+            return null;
+        }
+
+        _artistRepository.Delete(artist);
+        await _artistRepository.SaveChanges();
+
+        return artistDto;
     }
 
     public async Task<IEnumerable<ArtistDto>> GetSeveralArtists(List<int> ids)
     {
-        IEnumerable<Artist> artists = new List<Artist>();
-
-        foreach (var id in ids)
-        {
-            var artist = await _artistRepository.GetByIdWithJoins(id);
-            artists.Append(artist);
-        }
+        var artists = await _artistRepository.GetSeveralArtists(ids);
 
         IEnumerable<ArtistDto> artistDtos = _mapper.Map<IEnumerable<ArtistDto>>(artists);
         
@@ -37,13 +76,7 @@ public class ArtistService
 
     public async Task<IEnumerable<AlbumDto>> GetArtistAlbums(int id)
     {
-        var albums = await _databaseContext.Albums
-            .Include(a => a.AlbumType)
-            .Include(a => a.Image)
-                .ThenInclude(i => i.ImageType)
-            .Where(a => a.AlbumOwnerId == id)
-            .OrderByDescending(a => a.AlbumRelease)
-            .ToListAsync();
+        var albums = await _artistRepository.GetArtistAlbums(id);
 
         IEnumerable<AlbumDto> albumDtos = _mapper.Map<IEnumerable<AlbumDto>>(albums);
 
@@ -52,12 +85,7 @@ public class ArtistService
 
     public async Task<IEnumerable<TrackDto>> GetArtistTracks(int id)
     {
-        var tracks = await _databaseContext.Tracks
-            .Include(t => t.Audio)
-            .Include(t => t.Genre)
-            .Where(t => t.Album.AlbumOwnerId == id)
-            .OrderByDescending(t => t.Streams)
-            .ToListAsync();
+        var tracks = await _artistRepository.GetArtistTracks(id);
 
         IEnumerable<TrackDto> trackDtos = _mapper.Map<IEnumerable<TrackDto>>(tracks);
 
@@ -66,12 +94,7 @@ public class ArtistService
 
     public async Task<IEnumerable<StreamDto>> GetArtistStreams(int id)
     {
-        var streams = await _databaseContext.Streams
-            .Include(s => s.User)
-            .Include(s => s.Track)
-            .Where(s => s.Track.Album.AlbumOwnerId == id)
-            .OrderByDescending(s => s.StreamDate)
-            .ToListAsync();
+        var streams = await _artistRepository.GetArtistStreams(id);
 
         IEnumerable<StreamDto> streamDtos = _mapper.Map<IEnumerable<StreamDto>>(streams);
 

@@ -1,3 +1,4 @@
+using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Modsenfy.DataAccessLayer.Contracts;
 using Modsenfy.DataAccessLayer.Data;
@@ -24,14 +25,8 @@ namespace Modsenfy.DataAccessLayer.Repositories
         public async Task<Artist> GetByIdWithJoins(int id)
         {
             var artist = await _databaseContext.Artists
-                .Include(a => a.Image)
-                    .ThenInclude(i => i.ImageType)
                 .Include(a => a.TrackArtists)
                     .ThenInclude(ta => ta.Track)
-                        .ThenInclude(t => t.Audio)
-                .Include(a => a.TrackArtists)
-                    .ThenInclude(ta => ta.Track)
-                        .ThenInclude(t => t.Genre)
                 .Include(a => a.Albums)
                     .ThenInclude(al => al.AlbumType)
                 .FirstOrDefaultAsync(a => a.ArtistId == id);
@@ -39,19 +34,18 @@ namespace Modsenfy.DataAccessLayer.Repositories
             return artist;
         }
 
+        public async Task<IEnumerable<Artist>> GetSeveralArtists(List<int> ids)
+        {
+            var artists = await _databaseContext.Artists
+                .Where(a => ids.Contains(a.ArtistId))
+                .ToListAsync();
+
+            return artists;
+        }
+
         public async Task<IEnumerable<Artist>> GetAll()
         {
             var artists = await _databaseContext.Artists
-                .Include(a => a.Image)
-                    .ThenInclude(i => i.ImageType)
-                .Include(a => a.TrackArtists)
-                    .ThenInclude(ta => ta.Track)
-                        .ThenInclude(t => t.Audio)
-                .Include(a => a.TrackArtists)
-                    .ThenInclude(ta => ta.Track)
-                        .ThenInclude(t => t.Genre)
-                .Include(a => a.Albums)
-                    .ThenInclude(al => al.AlbumType)
                 .ToListAsync();
 
             return artists;
@@ -69,14 +63,42 @@ namespace Modsenfy.DataAccessLayer.Repositories
 
         public async Task Update(Artist entity)
         {
-            // _databaseContext.Entry(entity).State = EntityState.Modified;
             _databaseContext.Artists.Update(entity);
         }
 
-        public void Delete(Artist entity) 
+        public void Delete(Artist entity)
         {
             _databaseContext.Remove(entity);
-            _databaseContext.SaveChanges();
+        }
+
+        public async Task<IEnumerable<Album>> GetArtistAlbums(int id)
+        {
+            var albums = await _databaseContext.Albums
+                .Where(a => a.AlbumOwnerId == id)
+                .OrderByDescending(a => a.AlbumRelease)
+                .ToListAsync();
+
+            return albums;
+        }
+
+        public async Task<IEnumerable<Track>> GetArtistTracks(int id)
+        {
+            var tracks = await _databaseContext.Tracks
+                .Where(t => t.Album.AlbumOwnerId == id)
+                .OrderByDescending(t => t.Streams)
+                .ToListAsync();
+
+            return tracks;
+        }
+
+        public async Task<IEnumerable<Entities.Stream>> GetArtistStreams(int id)
+        {
+            var streams = await _databaseContext.Streams
+                .Where(s => s.Track.Album.AlbumOwnerId == id)
+                .OrderByDescending(s => s.StreamDate)
+                .ToListAsync();
+
+            return streams;
         }
     }
 }

@@ -24,45 +24,29 @@ namespace Modsenfy.DataAccessLayer.Repositories
         public async Task<Playlist> GetByIdWithJoins(int id) 
         {
             var playlist = await _databaseContext.Playlists
-                .Include(p => p.Image)
-                    .ThenInclude(i => i.ImageType)
-                .Include(p => p.User)
-                    .ThenInclude(u => u.Role)
                 .Include(p => p.PlaylistTracks)
                     .ThenInclude(pt => pt.Track)
-                        .ThenInclude(t => t.Audio)
-                .Include(p => p.PlaylistTracks)
-                    .ThenInclude(pt => pt.Track)
-                        .ThenInclude(t => t.Genre)
-                .Include(p => p.PlaylistTracks)
-                    .ThenInclude(pt => pt.Track)
-                        .ThenInclude(t => t.TrackArtists)
-                            .ThenInclude(ta => ta.Artist)
                 .FirstOrDefaultAsync(p => p.PlaylistId == id);
 
             return playlist;
         }
 
-        public async Task<IEnumerable<Playlist>> GetAll()
+        public async Task<IEnumerable<Playlist>> GetSeveralPlaylists(List<int> ids)
         {
-            var artists = await _databaseContext.Playlists
-                .Include(p => p.Image)
-                    .ThenInclude(i => i.ImageType)
-                .Include(p => p.User)
-                    .ThenInclude(u => u.Role)
-                .Include(p => p.PlaylistTracks)
-                    .ThenInclude(pt => pt.Track)
-                        .ThenInclude(t => t.Audio)
-                .Include(p => p.PlaylistTracks)
-                    .ThenInclude(pt => pt.Track)
-                        .ThenInclude(t => t.Genre)
-                .Include(p => p.PlaylistTracks)
-                    .ThenInclude(pt => pt.Track)
-                        .ThenInclude(t => t.TrackArtists)
-                            .ThenInclude(ta => ta.Artist)
+            var playlists = await _databaseContext.Playlists
+                .Where(p => ids.Contains(p.PlaylistId))
                 .ToListAsync();
 
-            return artists;
+            return playlists;
+        }
+
+        public async Task<IEnumerable<Playlist>> GetAll()
+        {
+            var playlists = await _databaseContext.Playlists
+                .OrderByDescending(p => p.PlaylistRelease)
+                .ToListAsync();
+
+            return playlists;
         }
 
         public async Task SaveChanges()
@@ -77,7 +61,6 @@ namespace Modsenfy.DataAccessLayer.Repositories
 
         public async Task Update(Playlist entity)
         {
-            // _databaseContext.Entry(entity).State = EntityState.Modified;
             _databaseContext.Playlists.Update(entity);
         }
 

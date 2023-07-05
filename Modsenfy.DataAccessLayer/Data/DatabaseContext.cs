@@ -1,15 +1,11 @@
 using Microsoft.EntityFrameworkCore;
 using Modsenfy.DataAccessLayer.Entities;
-using Stream = Modsenfy.DataAccessLayer.Entities.Stream;
 
 namespace Modsenfy.DataAccessLayer.Data;
 
 public class DatabaseContext : DbContext
 {
-    public DatabaseContext(DbContextOptions<DatabaseContext> options) : base(options) 
-    {
-        Database.Migrate();
-    }
+    public DatabaseContext(DbContextOptions<DatabaseContext> options) : base(options) { }
 
     public DbSet<Track> Tracks { get; set; }
 
@@ -34,17 +30,6 @@ public class DatabaseContext : DbContext
     public DbSet<Artist> Artists { get; set; }
 
     public DbSet<Playlist> Playlists { get; set; }
-
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        var connectionString = "Data Source=34.118.70.5,1433;Initial Catalog=modsenfydb;User ID=sqlserver;Password=password;";
-
-        if (!optionsBuilder.IsConfigured)
-        {
-            optionsBuilder.UseSqlServer(connectionString,
-                builder => builder.MigrationsAssembly("Modsenfy.DataAccessLayer"));
-        }
-    }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
