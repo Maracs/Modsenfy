@@ -15,19 +15,19 @@ public class RequestRepository:IRequestRepository
         _databaseContext = databaseContext;
     }
 
-    public async Task SaveChanges()
+    public async Task SaveChangesAsync()
     {
        await  _databaseContext.SaveChangesAsync();
     }
 
-    public async Task<Request> GetById(int id)
+    public async Task<Request> GetByIdAsync(int id)
     {
         var request = await _databaseContext.Requests.FindAsync(id);
 
         return request;
     }
 
-    public async Task<IEnumerable<Request>> GetAll()
+    public async Task<IEnumerable<Request>> GetAllAsync()
     {
         var requests = await _databaseContext.Requests.ToListAsync();
 
@@ -60,33 +60,32 @@ public class RequestRepository:IRequestRepository
             .Include(request => request.User)
             .ThenInclude(user => user.UserInfo)
             .ThenInclude(info => info.Image)
-            .ThenInclude(image => image.ImageType).ToListAsync();
+            .ThenInclude(image => image.ImageType)
+            .Include(request =>request.RequestStatus )
+            .ToListAsync();
         return requests;
     }
 
-    public async Task Create(Request entity)
+    public async Task CreateAsync(Request entity)
     {
         await  _databaseContext.AddAsync(entity);
     }
 
-    public async Task Update(Request entity)
+    public async Task UpdateAsync(Request entity)
     {
         _databaseContext.Requests.Update(entity);
     }
 
-    public async Task UpdateStatus(int id, string status)
-    {
-        var request = await _databaseContext.Requests.FindAsync(id);
+    
 
-        var requestStatus = await _databaseContext.RequestStatuses.FindAsync(request.RequestStatusId);
-
-        requestStatus.RequestStatusName = status;
-        
-        _databaseContext.RequestStatuses.Update(requestStatus);
-    }
-
-    public void Delete(Request entity)
+    public void DeleteAsync(Request entity)
     {
         _databaseContext.Requests.Remove(entity);
+    }
+
+    public async Task<int> GetRequestStatusIdByName(string name)
+    {
+        return (await _databaseContext.RequestStatuses.FirstOrDefaultAsync(requestStatus =>
+            requestStatus.RequestStatusName == name)).RequestStatusId;
     }
 }

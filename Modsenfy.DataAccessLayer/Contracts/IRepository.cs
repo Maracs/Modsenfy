@@ -5,15 +5,15 @@ namespace Modsenfy.DataAccessLayer.Contracts;
 
 public interface IRepository <T> where T : class
 {
-    Task SaveChanges();
+    Task SaveChangesAsync();
 
-    Task<T> GetById(int id);
+    Task<T> GetByIdAsync(int id);
 
-    Task<IEnumerable<T>> GetAll();
+    Task<IEnumerable<T>> GetAllAsync();
 
-    Task Create(T entity);
+    Task CreateAsync(T entity);
 
-    Task Update(T entity);
+    Task UpdateAsync(T entity);
 
     void Delete(T entity);
 }

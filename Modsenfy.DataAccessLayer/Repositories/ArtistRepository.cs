@@ -1,18 +1,12 @@
+using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Modsenfy.DataAccessLayer.Contracts;
 using Modsenfy.DataAccessLayer.Data;
 using Modsenfy.DataAccessLayer.Entities;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Reflection.Metadata.Ecma335;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Modsenfy.DataAccessLayer.Repositories
 {
-    public class ArtistRepository : IRepository<Artist>
+    public class ArtistRepository : IArtistRepository
     {
         private readonly DatabaseContext _databaseContext;
         
@@ -21,20 +15,40 @@ namespace Modsenfy.DataAccessLayer.Repositories
             _databaseContext = databaseContext;
         }
 
-        public async Task Create(Artist entity)
-        {
-            await _databaseContext.AddAsync(entity);
-        }
-
-        public Task<IEnumerable<Artist>> GetAll()
-        {
-            throw new NotImplementedException();
-        }
-
         public async Task<Artist> GetById(int id)
         {
             var artist = await _databaseContext.Artists.FindAsync(id);
+
             return artist;
+        }
+
+        public async Task<Artist> GetByIdWithJoins(int id)
+        {
+            var artist = await _databaseContext.Artists
+                .Include(a => a.TrackArtists)
+                    .ThenInclude(ta => ta.Track)
+                .Include(a => a.Albums)
+                    .ThenInclude(al => al.AlbumType)
+                .FirstOrDefaultAsync(a => a.ArtistId == id);
+
+            return artist;
+        }
+
+        public async Task<IEnumerable<Artist>> GetSeveralArtists(List<int> ids)
+        {
+            var artists = await _databaseContext.Artists
+                .Where(a => ids.Contains(a.ArtistId))
+                .ToListAsync();
+
+            return artists;
+        }
+
+        public async Task<IEnumerable<Artist>> GetAll()
+        {
+            var artists = await _databaseContext.Artists
+                .ToListAsync();
+
+            return artists;
         }
 
         public async Task SaveChanges()
@@ -42,19 +56,99 @@ namespace Modsenfy.DataAccessLayer.Repositories
             await _databaseContext.SaveChangesAsync();
         }
 
+        public async Task Create(Artist entity)
+        {
+            await _databaseContext.AddAsync(entity);
+        }
+
         public async Task Update(Artist entity)
         {
-            var artist = await _databaseContext.Artists.FindAsync(entity.ArtistId);
-
-            artist.ArtistName = entity.ArtistName;
-            artist.ArtistBio = entity.ArtistBio;
-            artist.Image = entity.Image;
-            artist.ImageId = entity.ImageId;
+            _databaseContext.Artists.Update(entity);
         }
 
-        public async void Delete(Artist entity) 
+        public void Delete(Artist entity)
         {
-            throw new NotImplementedException(); //
+            _databaseContext.Remove(entity);
+        }
+
+        public async Task<IEnumerable<Album>> GetArtistAlbums(int id)
+        {
+            var albums = await _databaseContext.Albums
+                .Where(a => a.AlbumOwnerId == id)
+                .OrderByDescending(a => a.AlbumRelease)
+                .ToListAsync();
+
+            return albums;
+        }
+
+        public async Task<IEnumerable<Track>> GetArtistTracks(int id)
+        {
+            var tracks = await _databaseContext.Tracks
+                .Where(t => t.Album.AlbumOwnerId == id)
+                .OrderByDescending(t => t.Streams)
+                .ToListAsync();
+
+            return tracks;
+        }
+
+        public async Task<IEnumerable<Entities.Stream>> GetArtistStreams(int id)
+        {
+            var streams = await _databaseContext.Streams
+                .Where(s => s.Track.Album.AlbumOwnerId == id)
+                .OrderByDescending(s => s.StreamDate)
+                .ToListAsync();
+
+            return streams;
         }
     }
+
+
+		public async Task<Artist> GetByIdAsync(int id)
+		{
+			var artist = await _databaseContext.Artists.FindAsync(id);
+
+			return artist;
+		}
+
+		public async Task<IEnumerable<Artist>> GetAllAsync()
+		{
+			return await _databaseContext.Artists.ToListAsync();
+		}
+
+		public async Task SaveChangesAsync()
+		{
+			await _databaseContext.SaveChangesAsync();
+		}
+
+		public async Task CreateAsync(Artist entity)
+		{
+			await _databaseContext.AddAsync(entity);
+		}
+
+		public async Task CreateWithId(Artist entity)
+		{
+			await _databaseContext.Database.OpenConnectionAsync();
+			try
+			{
+			await _databaseContext.Database.ExecuteSqlRawAsync("SET IDENTITY_INSERT dbo.Artists ON");
+			await _databaseContext.AddAsync(entity);
+			await _databaseContext.SaveChangesAsync();
+			await _databaseContext.Database.ExecuteSqlRawAsync("SET IDENTITY_INSERT dbo.Artists OFF");
+			}
+			finally
+			{
+				await _databaseContext.Database.CloseConnectionAsync();
+			}
+		}
+
+		public async Task UpdateAsync(Artist entity)
+		{
+			var artist = await _databaseContext.Artists.FindAsync(entity.ArtistId);
+
+			artist.ArtistName = entity.ArtistName;
+			artist.ArtistBio = entity.ArtistBio;
+			artist.Image = entity.Image;
+			artist.ImageId = entity.ImageId;
+		}
+	}
 }

@@ -22,39 +22,37 @@ public class ImageRepository:IImageRepository
         return imageEntry.Entity;
     }
 
-    public async Task SaveChanges()
+    public async Task SaveChangesAsync()
     {
        await _databaseContext.SaveChangesAsync();
     }
 
-    public async Task<Image> GetById(int id)
+    public async Task<Image> GetByIdAsync(int id)
     {
         var image = await _databaseContext.Images.FindAsync(id);
 
         return image;
     }
 
-    public async Task<IEnumerable<Image>> GetAll()
+    public async Task<IEnumerable<Image>> GetAllAsync()
     {
         var images = await _databaseContext.Images.ToListAsync();
 
         return images;
     }
 
-    public async Task Create(Image entity)
+    public async Task CreateAsync(Image entity)
     {
         await _databaseContext.Images.AddAsync(entity);
     }
 
-    public async Task Update(Image entity)
+    public async Task UpdateAsync(Image entity)
     {
         _databaseContext.Images.Update(entity);
     }
 
-    public void Delete(Image entity)
+    public void DeleteAsync(Image entity)
     {
         _databaseContext.Images.Remove(entity);
     }
-
-   
 }
