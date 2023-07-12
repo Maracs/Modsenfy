@@ -76,6 +76,9 @@ public class UserService
     public async Task<UserTokenDto> RegisterUserAsync(UserWithDetailsAndEmailAndPasshashDto userDto)
     {
 
+        if (await _userRepository.IfNicknameExistsAsync(userDto.Nickname) || await _userRepository.IfEmailExistsAsync(userDto.Email))
+            return null;
+
         var image = new Image()
         {
             ImageFilename = userDto.Image.ImageFilename,
@@ -95,11 +98,9 @@ public class UserService
             ImageId = imageId
         };
 
-
         var userInfoId = (await _userInfoRepository.CreateAndGetAsync(userInfo)).UserInfoId;
         
         using var hmac = new HMACSHA512();
-
 
         var user = new User()
         {
@@ -110,7 +111,6 @@ public class UserService
             UserInfoId = userInfoId,
             UserRoleId = 1 
         };
-
 
         var userId = (await _userRepository.CreateAndGetAsync(user)).UserId;
         
@@ -169,6 +169,24 @@ public class UserService
         }
         
         return topArtistsDto;
+    }
+
+    public async Task<UserWithDetailsAndEmailAndIdAndRoleDto> GetUserProfileForAdminAsync(int id)
+    {
+        var userWithJoins = await _userRepository.GetByIdWithJoinsAsync(id);
+        return  _mapper.Map<UserWithDetailsAndEmailAndIdAndRoleDto>(userWithJoins);
+    }
+
+    public async Task<UserDto> GetUserProfileForUserAsync(int id)
+    {
+        var userWithJoins = await _userRepository.GetByIdWithJoinsAsync(id);
+        return _mapper.Map<UserDto>(userWithJoins);
+    }
+
+    public async Task<string> GetUserRoleAsync(int userId)
+    {
+        var user = await _userRepository.GetByIdAsync(userId);
+        return  await _userRepository.GetUserRoleAsync(user);
     }
 
     public async Task<List<TrackWithAlbumDto>> GetUserTopTracksAsync(int id)
@@ -349,7 +367,7 @@ public class UserService
     public async Task<List<PlaylistDto>> GetUserPlaylistsAsync(int id,int limit,int offset)
     {
         var user = await _userRepository.GetUserWithPlaylistsAsync(id);
-        
+        if (user == null) { return null; }
        var limitedPlaylists= user.Playlists
             .OrderBy(playlist => playlist.PlaylistId)
             .Skip(offset)

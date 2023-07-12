@@ -79,7 +79,7 @@ public class TrackService
     public async Task<Track> UpdateTrackAsync(int userId, TrackDto trackDto)
     {
         if (!(await _trackRepository.IsTrackOwnerAsync(userId, trackDto.TrackId)))
-            return new Track();
+            return null;
 
         var track = _mapper.Map<Track>(trackDto);
         await _trackRepository.UpdateAsync(track);
@@ -89,7 +89,7 @@ public class TrackService
     public async Task<Track> DeleteTrackAsync(int userId, int id)
     {
         if (!(await _trackRepository.IsTrackOwnerAsync(userId, id)))
-            return new Track();
+            return null;
 
         var track = await _trackRepository.GetByIdAsync(id);
         _trackRepository.Delete(track);
@@ -100,7 +100,7 @@ public class TrackService
     public async Task<TrackWithStreamsDto> GetTrackStreamsAsync(int userId, int id)
     {
         if (!(await _trackRepository.IsTrackOwnerAsync(userId, id)))
-            return new TrackWithStreamsDto();
+            return null;
 
         var track = await _trackRepository.GetByIdWithStreamsAsync(id);
         var trackDto = _mapper.Map<TrackWithStreamsDto>(track);

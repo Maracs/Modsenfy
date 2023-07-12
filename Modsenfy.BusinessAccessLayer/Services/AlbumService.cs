@@ -136,9 +136,9 @@ public class AlbumService
 		{
 			foreach(var artistId in trackDto.Artists)
 			{
-				var res = await _artistRepository.Exists(artistId);
-				if (!res)
-					throw new Exception("artists not found");
+				//var res = await _artistRepository.Exists(artistId);
+				//if (!res)
+					//throw new Exception("artists not found");
 			}
 		}
 		
@@ -193,8 +193,8 @@ public class AlbumService
 		{
 			foreach(var artistId in trackDto.Artists)
 			{
-				var res = await _artistRepository.Exists(artistId);
-				if (!res)
+				//var res = await _artistRepository.Exists(artistId);
+				//if (!res)
 					throw new Exception("artists not found");
 			}
 		}
@@ -206,7 +206,7 @@ public class AlbumService
 			ImageTypeId = (await _imageTypeRepository.GetIfExists(albumDto.Image.ImageTypeName)).ImageTypeId
 		};
 		
-		var artistOwner = await _artistRepository.GetById(artistOwnerId);
+		var artistOwner = await _artistRepository.GetByIdAsync(artistOwnerId);
 		
 		
 		album.AlbumName = albumDto.AlbumName;

@@ -47,7 +47,7 @@ public class SearchService
 		trackSearchables = trackSearchables.OrderByDescending(t => t.Rate);
 
 
-		var artists = await _artistRepository.GetAll();
+		var artists = await _artistRepository.GetAllAsync();
 
 		IEnumerable<Searchable> artistSearchables = new List<Searchable>();
 		foreach (var artist in artists)
