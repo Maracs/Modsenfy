@@ -18,14 +18,12 @@ namespace Modsenfy.PresentationLayer.Controllers
     [Authorize(Roles = "Artist")]
     public class TracksController : ControllerBase
     {
-        private readonly TrackRepository _trackRepository;
         private readonly IMapper _mapper;
         private readonly TrackService _trackService;
 
-        public TracksController(IMapper mapper, TrackRepository trackRepository, TrackService trackService)
+        public TracksController(IMapper mapper, TrackService trackService)
         {
             _mapper = mapper;
-            _trackRepository = trackRepository;
             _trackService = trackService;
         }
 
@@ -33,7 +31,7 @@ namespace Modsenfy.PresentationLayer.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<TrackWithAlbumDto>> GetTrack([FromRoute]int id)
         {
-            var track = await _trackRepository.GetByIdWithJoinsAsync(id);
+            var track = await _trackService.GetTrack(id);
             if (track == null)
                 return NotFound();
 
@@ -45,24 +43,18 @@ namespace Modsenfy.PresentationLayer.Controllers
         [HttpPut]
         public async Task<ActionResult> UpdateTrack([FromBody]TrackDto trackDto)
         {
-            if (!(await _trackRepository.IsTrackOwnerAsync(User.GetUserId(), trackDto.TrackId)))
+            var track = await _trackService.UpdateTrackAsync(User.GetUserId(), trackDto);
+            if (track == null)
                 return Forbid();
-
-            var track = _mapper.Map<Track>(trackDto);
-            await _trackRepository.UpdateAsync(track);
-
             return Ok(track.TrackId);
         }
 
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteTrack([FromQuery]int id)
         {
-            if (!(await _trackRepository.IsTrackOwnerAsync(User.GetUserId(), id)))
+            var track = await _trackService.DeleteTrackAsync(User.GetUserId(), id);
+            if (track == null)
                 return Forbid();
-
-            var track = await _trackRepository.GetByIdAsync(id);
-            _trackRepository.Delete(track);
-            await _trackRepository.SaveChangesAsync();
             return Ok(track.TrackId);
         }
 
@@ -78,11 +70,10 @@ namespace Modsenfy.PresentationLayer.Controllers
         [HttpGet("{id}/streams")]
         public async Task<ActionResult<TrackWithStreamsDto>> GetTrackStreams(int id)
         {
-            if (!(await _trackRepository.IsTrackOwnerAsync(User.GetUserId(), id)))
+            var trackDto = await _trackService.GetTrackStreamsAsync(User.GetUserId(), id);
+            if (trackDto == null)
                 return Forbid();
 
-            var track = await _trackRepository.GetByIdWithStreamsAsync(id);
-            var trackDto = _mapper.Map<TrackWithStreamsDto>(track);
             return Ok(trackDto);
         }
     }

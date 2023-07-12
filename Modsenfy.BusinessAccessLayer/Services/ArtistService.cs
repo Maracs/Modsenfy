@@ -18,7 +18,7 @@ public class ArtistService
 
     public async Task<ArtistDto> GetArtist(int id)
     {
-        var artist = await _artistRepository.GetByIdWithJoins(id);
+        var artist = await _artistRepository.GetByIdWithJoinsAsync(id);
         var artistDto = _mapper.Map<ArtistDto>(artist);
 
         return artistDto;
@@ -28,8 +28,8 @@ public class ArtistService
     {
         var artist = _mapper.Map<Artist>(artistDto);
 
-        await _artistRepository.Create(artist);
-        await _artistRepository.SaveChanges();
+        await _artistRepository.CreateAsync(artist);
+        await _artistRepository.SaveChangesAsync();
 
         return artistDto;
     }
@@ -43,15 +43,15 @@ public class ArtistService
             return null;
         }
 
-        await _artistRepository.Update(artist);
-        await _artistRepository.SaveChanges();
+        await _artistRepository.UpdateAsync(artist);
+        await _artistRepository.SaveChangesAsync();
 
         return artistDto;
     }
 
     public async Task<ArtistDto> DeleteArtist(int id)
     {
-        var artist = await _artistRepository.GetById(id);
+        var artist = await _artistRepository.GetByIdAsync(id);
         var artistDto = _mapper.Map<ArtistDto>(artist);
 
         if (artist is null)
@@ -60,14 +60,14 @@ public class ArtistService
         }
 
         _artistRepository.Delete(artist);
-        await _artistRepository.SaveChanges();
+        await _artistRepository.SaveChangesAsync();
 
         return artistDto;
     }
 
     public async Task<IEnumerable<ArtistDto>> GetSeveralArtists(List<int> ids)
     {
-        var artists = await _artistRepository.GetSeveralArtists(ids);
+        var artists = await _artistRepository.GetSeveralArtistsAsync(ids);
 
         IEnumerable<ArtistDto> artistDtos = _mapper.Map<IEnumerable<ArtistDto>>(artists);
         
@@ -76,7 +76,7 @@ public class ArtistService
 
     public async Task<IEnumerable<AlbumDto>> GetArtistAlbums(int id)
     {
-        var albums = await _artistRepository.GetArtistAlbums(id);
+        var albums = await _artistRepository.GetArtistAlbumsAsync(id);
 
         IEnumerable<AlbumDto> albumDtos = _mapper.Map<IEnumerable<AlbumDto>>(albums);
 
@@ -85,7 +85,7 @@ public class ArtistService
 
     public async Task<IEnumerable<TrackDto>> GetArtistTracks(int id)
     {
-        var tracks = await _artistRepository.GetArtistTracks(id);
+        var tracks = await _artistRepository.GetArtistTracksAsync(id);
 
         IEnumerable<TrackDto> trackDtos = _mapper.Map<IEnumerable<TrackDto>>(tracks);
 
@@ -94,7 +94,7 @@ public class ArtistService
 
     public async Task<IEnumerable<StreamDto>> GetArtistStreams(int id)
     {
-        var streams = await _artistRepository.GetArtistStreams(id);
+        var streams = await _artistRepository.GetArtistStreamsAsync(id);
 
         IEnumerable<StreamDto> streamDtos = _mapper.Map<IEnumerable<StreamDto>>(streams);
 
