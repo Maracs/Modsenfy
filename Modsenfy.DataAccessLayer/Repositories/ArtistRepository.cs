@@ -72,7 +72,6 @@ namespace Modsenfy.DataAccessLayer.Repositories
         }
 
         public async Task<IEnumerable<Album>> GetArtistAlbumsAsync(int id)
-
         {
             var albums = await _databaseContext.Albums
                 .Where(a => a.AlbumOwnerId == id)
@@ -102,7 +101,7 @@ namespace Modsenfy.DataAccessLayer.Repositories
             return streams;
         }
 
-        public async Task CreateWithId(Artist entity)
+        public async Task CreateWithIdAsync(Artist entity)
         {
             await _databaseContext.Database.OpenConnectionAsync();
             try

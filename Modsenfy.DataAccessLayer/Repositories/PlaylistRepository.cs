@@ -67,7 +67,6 @@ namespace Modsenfy.DataAccessLayer.Repositories
         public void Delete(Playlist entity) 
         {
             _databaseContext.Remove(entity);
-            _databaseContext.SaveChanges();
         }
     }
 }

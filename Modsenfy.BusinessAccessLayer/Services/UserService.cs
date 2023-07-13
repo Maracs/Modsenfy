@@ -572,7 +572,7 @@ public class UserService
                 ArtistName = request.RequestArtistName,
                 ImageId = request.ImageId,
             };
-            await _artistRepository.CreateWithId(artist);
+            await _artistRepository.CreateWithIdAsync(artist);
             await _artistRepository.SaveChangesAsync();
         }
     }

@@ -16,7 +16,7 @@ namespace Modsenfy.BusinessAccessLayer.Services
             _mapper = mapper;
         }
 
-        public async Task<ArtistDto> GetArtist(int id)
+        public async Task<ArtistDto> GetArtistAsync(int id)
         {
             var artist = await _artistRepository.GetByIdWithJoinsAsync(id);
             var artistDto = _mapper.Map<ArtistDto>(artist);
@@ -24,7 +24,7 @@ namespace Modsenfy.BusinessAccessLayer.Services
             return artistDto;
         }
 
-        public async Task<ArtistDto> CreateArtist(ArtistDto artistDto)
+        public async Task<ArtistDto> CreateArtistAsync(ArtistDto artistDto)
         {
             var artist = _mapper.Map<Artist>(artistDto);
 
@@ -34,7 +34,7 @@ namespace Modsenfy.BusinessAccessLayer.Services
             return artistDto;
         }
 
-        public async Task<ArtistDto> UpdateArtist(ArtistDto artistDto)
+        public async Task<ArtistDto> UpdateArtistAsync(ArtistDto artistDto)
         {
             var artist = _mapper.Map<Artist>(artistDto);
 
@@ -49,7 +49,7 @@ namespace Modsenfy.BusinessAccessLayer.Services
             return artistDto;
         }
 
-        public async Task<ArtistDto> DeleteArtist(int id)
+        public async Task<ArtistDto> DeleteArtistAsync(int id)
         {
             var artist = await _artistRepository.GetByIdAsync(id);
             var artistDto = _mapper.Map<ArtistDto>(artist);
@@ -65,7 +65,7 @@ namespace Modsenfy.BusinessAccessLayer.Services
             return artistDto;
         }
 
-        public async Task<IEnumerable<ArtistDto>> GetSeveralArtists(List<int> ids)
+        public async Task<IEnumerable<ArtistDto>> GetSeveralArtistsAsync(List<int> ids)
         {
             var artists = await _artistRepository.GetSeveralArtistsAsync(ids);
 
@@ -74,7 +74,7 @@ namespace Modsenfy.BusinessAccessLayer.Services
             return artistDtos;
         }
 
-        public async Task<IEnumerable<AlbumDto>> GetArtistAlbums(int id)
+        public async Task<IEnumerable<AlbumDto>> GetArtistAlbumsAsync(int id)
         {
             var albums = await _artistRepository.GetArtistAlbumsAsync(id);
 
@@ -83,7 +83,7 @@ namespace Modsenfy.BusinessAccessLayer.Services
             return albumDtos;
         }
 
-        public async Task<IEnumerable<TrackDto>> GetArtistTracks(int id)
+        public async Task<IEnumerable<TrackDto>> GetArtistTracksAsync(int id)
         {
             var tracks = await _artistRepository.GetArtistTracksAsync(id);
 
@@ -92,7 +92,7 @@ namespace Modsenfy.BusinessAccessLayer.Services
             return trackDtos;
         }
 
-        public async Task<IEnumerable<StreamDto>> GetArtistStreams(int id)
+        public async Task<IEnumerable<StreamDto>> GetArtistStreamsAsync(int id)
         {
             var streams = await _artistRepository.GetArtistStreamsAsync(id);
 
