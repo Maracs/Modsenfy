@@ -15,36 +15,36 @@ public class ImageTypeRepository:IImageTypeRepository
         _databaseContext = databaseContext;
     }
     
-    public async Task SaveChanges()
+    public async Task SaveChangesAsync()
     {
         await _databaseContext.SaveChangesAsync();
     }
 
-    public async Task<ImageType> GetById(int id)
+    public async Task<ImageType> GetByIdAsync(int id)
     {
         var imageType = await _databaseContext.ImageTypes.FindAsync(id);
         
         return imageType;
     }
 
-    public async Task<IEnumerable<ImageType>> GetAll()
+    public async Task<IEnumerable<ImageType>> GetAllAsync()
     {
         var imageTypeList = await _databaseContext.ImageTypes.ToListAsync();
         
         return imageTypeList;;
     }
 
-    public async Task Create(ImageType entity)
+    public async Task CreateAsync(ImageType entity)
     {
         await _databaseContext.ImageTypes.AddAsync(entity);
     }
 
-    public async Task Update(ImageType entity)
+    public async Task UpdateAsync(ImageType entity)
     {
          _databaseContext.ImageTypes.Update(entity);
     }
 
-    public void Delete(ImageType entity)
+    public void DeleteAsync(ImageType entity)
     {
         _databaseContext.ImageTypes.Remove(entity);
     }

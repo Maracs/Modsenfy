@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 using Modsenfy.DataAccessLayer.Contracts;
 using Modsenfy.DataAccessLayer.Data;
 using Modsenfy.DataAccessLayer.Entities;
@@ -7,6 +8,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection.Metadata.Ecma335;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -21,9 +23,16 @@ namespace Modsenfy.DataAccessLayer.Repositories
             _databaseContext = databaseContext;
         }
 
-        public async Task Create(Track entity)
+        public async Task CreateAsync(Track entity)
         {
-            await _databaseContext.AddAsync(entity);
+            await _databaseContext.Tracks.AddAsync(entity);
+        }
+
+        public async Task<Track> CreateAndGetAsync(Track entity)
+        {
+            var trackEntry = await _databaseContext.Tracks.AddAsync(entity);
+            await SaveChangesAsync();
+            return trackEntry.Entity;
         }
 
         public void Delete(Track entity)
@@ -32,18 +41,31 @@ namespace Modsenfy.DataAccessLayer.Repositories
             return;
         }
 
-        public async Task<IEnumerable<Track>> GetAll()
+        public async Task<IEnumerable<Track>> GetAllAsync()
         {
-            return await _databaseContext.Tracks.ToListAsync();
+            var tracks = await _databaseContext.Tracks
+                .Include(t => t.Audio)
+                .Include(t => t.Genre)
+                .Include(t => t.TrackArtists)
+                    .ThenInclude(ta => ta.Artist)
+                        .ThenInclude(a => a.Image)
+                            .ThenInclude(i => i.ImageType)
+                .Include(t => t.Album)
+                    .ThenInclude(al => al.Image)
+                        .ThenInclude(i => i.ImageType)
+                .Include(t => t.Album)
+                    .ThenInclude(a => a.AlbumType)
+                .ToListAsync();
+            return tracks;
         }
 
-        public async Task<Track> GetById(int id)
+        public async Task<Track> GetByIdAsync(int id)
         {
             var track = await _databaseContext.Tracks.FindAsync(id);
             return track;
         }
-        
-        public async Task<Track> GetByIdWithJoins(int id)
+
+        public async Task<Track> GetByIdWithJoinsAsync(int id)
         {
             var track = await _databaseContext.Tracks
                  .Include(t => t.Audio)
@@ -57,11 +79,11 @@ namespace Modsenfy.DataAccessLayer.Repositories
                         .ThenInclude(i => i.ImageType)
                  .Include(t => t.Album)
                     .ThenInclude(a => a.AlbumType)
-                 .FirstOrDefaultAsync(t => t.TrackId  == id);
+                 .FirstOrDefaultAsync(t => t.TrackId == id);
             return track;
         }
 
-        public async Task<Track> GetByIdWithStreams(int id)
+        public async Task<Track> GetByIdWithStreamsAsync(int id)
         {
             var track = await _databaseContext.Tracks
                 .Include(t => t.Audio)
@@ -73,16 +95,16 @@ namespace Modsenfy.DataAccessLayer.Repositories
                 .Include(t => t.Streams)
                     .ThenInclude(st => st.User)
                         .ThenInclude(u => u.UserInfo)
-                .FirstOrDefaultAsync(t => t.TrackId == id); 
+                .FirstOrDefaultAsync(t => t.TrackId == id);
             return track;
         }
 
-        public async Task<List<int>> GetFollowersThroughTrack(Track track)
+        public async Task<List<int>> GetFollowersThroughTrackAsync(Track track)
         {
             var artists = await _databaseContext.TrackArtists
                 .Where(ta => ta.TrackId == track.TrackId)
                 .Select(ta => ta.Artist).ToListAsync();
-            
+
             List<int> followers = new List<int>(artists.Count);
             for (int i = 0; i < artists.Count; i++)
             {
@@ -92,22 +114,12 @@ namespace Modsenfy.DataAccessLayer.Repositories
             return followers;
         }
 
-        public async Task<IEnumerable<Track>> GetSeverlTracks(List<int> ids)
-        {
-            List<Track> tracks = new List<Track>();
-            foreach (var id in ids)
-            {
-                tracks.Add(await GetByIdWithJoins(id));
-            }
-            return tracks;
-        }
-
-        public async Task SaveChanges()
+        public async Task SaveChangesAsync()
         {
             await _databaseContext.SaveChangesAsync();
         }
 
-        public async Task Update(Track entity)
+        public async Task UpdateAsync(Track entity)
         {
             var track = await _databaseContext.Tracks.FindAsync(entity.TrackId);
 
@@ -117,6 +129,53 @@ namespace Modsenfy.DataAccessLayer.Repositories
             track.Genre = entity.Genre;
             track.TrackName = entity.TrackName;
             track.TrackGenius = entity.TrackGenius;
+
+            await SaveChangesAsync();
+        }
+
+        public async Task<bool> IsTrackOwnerAsync(int artistId, int trackId)
+        {
+            if (await _databaseContext.TrackArtists.SingleOrDefaultAsync
+                (x => x.TrackId == trackId && x.ArtistId == artistId) == null)
+            { return false; }
+
+            return true;
+        }
+
+        public IIncludableQueryable<Track, AlbumType> GetWithJoins()
+        {
+            IIncludableQueryable<Track, AlbumType> tracks = _databaseContext.Tracks
+                .Include(t => t.Audio)
+                .Include(t => t.Genre)
+                .Include(t => t.TrackArtists)
+                    .ThenInclude(ta => ta.Artist)
+                        .ThenInclude(a => a.Image)
+                            .ThenInclude(i => i.ImageType)
+                .Include(t => t.Album)
+                    .ThenInclude(al => al.Image)
+                        .ThenInclude(i => i.ImageType)
+                .Include(t => t.Album)
+                    .ThenInclude(a => a.AlbumType);
+            return tracks;
+        }
+
+        public async Task<IEnumerable<Track>> GetSkippedAsync(int offset)
+        {
+            var tracks = await GetWithJoins()
+                .Skip(offset)
+                .ToListAsync();
+
+            return tracks;
+        }
+
+        public async Task<IEnumerable<Track>> GetLimitedAsync(int limit, int offset)
+        {
+            var tracks = await GetWithJoins()
+                .Skip(offset)
+                .Take(limit)
+                .ToListAsync();
+
+            return tracks;
         }
     }
 }
