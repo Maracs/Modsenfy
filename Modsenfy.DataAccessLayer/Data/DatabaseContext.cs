@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using Modsenfy.DataAccessLayer.Entities;
-using Stream = Modsenfy.DataAccessLayer.Entities.Stream;
 
 namespace Modsenfy.DataAccessLayer.Data;
 

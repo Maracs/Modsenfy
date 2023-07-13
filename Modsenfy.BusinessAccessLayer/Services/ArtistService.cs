@@ -8,11 +8,96 @@ namespace Modsenfy.BusinessAccessLayer.Services;
 public class ArtistService
 {
     private readonly ArtistRepository _artistRepository;
-    
     private readonly IMapper _mapper;
+
     public ArtistService(ArtistRepository artistRepository, IMapper mapper)
     {
         _artistRepository = artistRepository;
 		_mapper = mapper;
+    }
+
+    public async Task<ArtistDto> GetArtist(int id)
+    {
+        var artist = await _artistRepository.GetByIdWithJoins(id);
+        var artistDto = _mapper.Map<ArtistDto>(artist);
+
+        return artistDto;
+    }
+
+    public async Task<ArtistDto> CreateArtist(ArtistDto artistDto)
+    {
+        var artist = _mapper.Map<Artist>(artistDto);
+
+        await _artistRepository.Create(artist);
+        await _artistRepository.SaveChanges();
+
+        return artistDto;
+    }
+
+    public async Task<ArtistDto> UpdateArtist(ArtistDto artistDto)
+    {
+        var artist = _mapper.Map<Artist>(artistDto);
+
+        if (artist is null)
+        {
+            return null;
+        }
+
+        await _artistRepository.Update(artist);
+        await _artistRepository.SaveChanges();
+
+        return artistDto;
+    }
+
+    public async Task<ArtistDto> DeleteArtist(int id)
+    {
+        var artist = await _artistRepository.GetById(id);
+        var artistDto = _mapper.Map<ArtistDto>(artist);
+
+        if (artist is null)
+        {
+            return null;
+        }
+
+        _artistRepository.Delete(artist);
+        await _artistRepository.SaveChanges();
+
+        return artistDto;
+    }
+
+    public async Task<IEnumerable<ArtistDto>> GetSeveralArtists(List<int> ids)
+    {
+        var artists = await _artistRepository.GetSeveralArtists(ids);
+
+        IEnumerable<ArtistDto> artistDtos = _mapper.Map<IEnumerable<ArtistDto>>(artists);
+        
+        return artistDtos;
+    }
+
+    public async Task<IEnumerable<AlbumDto>> GetArtistAlbums(int id)
+    {
+        var albums = await _artistRepository.GetArtistAlbums(id);
+
+        IEnumerable<AlbumDto> albumDtos = _mapper.Map<IEnumerable<AlbumDto>>(albums);
+
+        return albumDtos;
+    }
+
+    public async Task<IEnumerable<TrackDto>> GetArtistTracks(int id)
+    {
+        var tracks = await _artistRepository.GetArtistTracks(id);
+
+        IEnumerable<TrackDto> trackDtos = _mapper.Map<IEnumerable<TrackDto>>(tracks);
+
+        return trackDtos;
+    }
+
+    public async Task<IEnumerable<StreamDto>> GetArtistStreams(int id)
+    {
+        var streams = await _artistRepository.GetArtistStreams(id);
+
+        IEnumerable<StreamDto> streamDtos = _mapper.Map<IEnumerable<StreamDto>>(streams);
+
+        return streamDtos;
     }
 }
