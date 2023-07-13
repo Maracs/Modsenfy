@@ -1,3 +1,4 @@
+using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Modsenfy.DataAccessLayer.Contracts;
 using Modsenfy.DataAccessLayer.Data;
@@ -5,7 +6,7 @@ using Modsenfy.DataAccessLayer.Entities;
 
 namespace Modsenfy.DataAccessLayer.Repositories
 {
-    public class ArtistRepository : IRepository<Artist>
+    public class ArtistRepository : IArtistRepository
     {
         private readonly DatabaseContext _databaseContext;
         
@@ -24,14 +25,8 @@ namespace Modsenfy.DataAccessLayer.Repositories
         public async Task<Artist> GetByIdWithJoins(int id)
         {
             var artist = await _databaseContext.Artists
-                .Include(a => a.Image)
-                    .ThenInclude(i => i.ImageType)
                 .Include(a => a.TrackArtists)
                     .ThenInclude(ta => ta.Track)
-                        .ThenInclude(t => t.Audio)
-                .Include(a => a.TrackArtists)
-                    .ThenInclude(ta => ta.Track)
-                        .ThenInclude(t => t.Genre)
                 .Include(a => a.Albums)
                     .ThenInclude(al => al.AlbumType)
                 .FirstOrDefaultAsync(a => a.ArtistId == id);
@@ -39,9 +34,21 @@ namespace Modsenfy.DataAccessLayer.Repositories
             return artist;
         }
 
+        public async Task<IEnumerable<Artist>> GetSeveralArtists(List<int> ids)
+        {
+            var artists = await _databaseContext.Artists
+                .Where(a => ids.Contains(a.ArtistId))
+                .ToListAsync();
+
+            return artists;
+        }
+
         public async Task<IEnumerable<Artist>> GetAll()
         {
-            return await _databaseContext.Artists.ToListAsync();
+            var artists = await _databaseContext.Artists
+                .ToListAsync();
+
+            return artists;
         }
 
         public async Task SaveChanges()
@@ -56,38 +63,17 @@ namespace Modsenfy.DataAccessLayer.Repositories
 
         public async Task Update(Artist entity)
         {
-            var artist = await _databaseContext.Artists.FindAsync(entity.ArtistId);
-
-            artist.ArtistName = entity.ArtistName;
-            artist.ArtistBio = entity.ArtistBio;
-            artist.Image = entity.Image;
-            artist.ImageId = entity.ImageId;
+            _databaseContext.Artists.Update(entity);
         }
 
-        public void Delete(Artist entity) 
+        public void Delete(Artist entity)
         {
             _databaseContext.Remove(entity);
-            _databaseContext.SaveChanges();
-        }
-
-        public async Task<IEnumerable<Artist>> GetSeveralArtists(List<int> ids)
-        {
-            List<Artist> artists = new List<Artist>();
-
-            foreach (var id in ids)
-            {
-                artists.Add(await GetByIdWithJoins(id));
-            }
-
-            return artists;
         }
 
         public async Task<IEnumerable<Album>> GetArtistAlbums(int id)
         {
             var albums = await _databaseContext.Albums
-                .Include(a => a.AlbumType)
-                .Include(a => a.Image)
-                    .ThenInclude(i => i.ImageType)
                 .Where(a => a.AlbumOwnerId == id)
                 .OrderByDescending(a => a.AlbumRelease)
                 .ToListAsync();
@@ -98,8 +84,6 @@ namespace Modsenfy.DataAccessLayer.Repositories
         public async Task<IEnumerable<Track>> GetArtistTracks(int id)
         {
             var tracks = await _databaseContext.Tracks
-                .Include(t => t.Audio)
-                .Include(t => t.Genre)
                 .Where(t => t.Album.AlbumOwnerId == id)
                 .OrderByDescending(t => t.Streams)
                 .ToListAsync();
@@ -110,8 +94,6 @@ namespace Modsenfy.DataAccessLayer.Repositories
         public async Task<IEnumerable<Entities.Stream>> GetArtistStreams(int id)
         {
             var streams = await _databaseContext.Streams
-                .Include(s => s.User)
-                .Include(s => s.Track)
                 .Where(s => s.Track.Album.AlbumOwnerId == id)
                 .OrderByDescending(s => s.StreamDate)
                 .ToListAsync();

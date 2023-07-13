@@ -1,8 +1,7 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Modsenfy.BusinessAccessLayer.DTOs;
-using Modsenfy.DataAccessLayer.Entities;
-using Modsenfy.DataAccessLayer.Repositories;
+using Modsenfy.BusinessAccessLayer.Services;
 
 namespace Modsenfy.PresentationLayer.Controllers
 {
@@ -10,104 +9,90 @@ namespace Modsenfy.PresentationLayer.Controllers
     [ApiController]
     public class ArtistController : ControllerBase
     {
-        private readonly ArtistRepository _artistRepository;
+        private readonly ArtistService _artistService;
         private readonly IMapper _mapper;
+        
 
-        public ArtistController(IMapper mapper, ArtistRepository artistRepository)
+        public ArtistController(ArtistService artistService, IMapper mapper)
         {
+            _artistService = artistService;
             _mapper = mapper;
-            _artistRepository = artistRepository;
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<ArtistDto>> GetArtist(int id)
         {
-            var artist = await _artistRepository.GetByIdWithJoins(id);
+            var artistDto = await _artistService.GetArtist(id);
 
-            if (artist is null)
+            if (artistDto is null)
             {
                 return BadRequest();
             }
-
-            var artistDto = _mapper.Map<ArtistDto>(artist);
 
             return Ok(artistDto);
         }
 
         [HttpPost]
-        public async Task<ActionResult> CreateArtist(ArtistDto artistDto)
+        public async Task<ActionResult<ArtistDto>> CreateArtist(ArtistDto artistDto)
         {
-            var artist = _mapper.Map<Artist>(artistDto);
+            artistDto = await _artistService.CreateArtist(artistDto);
 
-            if (artist is null)
+            if (artistDto is null)
             {
                 return BadRequest();
             }
 
-            await _artistRepository.Create(artist);
-            await _artistRepository.SaveChanges();
-
-            return Ok(artist.ArtistId);
+            return Ok(artistDto);
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult> UpdateArtist(ArtistDto artistDto)
+        public async Task<ActionResult<ArtistDto>> UpdateArtist(ArtistDto artistDto)
         {
-            var artist = _mapper.Map<Artist>(artistDto);
+            artistDto = await _artistService.UpdateArtist(artistDto);
 
-            if (artist is null)
+            if (artistDto is null)
             {
                 return BadRequest();
             }
-            
-            await _artistRepository.Update(artist);
-            await _artistRepository.SaveChanges();
 
-            return Ok(artist.ArtistId);
+            return Ok(artistDto);
         }
 
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteArtist(int id)
         {
-            var artist = await _artistRepository.GetById(id);
+            var artistDto = await _artistService.DeleteArtist(id);
 
-            if (artist is null)
+            if (artistDto is null)
             {
                 return BadRequest();
             }
-            
-            _artistRepository.Delete(artist);
-            await _artistRepository.SaveChanges();
 
-            return Ok(artist.ArtistId);
+            return Ok();
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Artist>>> GetSeveralArtists(List<int> ids)
+        public async Task<ActionResult<IEnumerable<ArtistDto>>> GetSeveralArtists(List<int> ids)
         {
-            var artists = await _artistRepository.GetSeveralArtists(ids);
+            var artistDtos = await _artistService.GetSeveralArtists(ids);
 
-            if (artists is null)
+            if (artistDtos is null)
             {
                 return BadRequest();
             }
 
-            IEnumerable<ArtistDto> artistDtos = _mapper.Map<IEnumerable<ArtistDto>>(artists);
-            
             return Ok(artistDtos);
         }
 
         [HttpGet("{id}/albums")]
         public async Task<ActionResult<IEnumerable<AlbumDto>>> GetArtistAlbums(int id)
         {
-            var albums = await _artistRepository.GetArtistAlbums(id);
+            var albumDtos = await _artistService.GetArtistAlbums(id);
 
-            if (albums is null)
+            if (albumDtos is null)
             {
                 return BadRequest();
             }
-
-            IEnumerable<AlbumDto> albumDtos = _mapper.Map<IEnumerable<AlbumDto>>(albums);
 
             return Ok(albumDtos);
         }
@@ -115,14 +100,12 @@ namespace Modsenfy.PresentationLayer.Controllers
         [HttpGet("{id}/tracks")]
         public async Task<ActionResult<IEnumerable<TrackDto>>> GetArtistTracks(int id)
         {
-            var tracks = await _artistRepository.GetArtistTracks(id);
+            var trackDtos = await _artistService.GetArtistTracks(id);
 
-            if (tracks is null)
+            if (trackDtos is null)
             {
                 return BadRequest();
             }
-
-            IEnumerable<TrackDto> trackDtos = _mapper.Map<IEnumerable<TrackDto>>(tracks);
 
             return Ok(trackDtos);
         }
@@ -130,14 +113,12 @@ namespace Modsenfy.PresentationLayer.Controllers
         [HttpGet("{id}/streams")]
 		public async Task<ActionResult<IEnumerable<StreamDto>>> GetAlbumStreams(int id)
 		{
-            var streams = await _artistRepository.GetArtistStreams(id);
+            var streamDtos = await _artistService.GetArtistStreams(id);
 
-            if (streams is null)
+            if (streamDtos is null)
             {
                 return BadRequest();
             }
-
-            IEnumerable<StreamDto> streamDtos = _mapper.Map<IEnumerable<StreamDto>>(streams);
 
             return Ok(streamDtos);
 		}

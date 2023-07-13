@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using Modsenfy.DataAccessLayer.Entities;
-using Stream = Modsenfy.DataAccessLayer.Entities.Stream;
 
 namespace Modsenfy.DataAccessLayer.Data;
 
@@ -31,6 +30,8 @@ public class DatabaseContext : DbContext
 
     public DbSet<Artist> Artists { get; set; }
 
+    public DbSet<Playlist> Playlists { get; set; }
+    
     public DbSet<UserArtists> UserArtists { get; set; }
     
     public DbSet<UserTracks> UserTracks { get; set; }

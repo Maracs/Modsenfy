@@ -55,6 +55,4 @@ public class ImageRepository:IImageRepository
     {
         _databaseContext.Images.Remove(entity);
     }
-
-   
 }
