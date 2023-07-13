@@ -4,14 +4,15 @@ using Modsenfy.DataAccessLayer.Entities;
 
 namespace Modsenfy.DataAccessLayer.Repositories;
 
-
 public class TrackArtistsRepository : ITrackArtistsRepository
 {
 	private readonly DatabaseContext _databaseContext;
+	
 	public TrackArtistsRepository(DatabaseContext databaseContext)
 	{
 		_databaseContext = databaseContext;
 	}
+
 	public async Task CreateAsync(TrackArtists entity)
 	{
 		await _databaseContext.TrackArtists.AddAsync(entity);

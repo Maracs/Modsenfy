@@ -24,7 +24,6 @@ public class UserAlbumRepository:IUserAlbumRepository
         await _databaseContext.SaveChangesAsync();
     }
 
-    
     public async Task<IEnumerable<UserAlbums>> GetAllAsync()
     {
        return await _databaseContext.UserAlbums.ToListAsync();

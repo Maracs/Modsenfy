@@ -7,7 +7,6 @@ namespace Modsenfy.DataAccessLayer.Repositories;
 
 public class AlbumTypeRepository : IAlbumTypeRepository
 {
-
 	private readonly DatabaseContext _databaseContext;
 	public AlbumTypeRepository(DatabaseContext databaseContext)
 	{

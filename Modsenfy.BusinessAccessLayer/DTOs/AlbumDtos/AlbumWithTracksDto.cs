@@ -9,6 +9,5 @@ public class AlbumWithTracksDto
 	public int AlbumStreams { get; set; }
 	public ImageDto Image { get; set; }
 	public ArtistDto Artist { get; set; }
-
     public IEnumerable<TrackDto> Tracks{ get; set; }
 }

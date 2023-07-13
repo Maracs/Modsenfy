@@ -6,25 +6,15 @@ namespace Modsenfy.DataAccessLayer.Entities;
 public class Track
 {
     public int TrackId { get; set; }
-
     public string TrackName { get; set; }
-
     public int TrackStreams { get; set; }
-
     public DateTime TrackDuration { get; set; }
-
     public string TrackGenius { get; set; }
-
     public int AlbumId { get; set; }
-
     public Album Album { get; set;}
-
     public int AudioId { get; set; }
-
     public Audio Audio { get; set; }
-
     public int GenreId { get; set; }
-
     public Genre Genre { get; set; }
 
     [Newtonsoft.Json.JsonIgnore]

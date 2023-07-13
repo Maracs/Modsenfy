@@ -35,7 +35,6 @@ builder.Services.AddScoped<UserTrackRepository>();
 builder.Services.AddScoped<UserAlbumRepository>();
 builder.Services.AddScoped<UserPlaylistRepository>();
 
-
 builder.Services.AddScoped<AlbumService>();
 builder.Services.AddScoped<TrackService>();
 builder.Services.AddScoped<ArtistService>();
@@ -51,7 +50,6 @@ builder.Services.AddControllers()
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
 
 var app = builder.Build();
 

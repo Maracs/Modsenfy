@@ -52,19 +52,16 @@ public class TokenService
             Audience = _authOptions.Value.Audience,
             Issuer = _authOptions.Value.Issuer,
         };
+
         return tokenDescriptor;
     }
 
     public async Task<string> GetTokenAsync(User user)
     {
         var claims = await GetClaimsAsync(user);
-
         var creds = new SigningCredentials(_key, SecurityAlgorithms.HmacSha512Signature);
-
         var tokenDescriptor = GetTokenDescriptor(claims, creds);
-
         var tokenHandler = new JwtSecurityTokenHandler();
-
         var token = tokenHandler.CreateToken(tokenDescriptor);
 
         return tokenHandler.WriteToken(token);

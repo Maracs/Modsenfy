@@ -110,16 +110,16 @@ namespace Modsenfy.PresentationLayer.Controllers
         }
 
         [HttpGet("{id}/streams")]
-		    public async Task<ActionResult<IEnumerable<StreamDto>>> GetAlbumStreams(int id)
-		    {
-            var streamDtos = await _artistService.GetArtistStreams(id);
+        public async Task<ActionResult<IEnumerable<StreamDto>>> GetAlbumStreams(int id)
+        {
+        var streamDtos = await _artistService.GetArtistStreams(id);
 
-            if (streamDtos is null)
-            {
-                return BadRequest();
-            }
+        if (streamDtos is null)
+        {
+            return BadRequest();
+        }
 
-            return Ok(streamDtos);
-		    }
+        return Ok(streamDtos);
+        }
     }
 }

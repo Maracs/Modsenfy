@@ -12,6 +12,7 @@ public class Searchable
 	public object SearchObject { get; }
 	public PropertyInfo SearchProperty { get; }
 	public string Query { get; }
+	
 	public float Rate
 	{
 		get
@@ -37,6 +38,7 @@ public class Searchable
 		var nameWords = name.ToLowerInvariant().Split(new char[] { ' ' });
 
 		List<int> lengthsOfHits = new List<int>();
+		
 		foreach (var nameWord in nameWords)
 		{
 			foreach (var queryWord in queryWords)
@@ -50,10 +52,11 @@ public class Searchable
 			}
 		}
 
-		
 		foreach (var l in lengthsOfHits)
 			rate += l;
+
         rate /= (name.Length - (nameWords.Count() - 1));
+
         return rate;
 	}
 }

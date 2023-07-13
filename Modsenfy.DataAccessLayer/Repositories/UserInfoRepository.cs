@@ -7,7 +7,6 @@ namespace Modsenfy.DataAccessLayer.Repositories;
 
 public class UserInfoRepository:IUserInfoRepository
 {
-
     private readonly DatabaseContext _databaseContext;
 
     public UserInfoRepository(DatabaseContext databaseContext)
@@ -34,7 +33,6 @@ public class UserInfoRepository:IUserInfoRepository
         var userInfo = await _databaseContext.UserInfos.FindAsync(id);
 
         return userInfo;
-
     }
 
     public async Task<IEnumerable<UserInfo>> GetAllAsync()

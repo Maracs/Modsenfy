@@ -7,7 +7,6 @@ namespace Modsenfy.DataAccessLayer.Repositories;
 
 public class RequestRepository:IRequestRepository
 {
-    
     private readonly DatabaseContext _databaseContext;
 
     public RequestRepository(DatabaseContext databaseContext)
@@ -17,7 +16,7 @@ public class RequestRepository:IRequestRepository
 
     public async Task SaveChangesAsync()
     {
-       await  _databaseContext.SaveChangesAsync();
+        await  _databaseContext.SaveChangesAsync();
     }
 
     public async Task<Request> GetByIdAsync(int id)
@@ -75,8 +74,6 @@ public class RequestRepository:IRequestRepository
     {
         _databaseContext.Requests.Update(entity);
     }
-
-    
 
     public void DeleteAsync(Request entity)
     {

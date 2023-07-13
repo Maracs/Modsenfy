@@ -34,9 +34,8 @@ public static class AuthenticationExtention
                     ValidAudience = authenticationOptions.Audience,
                     ValidateLifetime = true
                  };
-        });
+            });
 
         return services;
     }
 }
-

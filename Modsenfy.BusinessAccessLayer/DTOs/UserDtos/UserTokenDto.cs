@@ -8,6 +8,5 @@ namespace Modsenfy.BusinessAccessLayer.DTOs.UserDtos;
 public class UserTokenDto
 {
     public string UserNickname { get; set; }
-
     public string UserToken { get; set; }
 }

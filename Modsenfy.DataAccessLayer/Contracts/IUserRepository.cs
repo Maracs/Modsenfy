@@ -4,11 +4,8 @@ namespace Modsenfy.DataAccessLayer.Contracts;
 
 public interface IUserRepository:IRepository<User>
 {
-
-    
     Task<string> GetUserRoleAsync(User user);
 
-  
     async Task IRepository<User>.SaveChangesAsync()
     {
         throw new NotImplementedException();
@@ -53,5 +50,4 @@ public interface IUserRepository:IRepository<User>
     {
         throw new NotImplementedException();
     }
-    
 }

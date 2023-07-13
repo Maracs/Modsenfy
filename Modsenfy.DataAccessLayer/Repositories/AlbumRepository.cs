@@ -10,7 +10,6 @@ public class AlbumRepository : IAlbumRepository
 {
 	private readonly DatabaseContext _databaseContext;
 
-
 	public AlbumRepository(DatabaseContext databaseContext)
 	{
 		_databaseContext = databaseContext;
@@ -26,6 +25,7 @@ public class AlbumRepository : IAlbumRepository
 		var albumEntry = await _databaseContext.Albums.AddAsync(entity);
 
 		await _databaseContext.SaveChangesAsync();
+		
 		return albumEntry.Entity;
 	}
 
@@ -66,6 +66,7 @@ public class AlbumRepository : IAlbumRepository
 					.ThenInclude(ta => ta.Artist)
 						.ThenInclude(ar => ar.Image)
 							.ThenInclude(ar => ar.ImageType);
+		
 		return albums;
 	}
 
@@ -73,7 +74,6 @@ public class AlbumRepository : IAlbumRepository
 	{
 		var album = await GetWithJoins()
 			.FirstOrDefaultAsync(a => a.AlbumId == id);
-			
 
 		return album;
 	}
@@ -92,7 +92,8 @@ public class AlbumRepository : IAlbumRepository
     {
 		if (!((await _databaseContext.Albums.SingleOrDefaultAsync(a => a.AlbumOwnerId == artistId)).AlbumId == albumId))
 			return false;
-        return true;
+        
+		return true;
     }
 
     public async Task<IEnumerable<Album>> GetByListWithJoinsAsync(IEnumerable<int> ids)
@@ -100,7 +101,8 @@ public class AlbumRepository : IAlbumRepository
         var albums = await GetWithJoins()
 			.Where(a => ids.Contains(a.AlbumId))
 			.ToListAsync();
-        return albums;
+        
+		return albums;
     }
 
     public async Task<IEnumerable<Album>> GetOrderedByRelease()
@@ -108,6 +110,7 @@ public class AlbumRepository : IAlbumRepository
 		var albums = await GetWithJoins()
 			.OrderByDescending(a => a.AlbumRelease)
 			.ToListAsync();
+		
 		return albums;
 	}
 	
@@ -117,6 +120,7 @@ public class AlbumRepository : IAlbumRepository
 			.OrderByDescending(a => a.AlbumRelease)
 			.Skip(offset)
 			.ToListAsync();
+		
 		return albums;
 	}
 	public async Task<IEnumerable<Album>> GetOrderedByReleaseAndLimited(int limit, int offset)
@@ -125,6 +129,7 @@ public class AlbumRepository : IAlbumRepository
 			.OrderByDescending(a => a.AlbumRelease)
 			.Skip(offset)
 			.Take(limit).ToListAsync();
+		
 		return albums;
 	}
 
@@ -141,7 +146,6 @@ public class AlbumRepository : IAlbumRepository
 	{
 		await _databaseContext.SaveChangesAsync();
 	}
-
 
 	public async Task UpdateAsync(Album album)
 	{
@@ -167,9 +171,7 @@ public class AlbumRepository : IAlbumRepository
 			.Where(s => s.Track.AlbumId == id)
 			.OrderByDescending(s => s.StreamDate)
 			.ToListAsync();
+		
 		return streams;
-
 	}
-
-	
 }

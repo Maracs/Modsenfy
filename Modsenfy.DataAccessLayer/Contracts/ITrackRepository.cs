@@ -10,9 +10,7 @@ namespace Modsenfy.DataAccessLayer.Contracts
 	internal interface ITrackRepository : IRepository<Track>
 	{
 		Task<Track> GetByIdWithJoinsAsync(int id);
-
 		Task<Track> GetByIdWithStreamsAsync(int id);
-
         Task<Track> CreateAndGetAsync(Track entity);
     }
 }

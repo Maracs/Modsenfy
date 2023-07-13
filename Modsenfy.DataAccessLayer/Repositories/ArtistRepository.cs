@@ -117,17 +117,5 @@ namespace Modsenfy.DataAccessLayer.Repositories
                 await _databaseContext.Database.CloseConnectionAsync();
             }
         }
-
- 
-
-        //public async Task UpdateAsync(Artist entity)
-        //{
-        //    var artist = await _databaseContext.Artists.FindAsync(entity.ArtistId);
-
-        //    artist.ArtistName = entity.ArtistName;
-        //    artist.ArtistBio = entity.ArtistBio;
-        //    artist.Image = entity.Image;
-        //    artist.ImageId = entity.ImageId;
-        //}
     }
 }

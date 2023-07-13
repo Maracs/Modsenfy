@@ -7,7 +7,6 @@ namespace Modsenfy.DataAccessLayer.Repositories;
 
 public class ImageTypeRepository:IImageTypeRepository
 {
-
     private readonly DatabaseContext _databaseContext;
 
     public ImageTypeRepository(DatabaseContext databaseContext)
@@ -56,5 +55,4 @@ public class ImageTypeRepository:IImageTypeRepository
 
          return await _databaseContext.ImageTypes.SingleOrDefaultAsync(x => x.ImageTypeName == type);
     }
-    
 }

@@ -30,10 +30,12 @@ public class SearchService
         var albums = await _albumRepository.GetAllAsync();
     
         IEnumerable<Searchable> albumSearchables = new List<Searchable>();
+        
         foreach (var album in albums)
         {
 	        albumSearchables =  albumSearchables.Append(new Searchable(album, album.GetType().GetProperty(nameof(Album.AlbumName)), query));
         }
+        
         albumSearchables = albumSearchables.OrderByDescending(a => a.Rate);
 
         var tracks = await _trackRepository.GetAllAsync();
@@ -44,16 +46,18 @@ public class SearchService
 		{
 			trackSearchables =	trackSearchables.Append(new Searchable(track, track.GetType().GetProperty(nameof(Track.TrackName)), query));
 		}
-		trackSearchables = trackSearchables.OrderByDescending(t => t.Rate);
-
+		
+        trackSearchables = trackSearchables.OrderByDescending(t => t.Rate);
 
 		var artists = await _artistRepository.GetAllAsync();
 
 		IEnumerable<Searchable> artistSearchables = new List<Searchable>();
-		foreach (var artist in artists)
+		
+        foreach (var artist in artists)
 		{
 			artistSearchables = artistSearchables.Append(new Searchable(artist, artist.GetType().GetProperty(nameof(Artist.ArtistName)), query));
 		}
+
         artistSearchables = artistSearchables.OrderByDescending(a => a.Rate);
 
 		var searchDto = new SearchDto()
@@ -62,9 +66,7 @@ public class SearchService
 			Tracks = trackSearchables.Select(t => _mapper.Map<TrackDto>((Track)t.SearchObject)),
 			Artists = artistSearchables.Select(a => _mapper.Map<ArtistDto>((Artist)a.SearchObject))
 		};
-		
-		
-
+        
 		return searchDto;
 	}
 }

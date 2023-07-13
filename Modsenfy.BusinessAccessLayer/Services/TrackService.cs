@@ -55,9 +55,11 @@ public class TrackService
 
         var addedTrack = await _trackRepository.CreateAndGetAsync(track);
         trackDto.Artists.Append(artistOwnerId);
+        
         foreach (var artistId in trackDto.Artists)
         {
             var artist = await _artistRepository.GetByIdAsync(artistId);
+            
             if (artist == null)
                 throw new Exception("artist not found");
 
@@ -82,7 +84,9 @@ public class TrackService
             return null;
 
         var track = _mapper.Map<Track>(trackDto);
+
         await _trackRepository.UpdateAsync(track);
+
         return track;
     }
 
@@ -92,8 +96,10 @@ public class TrackService
             return null;
 
         var track = await _trackRepository.GetByIdAsync(id);
+
         _trackRepository.Delete(track);
         await _trackRepository.SaveChangesAsync();
+
         return track;
     }
 
@@ -104,6 +110,7 @@ public class TrackService
 
         var track = await _trackRepository.GetByIdWithStreamsAsync(id);
         var trackDto = _mapper.Map<TrackWithStreamsDto>(track);
+
         return trackDto;
     }
 
@@ -111,6 +118,7 @@ public class TrackService
     {
         IEnumerable<Track> tracks;
         IEnumerable<int> intIds;
+        
         if (ids.Equals("all"))
         {
             if (limit == -1 && offset == 0)
@@ -129,11 +137,13 @@ public class TrackService
         }
 
         IEnumerable<TrackWithAlbumDto> trackDtos = new List<TrackWithAlbumDto>();
+        
         foreach (var track in tracks)
         {
             var trackDto = _mapper.Map<TrackWithAlbumDto>(track);
             trackDtos = trackDtos.Append(trackDto);
         }
+        
         return trackDtos;
     }
 }

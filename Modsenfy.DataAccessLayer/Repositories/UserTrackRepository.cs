@@ -7,7 +7,6 @@ namespace Modsenfy.DataAccessLayer.Repositories;
 
 public class UserTrackRepository:IUserTrackRepository
 {
-
     private readonly DatabaseContext _databaseContext;
     
     public UserTrackRepository(DatabaseContext databaseContext)
@@ -27,7 +26,7 @@ public class UserTrackRepository:IUserTrackRepository
 
     public async Task<IEnumerable<UserTracks>> GetAllAsync()
     {
-      return await _databaseContext.UserTracks.ToListAsync();
+        return await _databaseContext.UserTracks.ToListAsync();
     }
 
     public async Task CreateAsync(UserTracks entity)
@@ -47,7 +46,6 @@ public class UserTrackRepository:IUserTrackRepository
     
     public async Task<bool> IfUserFollowTrackAsync(int userId,int trackId)
     {
-        
         return (await _databaseContext.UserTracks.AnyAsync(tracks =>tracks.TrackId ==trackId && tracks.UserId == userId));
     }
 
