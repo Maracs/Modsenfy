@@ -4,15 +4,15 @@ namespace Modsenfy.DataAccessLayer.Contracts
 {
     public interface IArtistRepository : IRepository<Artist>
     {
-        Task<Artist> GetById(int id);
-        Task<Artist> GetByIdWithJoins(int id);
-        Task<IEnumerable<Artist>> GetAll();
-        Task SaveChanges();
-        Task Create(Artist entity);
-        Task Update(Artist entity);
+        Task<Artist> GetByIdAsync(int id);
+        Task<Artist> GetByIdWithJoinsAsync(int id);
+        Task<IEnumerable<Artist>> GetAllAsync();
+        Task SaveChangesAsync();
+        Task CreateAsync(Artist entity);
+        Task UpdateAsync(Artist entity);
         void Delete(Artist entity);
-        Task<IEnumerable<Album>> GetArtistAlbums(int id);
-        Task<IEnumerable<Track>> GetArtistTracks(int id);
-        Task<IEnumerable<Entities.Stream>> GetArtistStreams(int id);
+        Task<IEnumerable<Album>> GetArtistAlbumsAsync(int id);
+        Task<IEnumerable<Track>> GetArtistTracksAsync(int id);
+        Task<IEnumerable<Entities.Stream>> GetArtistStreamsAsync(int id);
     }
 }

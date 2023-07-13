@@ -289,7 +289,7 @@ public class UserRepository : IUserRepository
 
     public async Task<Playlist> CreateAndGetPlaylistAsync(Playlist entity)
     {
-        var entityEntry = await _databaseContext.Playlist.AddAsync(entity);
+        var entityEntry = await _databaseContext.Playlists.AddAsync(entity);
 
         await _databaseContext.SaveChangesAsync();
 

@@ -4,12 +4,12 @@ namespace Modsenfy.DataAccessLayer.Contracts
 {
     public interface IPlaylistRepository : IRepository<Playlist>
     {
-        Task<Playlist> GetById(int id);
-        Task<Playlist> GetByIdWithJoins(int id);
-        Task<IEnumerable<Playlist>> GetAll();
-        Task SaveChanges();
-        Task Create(Playlist entity);
-        Task Update(Playlist entity);
+        Task<Playlist> GetByIdAsync(int id);
+        Task<Playlist> GetByIdWithJoinsAsync(int id);
+        Task<IEnumerable<Playlist>> GetAllAsync();
+        Task SaveChangesAsync();
+        Task CreateAsync(Playlist entity);
+        Task UpdateAsync(Playlist entity);
         void Delete(Playlist entity);
     }
 }

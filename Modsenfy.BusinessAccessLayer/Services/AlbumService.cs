@@ -43,7 +43,7 @@ public class AlbumService
 			total += track.TrackStreams;
 		return total;
 	} 
-	public async Task<AlbumWithTracksDto> GetAlbum(int id)
+	public async Task<AlbumWithTracksDto> GetAlbumAsync(int id)
 	{
 		var album = await _albumRepository.GetByIdWithJoins(id);
 		var albumDto = _mapper.Map<AlbumWithTracksDto>(album);
@@ -104,14 +104,8 @@ public class AlbumService
 		{
 			var splittedIds = ids.Split(',');
 			intIds = splittedIds.Select(id => int.Parse(id));
-			albums = new List<Album>();
-			foreach (var id in intIds)			
-			{
-				var album = await _albumRepository.GetByIdWithJoins(id);
-				albums = albums.Append(album);
-			}
-		}
-
+			albums = await _albumRepository.GetByListWithJoinsAsync(intIds);
+        }
 
 		IEnumerable<AlbumWithTracksDto> albumDtos = new List<AlbumWithTracksDto>();
 		foreach (Album album in albums)
@@ -123,8 +117,10 @@ public class AlbumService
 		return albumDtos;
 	}
 	
-	public async Task<IEnumerable<StreamDto>> GetAlbumStreams(int id)
+	public async Task<IEnumerable<StreamDto>> GetAlbumStreams(int id, int artistId)
 	{
+		if (!(await _albumRepository.IsAlbumOwnerAsync(artistId, id)))
+			return null;
 		var albumStreams = await _albumRepository.GetAlbumStreams(id);
 		var streamDtos = albumStreams.Select(s => _mapper.Map<StreamDto>(s));
 		return streamDtos;
@@ -136,9 +132,9 @@ public class AlbumService
 		{
 			foreach(var artistId in trackDto.Artists)
 			{
-				var res = await _artistRepository.Exists(artistId);
-				if (!res)
-					throw new Exception("artists not found");
+				//var res = await _artistRepository.Exists(artistId);
+				//if (!res)
+					//throw new Exception("artists not found");
 			}
 		}
 		
@@ -178,6 +174,18 @@ public class AlbumService
 		return album.AlbumId;
 	}
 
+	public async Task<bool> DeleteAlbumAsync(int artistId, int albumId)
+	{
+		if (!(await _albumRepository.IsAlbumOwnerAsync(artistId, albumId)))
+			return false;
+
+        var album = await _albumRepository.GetByIdAsync(albumId);
+        _albumRepository.Delete(album);
+        await _albumRepository.SaveChangesAsync();
+
+		return true;
+    }
+
 	public async Task UpdateAlbum(int id, AlbumUpdateDto albumDto)
 	{
 		//artistOwnerId из клейма !TODO;
@@ -193,8 +201,8 @@ public class AlbumService
 		{
 			foreach(var artistId in trackDto.Artists)
 			{
-				var res = await _artistRepository.Exists(artistId);
-				if (!res)
+				//var res = await _artistRepository.Exists(artistId);
+				//if (!res)
 					throw new Exception("artists not found");
 			}
 		}
@@ -206,7 +214,7 @@ public class AlbumService
 			ImageTypeId = (await _imageTypeRepository.GetIfExists(albumDto.Image.ImageTypeName)).ImageTypeId
 		};
 		
-		var artistOwner = await _artistRepository.GetById(artistOwnerId);
+		var artistOwner = await _artistRepository.GetByIdAsync(artistOwnerId);
 		
 		
 		album.AlbumName = albumDto.AlbumName;

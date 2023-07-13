@@ -44,10 +44,9 @@ public class DatabaseContext : DbContext
     
     public DbSet<UserPlaylists> UserPlaylists { get; set; }
     
-    public DbSet<Playlist> Playlist { get; set; }
+    public DbSet<Playlist> Playlists { get; set; }
     
     public DbSet<Role> Role { get; set; }
-
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

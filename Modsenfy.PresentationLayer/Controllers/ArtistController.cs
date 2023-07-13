@@ -11,8 +11,7 @@ namespace Modsenfy.PresentationLayer.Controllers
     {
         private readonly ArtistService _artistService;
         private readonly IMapper _mapper;
-        
-
+    
         public ArtistController(ArtistService artistService, IMapper mapper)
         {
             _artistService = artistService;
@@ -41,7 +40,7 @@ namespace Modsenfy.PresentationLayer.Controllers
             {
                 return BadRequest();
             }
-
+            
             return Ok(artistDto);
         }
 
@@ -111,8 +110,8 @@ namespace Modsenfy.PresentationLayer.Controllers
         }
 
         [HttpGet("{id}/streams")]
-		public async Task<ActionResult<IEnumerable<StreamDto>>> GetAlbumStreams(int id)
-		{
+		    public async Task<ActionResult<IEnumerable<StreamDto>>> GetAlbumStreams(int id)
+		    {
             var streamDtos = await _artistService.GetArtistStreams(id);
 
             if (streamDtos is null)
@@ -121,6 +120,6 @@ namespace Modsenfy.PresentationLayer.Controllers
             }
 
             return Ok(streamDtos);
-		}
+		    }
     }
 }

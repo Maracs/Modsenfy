@@ -1,4 +1,5 @@
 using AutoMapper;
+using AutoMapper.Configuration.Annotations;
 using Modsenfy.BusinessAccessLayer.DTOs;
 using Modsenfy.DataAccessLayer.Contracts;
 using Modsenfy.DataAccessLayer.Entities;
@@ -69,6 +70,43 @@ public class TrackService
             await _trackArtistsRepository.CreateAsync(trackArtists);
         }
     }
+
+    public async Task<Track> GetTrack(int id)
+    {
+        return await _trackRepository.GetByIdWithJoinsAsync(id);
+    }
+
+    public async Task<Track> UpdateTrackAsync(int userId, TrackDto trackDto)
+    {
+        if (!(await _trackRepository.IsTrackOwnerAsync(userId, trackDto.TrackId)))
+            return null;
+
+        var track = _mapper.Map<Track>(trackDto);
+        await _trackRepository.UpdateAsync(track);
+        return track;
+    }
+
+    public async Task<Track> DeleteTrackAsync(int userId, int id)
+    {
+        if (!(await _trackRepository.IsTrackOwnerAsync(userId, id)))
+            return null;
+
+        var track = await _trackRepository.GetByIdAsync(id);
+        _trackRepository.Delete(track);
+        await _trackRepository.SaveChangesAsync();
+        return track;
+    }
+
+    public async Task<TrackWithStreamsDto> GetTrackStreamsAsync(int userId, int id)
+    {
+        if (!(await _trackRepository.IsTrackOwnerAsync(userId, id)))
+            return null;
+
+        var track = await _trackRepository.GetByIdWithStreamsAsync(id);
+        var trackDto = _mapper.Map<TrackWithStreamsDto>(track);
+        return trackDto;
+    }
+
     public async Task<IEnumerable<TrackWithAlbumDto>> GetSeverlTracksAsync(int limit, int offset, string ids)
     {
         IEnumerable<Track> tracks;
@@ -87,11 +125,7 @@ public class TrackService
             var splittedIds = ids.Split(',');
             intIds = splittedIds.Select(id => int.Parse(id));
             tracks = new List<Track>();
-            foreach (var id in intIds)
-            {
-                var track = await _trackRepository.GetByIdWithJoinsAsync(id);
-                tracks = tracks.Append(track);
-            }
+            tracks = await _trackRepository.GetByListWithJoinsAsync(intIds);
         }
 
         IEnumerable<TrackWithAlbumDto> trackDtos = new List<TrackWithAlbumDto>();

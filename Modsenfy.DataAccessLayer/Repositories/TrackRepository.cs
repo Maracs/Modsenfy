@@ -3,14 +3,6 @@ using Microsoft.EntityFrameworkCore.Query;
 using Modsenfy.DataAccessLayer.Contracts;
 using Modsenfy.DataAccessLayer.Data;
 using Modsenfy.DataAccessLayer.Entities;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Reflection.Metadata.Ecma335;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Modsenfy.DataAccessLayer.Repositories
 {
@@ -65,6 +57,24 @@ namespace Modsenfy.DataAccessLayer.Repositories
             return track;
         }
 
+        public async Task<IEnumerable<Track>> GetByListWithJoinsAsync(IEnumerable<int> ids)
+        {
+            var tracks = await _databaseContext.Tracks
+                 .Include(t => t.Audio)
+                 .Include(t => t.Genre)
+                 .Include(t => t.TrackArtists)
+                    .ThenInclude(ta => ta.Artist)
+                        .ThenInclude(a => a.Image)
+                            .ThenInclude(i => i.ImageType)
+                 .Include(t => t.Album)
+                    .ThenInclude(al => al.Image)
+                        .ThenInclude(i => i.ImageType)
+                 .Include(t => t.Album)
+                    .ThenInclude(a => a.AlbumType)
+                 .Where(t => ids.Contains(t.TrackId)).ToListAsync();
+            return tracks;
+        }
+        
         public async Task<Track> GetByIdWithJoinsAsync(int id)
         {
             var track = await _databaseContext.Tracks

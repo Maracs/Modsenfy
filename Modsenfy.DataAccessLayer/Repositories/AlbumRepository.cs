@@ -32,9 +32,7 @@ public class AlbumRepository : IAlbumRepository
 	public void Delete(Album album)
 	{
 		_databaseContext.Remove(album);
-		_databaseContext.SaveChanges();
 	}
-
 
 	public async Task<IEnumerable<Album>> GetAllAsync()
 	{
@@ -90,7 +88,22 @@ public class AlbumRepository : IAlbumRepository
 		return albums;
 	}
 
-	public async Task<IEnumerable<Album>> GetOrderedByRelease()
+    public async Task<bool> IsAlbumOwnerAsync(int artistId, int albumId)
+    {
+		if (!((await _databaseContext.Albums.SingleOrDefaultAsync(a => a.AlbumOwnerId == artistId)).AlbumId == albumId))
+			return false;
+        return true;
+    }
+
+    public async Task<IEnumerable<Album>> GetByListWithJoinsAsync(IEnumerable<int> ids)
+    {
+        var albums = await GetWithJoins()
+			.Where(a => ids.Contains(a.AlbumId))
+			.ToListAsync();
+        return albums;
+    }
+
+    public async Task<IEnumerable<Album>> GetOrderedByRelease()
 	{
 		var albums = await GetWithJoins()
 			.OrderByDescending(a => a.AlbumRelease)
