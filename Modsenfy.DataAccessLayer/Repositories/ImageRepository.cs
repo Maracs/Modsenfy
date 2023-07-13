@@ -14,7 +14,7 @@ public class ImageRepository:IImageRepository
         _databaseContext = databaseContext;
     }
     
-    public async Task<Image> CreateAndGet(Image entity)
+    public async Task<Image> CreateAndGetAsync(Image entity)
     {
         var imageEntry = await _databaseContext.Images.AddAsync(entity);
 

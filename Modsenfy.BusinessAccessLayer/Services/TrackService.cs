@@ -32,7 +32,7 @@ public class TrackService
         _mapper = mapper;
     }
 
-    public async Task CreateTrack(TrackCreateDto trackDto, int albumId, int artistOwnerId)
+    public async Task CreateTrackAsync(TrackCreateDto trackDto, int albumId, int artistOwnerId)
     {
         var genre = await _genreRepository.GetByName(trackDto.GenreName);
         var audio = new Audio()
@@ -54,15 +54,16 @@ public class TrackService
         };
 
         var addedTrack = await _trackRepository.CreateAndGetAsync(track);
-        trackDto.Artists.Append(artistOwnerId);
-        
+        var trackArtist = new TrackArtists
+        {
+            TrackId = addedTrack.TrackId,
+            ArtistId = artistOwnerId
+        };
+
+        await _trackArtistsRepository.CreateAsync(trackArtist);
+
         foreach (var artistId in trackDto.Artists)
         {
-            var artist = await _artistRepository.GetByIdAsync(artistId);
-            
-            if (artist == null)
-                throw new Exception("artist not found");
-
             var trackArtists = new TrackArtists
             {
                 TrackId = addedTrack.TrackId,

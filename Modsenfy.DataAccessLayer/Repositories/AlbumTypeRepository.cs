@@ -35,7 +35,7 @@ public class AlbumTypeRepository : IAlbumTypeRepository
 		return type;
 	}
 
-	public async Task<AlbumType> GetByName(string typeName)
+	public async Task<AlbumType> GetByNameAsync(string typeName)
 	{
 		var type = await _databaseContext.AlbumTypes.FirstOrDefaultAsync(at => at.AlbumTypeName.ToLower() == typeName.ToLower());
         return type;

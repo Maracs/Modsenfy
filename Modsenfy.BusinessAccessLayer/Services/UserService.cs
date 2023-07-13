@@ -69,10 +69,10 @@ public class UserService
         var image = new Image()
         {
             ImageFilename = userDto.Image.ImageFilename,
-            ImageTypeId = (await _imageTypeRepository.GetIfExists(userDto.Image.ImageTypeName)).ImageTypeId
+            ImageTypeId = (await _imageTypeRepository.GetIfExistsAsync(userDto.Image.ImageTypeName)).ImageTypeId
         };
         
-        var imageId = (await _imageRepository.CreateAndGet(image)).ImageId;
+        var imageId = (await _imageRepository.CreateAndGetAsync(image)).ImageId;
 
         var userInfo = new UserInfo()
         {
@@ -319,7 +319,7 @@ public class UserService
         var image = await _imageRepository.GetByIdAsync(userInfo.ImageId);
         image.ImageFilename = userDto.Image.ImageFilename;
 
-        var imageType = await _imageTypeRepository.GetIfExists(userDto.Image.ImageTypeName);
+        var imageType = await _imageTypeRepository.GetIfExistsAsync(userDto.Image.ImageTypeName);
         if(imageType==null)
             return false;
         image.ImageTypeId = imageType.ImageTypeId;
@@ -714,10 +714,10 @@ public class UserService
         var image = new Image()
         {
             ImageFilename = requestDto.Image.ImageFilename,
-            ImageTypeId = (await _imageTypeRepository.GetIfExists(requestDto.Image.ImageTypeName)).ImageTypeId
+            ImageTypeId = (await _imageTypeRepository.GetIfExistsAsync(requestDto.Image.ImageTypeName)).ImageTypeId
         };
         
-        var imageWithId = await _imageRepository.CreateAndGet(image);
+        var imageWithId = await _imageRepository.CreateAndGetAsync(image);
         var request = new Request()
         {
             RequestStatusId = 1,
@@ -822,7 +822,7 @@ public class UserService
 
     public async Task<int> CreateUserPlaylistAsync(int id, PlaylistWithNameAndImage playlistDto)
     {
-        var imageType = await _imageTypeRepository.GetIfExists(playlistDto.Image.ImageTypeName);
+        var imageType = await _imageTypeRepository.GetIfExistsAsync(playlistDto.Image.ImageTypeName);
         if (imageType == null)
             return -1;
         var image = new Image()
@@ -830,7 +830,7 @@ public class UserService
             ImageFilename = playlistDto.Image.ImageFilename,
             ImageTypeId = imageType.ImageTypeId
         };
-        var savedImage = await _imageRepository.CreateAndGet(image);
+        var savedImage = await _imageRepository.CreateAndGetAsync(image);
 
         var playlist = new Playlist()
         {

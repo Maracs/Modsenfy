@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 using Modsenfy.BusinessAccessLayer.Services;
 using Microsoft.AspNetCore.Authorization;
 using Modsenfy.BusinessAccessLayer.Extentions;
+using System.Diagnostics.Eventing.Reader;
 
 namespace Modsenfy.PresentationLayer.Controllers
 {
@@ -34,7 +35,7 @@ namespace Modsenfy.PresentationLayer.Controllers
 		[HttpPost]
 		public async Task<ActionResult<int>> CreateAlbum([FromBody] AlbumCreateDto albumCreateDto)
 		{
-            var id = await _albumService.CreateAlbum(albumCreateDto);
+            var id = await _albumService.CreateAlbumAsync(albumCreateDto, User.GetUserId());
             return Ok(id);
 		}//ready
 
@@ -42,7 +43,12 @@ namespace Modsenfy.PresentationLayer.Controllers
         [HttpPut("{id}")]
 		public async Task<ActionResult> UpdateAlbum([FromRoute] int id, [FromBody] AlbumUpdateDto albumUpdateDto)
 		{
-            await _albumService.UpdateAlbum(id, albumUpdateDto);
+			var res = await _albumService.UpdateAlbum(id, albumUpdateDto, User.GetUserId());
+			if (res == "Forbid")
+				return Forbid();
+			else if (res == "NotFound")
+				return NotFound();
+
             return Ok();
 		}// надо переделать логику 
 

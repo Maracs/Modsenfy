@@ -34,7 +34,7 @@ public interface IImageRepository:IRepository<Image>
         throw new NotImplementedException();
     }
     
-    public async Task<Image> CreateAndGet(Image entity)
+    public async Task<Image> CreateAndGetAsync(Image entity)
     {
         throw new NotImplementedException();
     }
