@@ -25,8 +25,17 @@ builder.Services.AddScoped<ImageRepository>();
 builder.Services.AddScoped<ImageTypeRepository>();
 builder.Services.AddScoped<RequestRepository>();
 builder.Services.AddScoped<AlbumRepository>();
-builder.Services.AddScoped<AlbumService>();
+builder.Services.AddScoped<AlbumTypeRepository>();
+builder.Services.AddScoped<GenreRepository>();
+builder.Services.AddScoped<TrackArtistsRepository>();
 
+
+builder.Services.AddScoped<UserTrackRepository>();
+builder.Services.AddScoped<UserAlbumRepository>();
+
+builder.Services.AddScoped<AlbumService>();
+builder.Services.AddScoped<TrackService>();
+builder.Services.AddScoped<ArtistService>();
 builder.Services.AddScoped<UserService>();
 
 

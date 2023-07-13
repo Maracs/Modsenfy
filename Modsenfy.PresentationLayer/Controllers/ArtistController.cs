@@ -5,7 +5,7 @@ using Modsenfy.BusinessAccessLayer.Services;
 
 namespace Modsenfy.PresentationLayer.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [ApiController]
     public class ArtistController : ControllerBase
     {

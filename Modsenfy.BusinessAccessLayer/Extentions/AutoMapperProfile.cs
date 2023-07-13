@@ -11,9 +11,9 @@ public class AutoMapperProfile : Profile
 {
 	public AutoMapperProfile()
 	{
-        CreateMap<Image, ImageDto>()
-            .ForMember(dest => dest.ImageTypeName, opt => opt.MapFrom(src => src.ImageType.ImageTypeName));
-
+		CreateMap<Image, ImageDto>()
+			.ForMember(dest => dest.ImageTypeName, opt => opt.MapFrom(src => src.ImageType.ImageTypeName))
+			.ReverseMap();
 		CreateMap<Audio, AudioDto>()
 			.ForMember(dest => dest.AudioFilename, opt => opt.MapFrom(src => src.AudioFilename));
 
@@ -21,13 +21,13 @@ public class AutoMapperProfile : Profile
 
 		CreateMap<Artist, ArtistDto>()
 			.ForMember(dest => dest.Image, opt => opt.MapFrom(src => src.Image))
-            .ReverseMap();
-			
+			.ForMember(dest => dest.Followers,opt=>opt.MapFrom(src=> new ArtistFollowersDto(){Url = src.ArtistId.ToString(),Total = src.UserArtists.Count}))
+			.ReverseMap();
+
 		CreateMap<Track, TrackDto>()
 			.ForMember(dest => dest.Artists, opt => opt.MapFrom(src => src.TrackArtists.Select(ta => ta.Artist)))
 			.ForMember(dest => dest.GenreName, opt => opt.MapFrom(src => src.Genre.GenreName))
 			.ForMember(dest => dest.Audio, opt => opt.MapFrom(src => src.Audio)).ReverseMap();
-			
 
 		CreateMap<Album, AlbumWithTracksDto>()
 			.ForMember(dest => dest.Image, opt => opt.MapFrom(src => src.Image))

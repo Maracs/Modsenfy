@@ -5,7 +5,8 @@ namespace Modsenfy.DataAccessLayer.Data;
 
 public class DatabaseContext : DbContext
 {
-    public DatabaseContext(DbContextOptions<DatabaseContext> options) : base(options) { }
+    public DatabaseContext(DbContextOptions<DatabaseContext> options)
+        : base(options) { }
 
     public DbSet<Track> Tracks { get; set; }
 
@@ -30,6 +31,30 @@ public class DatabaseContext : DbContext
     public DbSet<Artist> Artists { get; set; }
 
     public DbSet<Playlist> Playlists { get; set; }
+    
+    public DbSet<UserArtists> UserArtists { get; set; }
+    
+    public DbSet<UserTracks> UserTracks { get; set; }
+    
+    public DbSet<UserAlbums> UserAlbums { get; set; }
+    
+    public DbSet<Genre> Genres { get; set; }
+    
+    public DbSet<AlbumType> AlbumTypes { get; set; }
+    
+    public DbSet<Audio> Audios { get; set; }
+    
+    public DbSet<UserPlaylists> UserPlaylists { get; set; }
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        var connectionString = "Data Source=34.118.70.5,1433;Initial Catalog=modsenfydb;User ID=sqlserver;Password=password;";
+        if (!optionsBuilder.IsConfigured)
+        {
+            optionsBuilder.UseSqlServer(connectionString,
+                builder => builder.MigrationsAssembly("Modsenfy.DataAccessLayer"));
+        }
+    }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -48,7 +73,7 @@ public class DatabaseContext : DbContext
             .HasForeignKey(a => a.AlbumOwnerId)
             .OnDelete(DeleteBehavior.NoAction);
 
-        modelBuilder.Entity<Playlist>()
+     modelBuilder.Entity<Playlist>()
             .HasOne(playlist => playlist.User)
             .WithMany(user => user.Playlists)
             .HasForeignKey(playlist => playlist.PlaylistOwnerId);
@@ -153,8 +178,7 @@ public class DatabaseContext : DbContext
         modelBuilder.Entity<UserPlaylists>()
             .HasOne(pt => pt.Playlist)
             .WithMany(p => p.UserPlaylists)
-            .HasForeignKey(pt => pt.PlaylistId)
-            .OnDelete(DeleteBehavior.NoAction);
+            .HasForeignKey(pt => pt.PlaylistId);
 
         modelBuilder.Entity<UserTracks>()
             .HasKey(pt => new { pt.UserId, pt.TrackId });
