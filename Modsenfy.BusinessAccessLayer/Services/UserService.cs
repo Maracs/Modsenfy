@@ -177,16 +177,9 @@ public class UserService
         return  _mapper.Map<UserWithDetailsAndEmailAndIdAndRoleDto>(userWithJoins);
     }
 
-    public async Task<UserDto> GetUserProfileForUserAsync(int id)
+    public async Task<User> GetUserProfileForUserAsync(int id)
     {
-        var userWithJoins = await _userRepository.GetByIdWithJoinsAsync(id);
-        return _mapper.Map<UserDto>(userWithJoins);
-    }
-
-    public async Task<string> GetUserRoleAsync(int userId)
-    {
-        var user = await _userRepository.GetByIdAsync(userId);
-        return  await _userRepository.GetUserRoleAsync(user);
+        return  await _userRepository.GetByIdWithJoinsAsync(id); 
     }
 
     public async Task<List<TrackWithAlbumDto>> GetUserTopTracksAsync(int id)

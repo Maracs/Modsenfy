@@ -38,7 +38,7 @@ namespace Modsenfy.PresentationLayer.Controllers
             var trackDto = _mapper.Map<TrackWithAlbumDto>(track);
 
             return Ok(trackDto);
-        }
+        }//ready //working
 
         [HttpPut]
         public async Task<ActionResult> UpdateTrack([FromBody]TrackDto trackDto)
@@ -47,7 +47,7 @@ namespace Modsenfy.PresentationLayer.Controllers
             if (track == null)
                 return Forbid();
             return Ok(track.TrackId);
-        }
+        }//ready 
 
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteTrack([FromQuery]int id)
@@ -56,7 +56,7 @@ namespace Modsenfy.PresentationLayer.Controllers
             if (track == null)
                 return Forbid();
             return Ok(track.TrackId);
-        }
+        }//ready
 
         [AllowAnonymous]
         [HttpGet]
@@ -65,7 +65,7 @@ namespace Modsenfy.PresentationLayer.Controllers
         {
             var tracks = await _trackService.GetSeverlTracksAsync(limit, offset, ids);
             return Ok(tracks);
-        }
+        }//ready //working
         
         [HttpGet("{id}/streams")]
         public async Task<ActionResult<TrackWithStreamsDto>> GetTrackStreams(int id)
@@ -75,6 +75,6 @@ namespace Modsenfy.PresentationLayer.Controllers
                 return Forbid();
 
             return Ok(trackDto);
-        }
+        }//ready //working
     }
 }

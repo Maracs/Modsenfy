@@ -61,7 +61,7 @@ public class UsersController:ControllerBase
     {
         if (User.HasClaim(ClaimTypes.Role, "Admin"))   
             return Ok(await _userService.GetUserProfileForAdminAsync(id));
-        return Ok(await _userService.GetUserProfileForUserAsync(id));
+        return Ok(_mapper.Map<UserDto>(await _userService.GetUserProfileForUserAsync(id)));
     }
     //ready
 
