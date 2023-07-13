@@ -5,12 +5,8 @@ namespace Modsenfy.DataAccessLayer.Data;
 
 public class DatabaseContext : DbContext
 {
-<<<<<<< HEAD
-    public DatabaseContext(DbContextOptions<DatabaseContext> options) : base(options) { }
-=======
     public DatabaseContext(DbContextOptions<DatabaseContext> options)
         : base(options) { }
->>>>>>> dev
 
     public DbSet<Track> Tracks { get; set; }
 
@@ -34,9 +30,6 @@ public class DatabaseContext : DbContext
 
     public DbSet<Artist> Artists { get; set; }
 
-<<<<<<< HEAD
-    public DbSet<Playlist> Playlists { get; set; }
-=======
     public DbSet<UserArtists> UserArtists { get; set; }
     
     public DbSet<UserTracks> UserTracks { get; set; }
@@ -55,7 +48,6 @@ public class DatabaseContext : DbContext
     
     public DbSet<Role> Role { get; set; }
 
->>>>>>> dev
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
