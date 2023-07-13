@@ -34,7 +34,7 @@ namespace Modsenfy.DataAccessLayer.Repositories
             return artist;
         }
 
-        public async Task<IEnumerable<Artist>> GetSeveralArtistsAsync(List<int> ids)
+        public async Task<IEnumerable<Artist>> GetSeveralArtistsAsync(List<int> ids
         {
             var artists = await _databaseContext.Artists
                 .Where(a => ids.Contains(a.ArtistId))
@@ -72,6 +72,7 @@ namespace Modsenfy.DataAccessLayer.Repositories
         }
 
         public async Task<IEnumerable<Album>> GetArtistAlbumsAsync(int id)
+
         {
             var albums = await _databaseContext.Albums
                 .Where(a => a.AlbumOwnerId == id)
