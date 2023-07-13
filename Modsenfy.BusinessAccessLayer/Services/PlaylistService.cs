@@ -16,7 +16,7 @@ namespace Modsenfy.BusinessAccessLayer.Services
             _mapper = mapper;
         }
 
-        public async Task<PlaylistDto> GetPlaylist(int id)
+        public async Task<PlaylistDto> GetPlaylistAsync(int id)
         {
             var playlist = await _playlistRepository.GetByIdWithJoinsAsync(id);
             var playlistDto = _mapper.Map<PlaylistDto>(playlist);
@@ -24,7 +24,7 @@ namespace Modsenfy.BusinessAccessLayer.Services
             return playlistDto;
         }
 
-        public async Task<PlaylistDto> CreatePlaylist(PlaylistDto playlistDto)
+        public async Task<PlaylistDto> CreatePlaylistAsync(PlaylistDto playlistDto)
         {
             var playlist = _mapper.Map<Playlist>(playlistDto);
 
@@ -34,7 +34,7 @@ namespace Modsenfy.BusinessAccessLayer.Services
             return playlistDto;
         }
 
-        public async Task<PlaylistDto> UpdatePlaylist(PlaylistDto playlistDto)
+        public async Task<PlaylistDto> UpdatePlaylistAsync(PlaylistDto playlistDto)
         {
             var playlist = _mapper.Map<Playlist>(playlistDto);
 
@@ -49,7 +49,7 @@ namespace Modsenfy.BusinessAccessLayer.Services
             return playlistDto;
         }
 
-        public async Task<PlaylistDto> DeletePlaylist(int id)
+        public async Task<PlaylistDto> DeletePlaylistAsync(int id)
         {
             var playlist = await _playlistRepository.GetByIdAsync(id);
             var playlistDto = _mapper.Map<PlaylistDto>(playlist);
@@ -65,7 +65,7 @@ namespace Modsenfy.BusinessAccessLayer.Services
             return playlistDto;
         }
 
-        public async Task<IEnumerable<PlaylistDto>> GetSeveralPlaylists(List<int> ids)
+        public async Task<IEnumerable<PlaylistDto>> GetSeveralPlaylistsAsync(List<int> ids)
         {
             var playlists = await _playlistRepository.GetSeveralPlaylistsAsync(ids);
 
@@ -74,7 +74,7 @@ namespace Modsenfy.BusinessAccessLayer.Services
             return playlistDtos;
         }
 
-        public async Task<IEnumerable<TrackDto>> GetTracksOfPlaylist(int id)
+        public async Task<IEnumerable<TrackDto>> GetTracksOfPlaylistAsync(int id)
         {
             var playlist = await _playlistRepository.GetByIdWithJoinsAsync(id);
             var tracks = playlist.PlaylistTracks;

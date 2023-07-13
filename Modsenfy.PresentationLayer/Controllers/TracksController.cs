@@ -49,7 +49,7 @@ namespace Modsenfy.PresentationLayer.Controllers
             return Ok(track.TrackId);
         }//ready 
 
-        [HttpDelete("{id}")]
+        [HttpDelete]
         public async Task<ActionResult> DeleteTrack([FromQuery]int id)
         {
             var track = await _trackService.DeleteTrackAsync(User.GetUserId(), id);

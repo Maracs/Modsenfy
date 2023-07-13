@@ -27,7 +27,7 @@ public class AudioRepository : IAudioRepository
 
 	public void Delete(Audio entity)
 	{
-		throw new NotImplementedException();
+		_databaseContext.Audios.Remove(entity);
 	}
 
 	public Task<IEnumerable<Audio>> GetAllAsync()
@@ -35,9 +35,9 @@ public class AudioRepository : IAudioRepository
 		throw new NotImplementedException();
 	}
 
-	public Task<Audio> GetByIdAsync(int id)
+	public async Task<Audio> GetByIdAsync(int id)
 	{
-		throw new NotImplementedException();
+		return await _databaseContext.Audios.FindAsync(id);
 	}
 
 	public async Task SaveChangesAsync()
@@ -45,8 +45,9 @@ public class AudioRepository : IAudioRepository
 		await _databaseContext.SaveChangesAsync();
 	}
 
-	public Task UpdateAsync(Audio entity)
+	public async Task UpdateAsync(Audio entity)
 	{
-		throw new NotImplementedException();
+		_databaseContext.Audios.Update(entity);
+		await _databaseContext.SaveChangesAsync();
 	}
 }

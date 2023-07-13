@@ -83,12 +83,18 @@ public class TrackService
     {
         if (!(await _trackRepository.IsTrackOwnerAsync(userId, trackDto.TrackId)))
             return null;
+        var genre = await _genreRepository.GetByName(trackDto.GenreName);
+        var trackUpdate = await _trackRepository.GetByIdAsync(trackDto.TrackId);
+        var audio = await _audioRepository.GetByIdAsync(trackUpdate.AudioId);
+        trackUpdate.TrackDuration = trackDto.TrackDuration;
+        trackUpdate.TrackGenius = trackDto.TrackGenius;
+        audio.AudioFilename = trackDto.Audio.AudioFilename;
+        trackUpdate.TrackName = trackDto.TrackName;
+        trackUpdate.GenreId = genre.GenreId;
 
-        var track = _mapper.Map<Track>(trackDto);
-
-        await _trackRepository.UpdateAsync(track);
-
-        return track;
+        await _trackRepository.UpdateAsync(trackUpdate);
+        await _audioRepository.UpdateAsync(audio);
+        return trackUpdate;
     }
 
     public async Task<Track> DeleteTrackAsync(int userId, int id)
@@ -97,8 +103,9 @@ public class TrackService
             return null;
 
         var track = await _trackRepository.GetByIdAsync(id);
-
+        var audio = await _audioRepository.GetByIdAsync(track.AudioId);
         _trackRepository.Delete(track);
+        _audioRepository.Delete(audio);
         await _trackRepository.SaveChangesAsync();
 
         return track;

@@ -131,15 +131,7 @@ namespace Modsenfy.DataAccessLayer.Repositories
 
         public async Task UpdateAsync(Track entity)
         {
-            var track = await _databaseContext.Tracks.FindAsync(entity.TrackId);
-
-            track.TrackArtists = entity.TrackArtists;
-            track.TrackDuration = entity.TrackDuration;
-            track.Audio = entity.Audio;
-            track.Genre = entity.Genre;
-            track.TrackName = entity.TrackName;
-            track.TrackGenius = entity.TrackGenius;
-
+            _databaseContext.Tracks.Update(entity);
             await SaveChangesAsync();
         }
 
