@@ -12,7 +12,6 @@ namespace Modsenfy.PresentationLayer.Controllers
     {
         private readonly ArtistService _artistService;
         private readonly IMapper _mapper;
-    
         public ArtistController(ArtistService artistService, IMapper mapper)
         {
             _artistService = artistService;
