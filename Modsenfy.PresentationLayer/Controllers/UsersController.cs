@@ -1,129 +1,156 @@
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Modsenfy.BusinessAccessLayer.DTOs;
 using Modsenfy.BusinessAccessLayer.DTOs.RequestDtos;
+using Modsenfy.BusinessAccessLayer.DTOs.UserDtos;
+using Modsenfy.BusinessAccessLayer.Extentions;
 using Modsenfy.BusinessAccessLayer.Services;
 using Modsenfy.DataAccessLayer.Contracts;
+using Modsenfy.DataAccessLayer.Data;
 using Modsenfy.DataAccessLayer.Entities;
 using Modsenfy.DataAccessLayer.Repositories;
+using System.Security.Claims;
+using System.Security.Cryptography;
+using System.Text;
 
-namespace Modsenfy.PresentationLayer.Controllers;
-
-
-[Route("[controller]")]
-[ApiController]
-public class UsersController:ControllerBase
+namespace Modsenfy.PresentationLayer.Controllers
 {
-
-    private readonly UserRepository _userRepository;
-
-    
-
-    private readonly IMapper _mapper;
-
-    private readonly UserService _userService;
-    
-    public UsersController(IMapper mapper, UserRepository userRepository, UserService userService)
+    [Route("[controller]")]
+    [ApiController]
+    public class UsersController:ControllerBase
     {
-        _userRepository = userRepository;
+        private readonly IMapper _mapper;
+        private readonly UserService _userService;
+        
+        public UsersController(IMapper mapper, UserService userService)
+        {
+            _userService = userService;
+            _mapper = mapper;
+        }
 
-        _userService = userService;
+        [AllowAnonymous]
+        [HttpPost("signin")]
+        public async Task<ActionResult<UserTokenDto>> SignInUser(UserSigningDto userDto)
+        {
+            var userToken = await _userService.SignInUserAsync(userDto);
+        
+            if (userToken.UserToken == "None") { return Unauthorized(); }
+            
+            return Ok(userToken);
+        } //ready //working
 
-        _mapper = mapper;
+        [AllowAnonymous]
+        [HttpPost]
+        public async Task<ActionResult<int>> RegisterUserAsync([FromBody] UserWithDetailsAndEmailAndPasshashDto userDto)
+        {
+            var userRegDto = await _userService.RegisterUserAsync(userDto);
+            if (userRegDto == null)
+                return BadRequest("This nickname or email is already taken");
+
+            return Ok(userRegDto);
+        } //ready //working
+
+        [AllowAnonymous]
+        [HttpGet("{id}")]
+        public async Task<ActionResult<UserWithDetailsAndEmailAndIdAndRoleDto>> GetUserProfileAsync([FromRoute]int id)
+        {
+            if (User.HasClaim(ClaimTypes.Role, "Admin"))   
+                return Ok(await _userService.GetUserProfileForAdminAsync(id));
+            return Ok(_mapper.Map<UserDto>(await _userService.GetUserProfileForUserAsync(id)));
+        }
+        //ready
+
+        [Authorize(Roles = "User,Admin")]
+        [HttpPut("{id}")]
+        public async Task<ActionResult> UpdateUserAsync([FromRoute] int id,[FromBody] UserWithDetailsAndEmailDto userDto)
+        {
+            if (!(User.HasClaim(ClaimTypes.Role, "Admin") || User.GetUserId() == id))
+                return Forbid("Not enough rights");
+
+            if (!await _userService.UpdateUserAsync(id, userDto))
+                return BadRequest("Incorrect image type");
+            
+            return Ok();
+        }//ready
+
+        [Authorize(Roles = "User,Admin")]
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> DeleteUserAsync([FromRoute] int id)
+        {
+            if (!(User.HasClaim(ClaimTypes.Role, "Admin") || User.GetUserId() == id))
+                return Forbid("Not enough rights");
+            
+            await _userService.DeleteUserAsync(id);
+            
+            return Ok();
+        }//ready
+
+        [AllowAnonymous]
+        [HttpGet("{id}/playlists")]
+        public async Task<ActionResult<IEnumerable<PlaylistDto>>> GetUserPlaylistsAsync([FromRoute] int id, [FromQuery] int limit,
+            [FromQuery] int offset)
+        {
+            if (limit < -1 )
+                return BadRequest("Invalid limit value");
+            
+            if (offset < 0)
+                return BadRequest("Invalid offset value");
+            
+            var playlists = await _userService.GetUserPlaylistsAsync(id, limit, offset);
+            if (playlists == null) return NotFound("User not found");
+
+            return Ok(playlists);
+        } //ready //working
+
+        [Authorize(Roles = "User,Admin")]
+        [HttpPost("{id}/playlists")]
+        public async Task<ActionResult<int>> CreateUserPlaylistAsync([FromRoute] int id, [FromBody] PlaylistWithNameAndImage playlistDto)
+        {
+            if (!(User.HasClaim(ClaimTypes.Role, "Admin") || User.GetUserId() == id))
+                return Forbid();
+            
+            var playlistId = await _userService.CreateUserPlaylistAsync(id, playlistDto);
+            
+            return Ok(playlistId);
+        }//ready //working
+
+        [Authorize(Roles = "User,Admin")]
+        [HttpGet("playlists/{playlistId}/followers/contains")]
+        public async Task<ActionResult<IEnumerable<bool>>> CheckIfUsersFollowUserPlaylistAsync(int playlistId,[FromQuery] string ids)
+        {
+            var followings =  await _userService.CheckIfUsersFollowPlaylistAsync(playlistId,ids);
+
+            return Ok(followings);
+        } // �� ����� ������� ����� ���������
+        
+        [Authorize(Roles = "Admin")]
+        [HttpGet("requests")]
+        public async Task<ActionResult<IEnumerable<RequestDto>>> GetSeveralRequestsAsync([FromQuery] int limit,
+            [FromQuery] int offset, [FromQuery] string status)
+        {
+            var requests = await _userService.GetSeveralRequestsAsync(limit, offset, status);
+            return Ok(requests);
+        }//ready //working
+
+        [Authorize(Roles = "User,Admin")]
+        [HttpGet("requests/{id}")]
+        public async Task<ActionResult<RequestDto>> GetRequestAsync([FromRoute] int id)
+        {
+            if (!(User.HasClaim(ClaimTypes.Role, "Admin") || User.GetUserId() == id))
+                return Forbid();
+        
+            var request = await _userService.GetRequestAsync(id);
+            
+            return Ok(request);
+        }//ready //working
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost("requests/{id}/managing")]
+        public async Task<ActionResult> AnswerRequestAsync([FromRoute] int id,[FromBody] string answer)
+        {
+            await _userService.AnswerRequestAsync(id, answer);
+            return Ok();
+        }//ready
     }
-    
-    
-    [HttpPost]
-    public async Task<ActionResult<int>> RegisterUser([FromBody] UserWithDetailsAndEmailAndPasshashDto userDto)
-    {
-        if (await _userRepository.IfNicknameExists(userDto.Nickname) || await _userRepository.IfEmailExists(userDto.Email))
-            return BadRequest("This nickname or email is already taken");
-
-        var userId = await _userService.RegisterUser(userDto);
-        
-        
-        return Ok(userId);
-    }
-
-    [HttpGet("{id}")]
-    public async Task<ActionResult<UserWithDetailsAndEmailAndIdAndRoleDto>> GetUserProfile([FromRoute]int id)
-    {
-        var user = await _userRepository.GetByIdWithJoins(id);
-
-        var userDto = _mapper.Map<UserWithDetailsAndEmailAndIdAndRoleDto>(user);
-        
-        return Ok(userDto);
-    }
-
-    [HttpPut("{id}")]
-    public async Task<ActionResult> UpdateUser([FromRoute] int id,[FromBody] UserWithDetailsAndEmailDto userDto)
-    {
-
-        if (!await _userService.UpdateUser(id, userDto))
-            return BadRequest("Incorrect image type");
-        
-        return Ok();
-    }
-
-    [HttpDelete("{id}")]
-    public async Task<ActionResult> DeleteUser([FromRoute] int id)
-    {
-        if (await _userRepository.GetById(id) == null)
-            return BadRequest("User with this Id does not exists");
-        
-        await _userService.DeleteUser(id);
-        
-        return Ok();
-    }
-
-    [HttpGet("{id}/playlists")]
-    public async Task<ActionResult<IEnumerable<PlaylistDto>>> GetUserPlaylists([FromRoute] int id, [FromQuery] int limit,
-        [FromQuery] int offset)
-    {
-        if (await _userRepository.GetById(id) == null)
-            return BadRequest("User with this Id does not exists");
-
-        if (limit < -1 )
-            return BadRequest("Invalid limit value");
-        
-        if (offset<0)
-            return BadRequest("Invalid offset value");
-        
-        var playlists = await _userService.GetUserPlaylists(id, limit, offset);
-        
-        return Ok(playlists);
-    }
-
-    [HttpPost("{id}/playlists")]
-    public async Task<ActionResult> CreateUserPlaylist([FromRoute] int id, [FromBody] PlaylistDto playlistDto)
-    {
-        return Ok();
-    }
-
-    [HttpGet("requests")]
-    public async Task<ActionResult<IEnumerable<RequestDto>>> GetSeveralRequests([FromQuery] int limit,
-        [FromQuery] int offset, [FromQuery] string status)
-    {
-        var requests = await _userService.GetSeveralRequests(limit, offset, status);
-       
-        return Ok(requests);
-    }
-
-    [HttpGet("requests/{id}")]
-    public async Task<ActionResult<RequestDto>> GetRequest([FromRoute] int id)
-    {
-        
-        var request = await _userService.GetRequest(id);
-        
-        return Ok(request);
-    }
-
-    [HttpPost("requests/{id}/managing")]
-    public async Task<ActionResult> AnswerRequest([FromRoute] int id,[FromBody] string answer)
-    {
-        await _userService.AnswerRequest(id, answer);
-        return Ok();
-    }
-    
-    
 }

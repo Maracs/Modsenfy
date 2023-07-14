@@ -1,4 +1,5 @@
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Modsenfy.BusinessAccessLayer.DTOs;
 using Modsenfy.BusinessAccessLayer.Services;
@@ -18,10 +19,11 @@ namespace Modsenfy.PresentationLayer.Controllers
             _mapper = mapper;
         }
 
+        [AllowAnonymous]
         [HttpGet("{id}")]
         public async Task<ActionResult<PlaylistDto>> GetPlaylist(int id)
         {
-            var playlistDto = await _playlistService.GetPlaylist(id);
+            var playlistDto = await _playlistService.GetPlaylistAsync(id);
 
             if (playlistDto is null)
             {
@@ -31,10 +33,11 @@ namespace Modsenfy.PresentationLayer.Controllers
             return Ok(playlistDto);
         }
 
+        [Authorize(Roles = "User,Artist")]
         [HttpPost]
         public async Task<ActionResult> CreatePlaylist(PlaylistDto playlistDto)
         {
-            playlistDto = await _playlistService.CreatePlaylist(playlistDto);
+            playlistDto = await _playlistService.CreatePlaylistAsync(playlistDto);
 
             if (playlistDto is null)
             {
@@ -44,10 +47,11 @@ namespace Modsenfy.PresentationLayer.Controllers
             return Ok(playlistDto);
         }
 
+        [Authorize(Roles = "User,Artist")]
         [HttpPut("{id}")]
         public async Task<ActionResult> UpdatePlaylist(PlaylistDto playlistDto)
         {
-            playlistDto = await _playlistService.UpdatePlaylist(playlistDto);
+            playlistDto = await _playlistService.UpdatePlaylistAsync(playlistDto);
 
             if (playlistDto is null)
             {
@@ -57,10 +61,11 @@ namespace Modsenfy.PresentationLayer.Controllers
             return Ok(playlistDto);
         }
 
+        [Authorize(Roles = "User,Artist")]
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeletePlaylist(int id)
         {
-            var playlistDto = await _playlistService.DeletePlaylist(id);
+            var playlistDto = await _playlistService.DeletePlaylistAsync(id);
 
             if (playlistDto is null)
             {
@@ -70,10 +75,11 @@ namespace Modsenfy.PresentationLayer.Controllers
             return Ok();
         }
 
+        [AllowAnonymous]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<PlaylistDto>>> GetSeveralPlaylists(List<int> ids)
         {
-            var playlistDtos = await _playlistService.GetSeveralPlaylists(ids);
+            var playlistDtos = await _playlistService.GetSeveralPlaylistsAsync(ids);
 
             if (playlistDtos is null)
             {
@@ -83,10 +89,11 @@ namespace Modsenfy.PresentationLayer.Controllers
             return Ok(playlistDtos);
         }
 
+        [AllowAnonymous]
         [HttpGet("{id}/tracks")]
         public async Task<ActionResult<IEnumerable<TrackDto>>> GetTracksOfPlaylist(int id)
         {
-            var trackDtos = await _playlistService.GetTracksOfPlaylist(id);
+            var trackDtos = await _playlistService.GetTracksOfPlaylistAsync(id);
 
             if (trackDtos is null)
             {

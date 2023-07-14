@@ -4,5 +4,5 @@ namespace Modsenfy.DataAccessLayer.Contracts;
 
 public interface IAlbumTypeRepository : IRepository<AlbumType>
 {
-    Task<AlbumType> GetByName(string typeName);
+    Task<AlbumType> GetByNameAsync(string typeName);
 }

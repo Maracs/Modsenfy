@@ -9,13 +9,10 @@ public interface IAlbumRepository : IRepository<Album>
 	IIncludableQueryable<Album, ImageType> GetWithJoins();
 	Task<Album> GetByIdWithJoins(int id);
 	Task<IEnumerable<Album>> GetLimited(int limit, int offset);
-
-	Task<IEnumerable<Album>> GetSkipped(int offset);
+    Task<IEnumerable<Album>> GetSkipped(int offset);
 	Task<IEnumerable<Album>> GetOrderedByReleaseAndLimited(int limit, int offset);
 	Task<IEnumerable<Album>> GetOrderedByRelease();
 	Task<IEnumerable<Album>> GetOrderedByReleaseAndSkipped(int offset);
 	Task<IEnumerable<Entities.Stream>> GetAlbumStreams(int id);
-
-
    	Task<Album> CreateAndGet(Album entity);
 }

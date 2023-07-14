@@ -1,8 +1,11 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Storage;
 using Modsenfy.BusinessAccessLayer.DTOs;
+using Modsenfy.BusinessAccessLayer.Extentions;
+using Modsenfy.BusinessAccessLayer.Services;
 using Modsenfy.DataAccessLayer.Data;
 using Modsenfy.DataAccessLayer.Entities;
 using Modsenfy.DataAccessLayer.Repositories;
@@ -12,80 +15,66 @@ namespace Modsenfy.PresentationLayer.Controllers
 {
     [Route("[controller]")]
     [ApiController]
+    [Authorize(Roles = "Artist")]
     public class TracksController : ControllerBase
     {
-        private readonly TrackRepository _trackRepository;
         private readonly IMapper _mapper;
+        private readonly TrackService _trackService;
 
-        public TracksController(IMapper mapper, TrackRepository trackRepository)
+        public TracksController(IMapper mapper, TrackService trackService)
         {
             _mapper = mapper;
-            _trackRepository = trackRepository;
+            _trackService = trackService;
         }
 
+        [AllowAnonymous]
         [HttpGet("{id}")]
-        public async Task<ActionResult<TrackWithAlbumDto>> GetTrack(int id)
+        public async Task<ActionResult<TrackWithAlbumDto>> GetTrack([FromRoute]int id)
         {
-            var track = await _trackRepository.GetByIdWithJoins(id);
+            var track = await _trackService.GetTrack(id);
             if (track == null)
                 return NotFound();
 
             var trackDto = _mapper.Map<TrackWithAlbumDto>(track);
 
             return Ok(trackDto);
-        }
+        }//ready //working
 
-        [HttpPost]
-        public async Task<ActionResult> CreateTrack(TrackDto trackDto)
+        [HttpPut]
+        public async Task<ActionResult> UpdateTrack([FromBody]TrackDto trackDto)
         {
-            var track = new Track() 
-            {
-             
-            };
-
-            await _trackRepository.Create(track);
-            await _trackRepository.SaveChanges();
-
+            var track = await _trackService.UpdateTrackAsync(User.GetUserId(), trackDto);
+            if (track == null)
+                return Forbid();
             return Ok(track.TrackId);
-        }
+        }//ready 
 
-        [HttpPut("{id}")]
-        public async Task<ActionResult> UpdateTrack(TrackDto trackDto)
+        [HttpDelete]
+        public async Task<ActionResult> DeleteTrack([FromQuery]int id)
         {
-            var track = _mapper.Map<Track>(trackDto);
-            await _trackRepository.Update(track);
-            await _trackRepository.SaveChanges();
-
+            var track = await _trackService.DeleteTrackAsync(User.GetUserId(), id);
+            if (track == null)
+                return Forbid();
             return Ok(track.TrackId);
-        }
+        }//ready
 
-        [HttpDelete("{id}")]
-        public async Task<ActionResult> DeleteTrack(int id)
-        {
-            var track = await _trackRepository.GetById(id);
-            _trackRepository.Delete(track);
-            await _trackRepository.SaveChanges();
-            return Ok(track.TrackId);
-        }
-
+        [AllowAnonymous]
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<TrackWithAlbumDto>>> GetSeveralTracks(List<int> ids)
+        public async Task<ActionResult<IEnumerable<TrackWithAlbumDto>>> GetSeveralTracks([FromQuery] int limit = -1,
+            [FromQuery] int offset = 0, [FromQuery] string ids = "all")
         {
-            var tracks = await _trackRepository.GetSeverlTracks(ids);
-            List<TrackWithAlbumDto> tracksDto = new List<TrackWithAlbumDto>();
-            foreach (var track in tracks)
-            {
-                tracksDto.Add(_mapper.Map<TrackWithAlbumDto>(track));   
-            }
-            return Ok(tracksDto);
-        }
-
+            var tracks = await _trackService.GetSeverlTracksAsync(limit, offset, ids);
+            return Ok(tracks);
+        }//ready //working
+        
         [HttpGet("{id}/streams")]
         public async Task<ActionResult<TrackWithStreamsDto>> GetTrackStreams(int id)
         {
-            var track = await _trackRepository.GetByIdWithStreams(id);
-            var trackDto = _mapper.Map<TrackWithStreamsDto>(track);
+            var trackDto = await _trackService.GetTrackStreamsAsync(User.GetUserId(), id);
+            if (trackDto == null)
+                return Forbid();
+
             return Ok(trackDto);
-        }
+        }//ready //working
     }
 }

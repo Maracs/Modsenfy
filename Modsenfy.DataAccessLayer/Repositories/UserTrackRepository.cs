@@ -7,7 +7,6 @@ namespace Modsenfy.DataAccessLayer.Repositories;
 
 public class UserTrackRepository:IUserTrackRepository
 {
-
     private readonly DatabaseContext _databaseContext;
     
     public UserTrackRepository(DatabaseContext databaseContext)
@@ -15,43 +14,42 @@ public class UserTrackRepository:IUserTrackRepository
         _databaseContext = databaseContext;
     }
     
-    public async Task SaveChanges()
+    public async Task SaveChangesAsync()
     {
        await _databaseContext.SaveChangesAsync();
     }
 
-    public async Task<UserTracks> GetById(int id)
+    public async Task<UserTracks> GetByIdAsync(int id)
     {
        return await _databaseContext.UserTracks.FindAsync(id);
     }
 
-    public async Task<IEnumerable<UserTracks>> GetAll()
+    public async Task<IEnumerable<UserTracks>> GetAllAsync()
     {
-      return await _databaseContext.UserTracks.ToListAsync();
+        return await _databaseContext.UserTracks.ToListAsync();
     }
 
-    public async Task Create(UserTracks entity)
+    public async Task CreateAsync(UserTracks entity)
     {
         await _databaseContext.UserTracks.AddAsync(entity);
     }
 
-    public async Task Update(UserTracks entity)
+    public async Task UpdateAsync(UserTracks entity)
     {
         _databaseContext.UserTracks.Update(entity);
     }
 
-    public void Delete(UserTracks entity)
+    public void DeleteAsync(UserTracks entity)
     {
         _databaseContext.UserTracks.Remove(entity);
     }
     
-    public async Task<bool> IfUserFollowTrack(int userId,int trackId)
+    public async Task<bool> IfUserFollowTrackAsync(int userId,int trackId)
     {
-        
         return (await _databaseContext.UserTracks.AnyAsync(tracks =>tracks.TrackId ==trackId && tracks.UserId == userId));
     }
 
-    public async Task<IEnumerable<UserTracks>> GetUserTracks(int id)
+    public async Task<IEnumerable<UserTracks>> GetUserTracksAsync(int id)
     {
         var userTracks = await _databaseContext.UserTracks
             .Include(userTracks => userTracks.Track)

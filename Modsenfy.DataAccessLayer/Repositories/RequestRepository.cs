@@ -7,7 +7,6 @@ namespace Modsenfy.DataAccessLayer.Repositories;
 
 public class RequestRepository:IRequestRepository
 {
-    
     private readonly DatabaseContext _databaseContext;
 
     public RequestRepository(DatabaseContext databaseContext)
@@ -15,19 +14,19 @@ public class RequestRepository:IRequestRepository
         _databaseContext = databaseContext;
     }
 
-    public async Task SaveChanges()
+    public async Task SaveChangesAsync()
     {
-       await  _databaseContext.SaveChangesAsync();
+        await  _databaseContext.SaveChangesAsync();
     }
 
-    public async Task<Request> GetById(int id)
+    public async Task<Request> GetByIdAsync(int id)
     {
         var request = await _databaseContext.Requests.FindAsync(id);
 
         return request;
     }
 
-    public async Task<IEnumerable<Request>> GetAll()
+    public async Task<IEnumerable<Request>> GetAllAsync()
     {
         var requests = await _databaseContext.Requests.ToListAsync();
 
@@ -66,19 +65,17 @@ public class RequestRepository:IRequestRepository
         return requests;
     }
 
-    public async Task Create(Request entity)
+    public async Task CreateAsync(Request entity)
     {
         await  _databaseContext.AddAsync(entity);
     }
 
-    public async Task Update(Request entity)
+    public async Task UpdateAsync(Request entity)
     {
         _databaseContext.Requests.Update(entity);
     }
 
-    
-
-    public void Delete(Request entity)
+    public void DeleteAsync(Request entity)
     {
         _databaseContext.Requests.Remove(entity);
     }

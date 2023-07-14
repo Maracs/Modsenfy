@@ -7,14 +7,13 @@ namespace Modsenfy.DataAccessLayer.Repositories;
 
 public class AlbumTypeRepository : IAlbumTypeRepository
 {
-
 	private readonly DatabaseContext _databaseContext;
 	public AlbumTypeRepository(DatabaseContext databaseContext)
 	{
 		_databaseContext = databaseContext;
 	}
 	
-	public Task Create(AlbumType entity)
+	public Task CreateAsync(AlbumType entity)
 	{
 		throw new NotImplementedException();
 	}
@@ -24,30 +23,30 @@ public class AlbumTypeRepository : IAlbumTypeRepository
 		throw new NotImplementedException();
 	}
 
-	public async Task<IEnumerable<AlbumType>> GetAll()
+	public async Task<IEnumerable<AlbumType>> GetAllAsync()
 	{
 		var types = await _databaseContext.AlbumTypes.ToListAsync();
 		return types;
 	}
 
-	public async Task<AlbumType> GetById(int id)
+	public async Task<AlbumType> GetByIdAsync(int id)
 	{
 		var type = await _databaseContext.AlbumTypes.FindAsync(id);
 		return type;
 	}
 
-	public async Task<AlbumType> GetByName(string typeName)
+	public async Task<AlbumType> GetByNameAsync(string typeName)
 	{
 		var type = await _databaseContext.AlbumTypes.FirstOrDefaultAsync(at => at.AlbumTypeName.ToLower() == typeName.ToLower());
         return type;
     }
 
-	public Task SaveChanges()
+	public Task SaveChangesAsync()
 	{
 		throw new NotImplementedException();
 	}
 
-	public Task Update(AlbumType entity)
+	public Task UpdateAsync(AlbumType entity)
 	{
 		throw new NotImplementedException();
 	}

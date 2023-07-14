@@ -1,241 +1,193 @@
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Modsenfy.BusinessAccessLayer.DTOs;
 using Modsenfy.BusinessAccessLayer.DTOs.RequestDtos;
+using Modsenfy.BusinessAccessLayer.Extentions;
 using Modsenfy.BusinessAccessLayer.Services;
 using Modsenfy.DataAccessLayer.Repositories;
 
-namespace Modsenfy.PresentationLayer.Controllers;
-
-
-
-[Route("me")]
-[ApiController]
-public class CurrentUserController:ControllerBase
+namespace Modsenfy.PresentationLayer.Controllers
 {
-
-    private readonly UserService _userService;
-
-    private readonly IMapper _mapper;
-
-    private readonly UserRepository _userRepository;
-
-    public CurrentUserController(UserService userService, IMapper mapper,UserRepository userRepository)
+    [Route("me")]
+    [ApiController]
+    [Authorize(Roles = "User,Artist,Admin")]
+    public class CurrentUserController:ControllerBase
     {
-        _userService = userService;
+        private readonly UserService _userService;
+        private readonly IMapper _mapper;
 
-        _mapper = mapper;
+        public CurrentUserController(UserService userService, IMapper mapper)
+        {
+            _userService = userService;
+            _mapper = mapper;
+        }
 
-        _userRepository = userRepository;
-    }
-    
-    [HttpGet]
-    public async Task<ActionResult<UserWithDetailsAndEmailAndIdAndRoleDto>> GetUserProfile()
-    {
+        [HttpGet]
+        public async Task<ActionResult<UserWithDetailsAndEmailAndIdAndRoleDto>> GetUserProfileAsync()
+        {
+            return Ok(_mapper.Map<UserWithDetailsAndEmailAndIdAndRoleDto>(
+                await _userService.GetUserProfileForUserAsync(User.GetUserId())));
+        }//ready //����� �� ��������, �� ���� ��������� � ����������� ������� � ��
 
-         var id = 1; // Заглушка для id
-        
-        var user = await _userRepository.GetByIdWithJoins(id);
-        var userDto = _mapper.Map<UserWithDetailsAndEmailAndIdAndRoleDto>(user);
-        
-        return Ok(userDto);
-    }
+        [HttpGet("top/artists")]
+        public async Task<ActionResult<IEnumerable<ArtistDto>>> GetUserTopArtistsAsyncAsync()
+        {
+            var artists = await _userService.GetUserTopArtistsAsync(User.GetUserId());
+            return Ok(artists);
+        }//ready
 
-    [HttpGet("top/artists")]
-    public async Task<ActionResult<IEnumerable<ArtistDto>>> GetUserTopArtists()
-    {
-        var id = 1; // Заглушка для id
+        [HttpGet("top/tracks")]
+        public async Task<ActionResult<IEnumerable<TrackWithAlbumDto>>> GetUserTopTracksAsync()
+        {
+            var tracks = await _userService.GetUserTopTracksAsync(User.GetUserId());
+            return Ok(tracks);
+        }//ready
 
-        var artists = await _userService.GetUserTopArtists(id);
-        
-        return Ok(artists);
-    }
+        [HttpGet("albums")]
+        public async Task<ActionResult<IEnumerable<AlbumWithTracksDto>>> GetUserSavedAlbumsAsync([FromQuery] int limit,
+            [FromQuery] int offset)
+        {
+            var albums = await _userService.GetUserSavedAlbumsAsync(User.GetUserId(), limit, offset);
+            return Ok(albums);
+        }//ready
 
-    [HttpGet("top/tracks")]
-    public async Task<ActionResult<IEnumerable<TrackWithAlbumDto>>> GetUserTopTracks()
-    {
-        var id = 1;
+        [HttpGet("albums/contains")]
+        public async Task<ActionResult<IEnumerable<bool>>> CheckUserSavedAlbumsAsync([FromQuery] string ids)
+        {
+            var userFollowAlbums  = await _userService.CheckUserSavedAlbumsAsync(User.GetUserId(), ids);
+            return Ok(userFollowAlbums);
+        }//ready
 
-        var tracks = await _userService.GetUserTopTracks(id);
-        
-        return Ok(tracks);
-    }
+        [HttpPut("albums")]
+        public async Task<ActionResult> SaveAlbumsForUserAsync([FromQuery] string ids)
+        {
+            await _userService.SaveAlbumsForUserAsync(User.GetUserId(), ids);
+            return Ok();
+        }//ready
 
-    [HttpGet("albums")]
-    public async Task<ActionResult<IEnumerable<AlbumWithTracksDto>>> GetUserSavedAlbums([FromQuery] int limit,
-        [FromQuery] int offset)
-    {
-        var id = 1;
-        var albums = await _userService.GetUserSavedAlbums(id, limit, offset);
-        
-        return Ok(albums);
-    }
+        [HttpDelete("albums")]
+        public async Task<ActionResult> DeleteUserSavedAlbumsAsync([FromQuery] string ids)
+        {
+            await _userService.DeleteUserSavedAlbumsAsync(User.GetUserId(), ids);
+            return Ok();
+        }//ready
 
-    [HttpGet("albums/contains")]
-    public async Task<ActionResult<IEnumerable<bool>>> CheckUserSavedAlbums([FromQuery] string ids)
-    {
-        var id = 1;
-        var userFollowAlbums  = await _userService.CheckUserSavedAlbums(id, ids);
-        
-        return Ok(userFollowAlbums);
-    }
+        [HttpGet("playlists")]
+        public async Task<ActionResult<IEnumerable<PlaylistDto>>> GetUserPlaylistsAsync([FromQuery] int limit,
+            [FromQuery] int offset)
+        {
+            if (limit < -1 )
+                return BadRequest("Invalid limit value");
+            
+            if (offset<0)
+                return BadRequest("Invalid offset value");
+            
+            var playlists = await _userService.GetUserSavedPlaylistsAsync(User.GetUserId(), limit, offset);
+            return Ok(playlists);
+        }//ready
 
-    [HttpPut("albums")]
-    public async Task<ActionResult> SaveAlbumsForUser([FromQuery] string ids)
-    {
-        var id = 1;
+        [HttpGet("tracks")]
+        public async Task<ActionResult<IEnumerable<TrackWithAlbumDto>>> GetUserTracksAsync([FromQuery] int limit, [FromQuery] int offset)
+        {
+            var tracks =await _userService.GetUserTracksAsync(User.GetUserId(), limit, offset);
+            return Ok(tracks);
+        }//ready
 
-       await _userService.SaveAlbumsForUser(id, ids);
-        
-        return Ok();
-    }
+        [HttpPut("tracks")]
+        public async Task<ActionResult> SaveTracksForUserAsync([FromQuery] string ids)
+        {
+            await _userService.SaveTracksForUserAsync(User.GetUserId(),ids);
+            return Ok();
+        }
 
-    [HttpDelete("albums")]
-    public async Task<ActionResult> DeleteUserSavedAlbums([FromQuery] string ids)
-    {
-        var id = 1;
+        [HttpDelete("tracks")]
+        public async Task<ActionResult> DeleteUserSavedTracksAsync([FromQuery] string ids)
+        {
+            await _userService.DeleteUserSavedTracksAsync(User.GetUserId(), ids);
+            return Ok();
+        }//ready
 
-       await _userService.DeleteUserSavedAlbums(id, ids);
-        
-        return Ok();
-    }
+        [HttpGet("tracks/contains")]
+        public async Task<ActionResult<IEnumerable<bool>>> CheckUserSavedTracksAsync([FromQuery] string ids)
+        {
+            var userFollowTracks  = await _userService.CheckUserSavedTracksAsync(User.GetUserId(), ids);
+            return Ok(userFollowTracks);
+        }//ready
 
-    [HttpGet("playlists")]
-    public async Task<ActionResult<IEnumerable<PlaylistDto>>> GetUserPlaylists([FromQuery] int limit,
-        [FromQuery] int offset)
-    {
-        var id = 1;
-        
-        if (limit < -1 )
-            return BadRequest("Invalid limit value");
-        
-        if (offset<0)
-            return BadRequest("Invalid offset value");
-        
-        var playlists = await _userService.GetUserSavedPlaylists(id, limit, offset);
-        
-        return Ok(playlists);
-    }
+        [HttpGet("following")]
+        public async Task<ActionResult<IEnumerable<ArtistDto>>> GetFollowedArtistsAsync([FromQuery] int limit,
+            [FromQuery] int offset)
+        {
+            var artists = await _userService.GetFollowedArtistsAsync(User.GetUserId(), limit, offset);
+            return Ok(artists);
+        }//ready
 
-    [HttpGet("tracks")]
-    public async Task<ActionResult<IEnumerable<TrackWithAlbumDto>>> GetUserTracks([FromQuery] int limit, [FromQuery] int offset)
-    {
-        var id = 1;
-        var tracks =await _userService.GetUserTracks(id, limit, offset);
-        
-        return Ok(tracks);
-    }
+        [HttpPut("following")]
+        public async Task<ActionResult> FollowArtistsAsync([FromQuery] string ids)
+        {
+            await _userService.FollowArtistsAsync(User.GetUserId(),ids);
+            return Ok();
+        }//ready
 
-    [HttpPut("tracks")]
-    public async Task<ActionResult> SaveTracksForUser([FromQuery] string ids)
-    {
+        [HttpDelete("following")]
+        public async Task<ActionResult> UnfollowArtistsAsync([FromQuery] string ids)
+        {
+            await _userService.UnfollowArtistsAsync(User.GetUserId(),ids);
+            return Ok();
+        }//ready
 
-        var id = 1;
+        [HttpGet("following/contains")]
+        public async Task<ActionResult<IEnumerable<bool>>> CheckUserFollowsArtistsAsync([FromQuery] string ids)
+        {
+            var followings = await _userService.CheckUserFollowsArtistsAsync(User.GetUserId(), ids);
+            return Ok(followings);
+        }//ready
 
-        await _userService.SaveTracksForUser(id,ids);
-        
-        return Ok();
-    }
+        [Authorize(Roles = "User")]
+        [HttpPost("become-artist")]
+        public async Task<ActionResult> CreateRequestAsync([FromBody] RequestWithoutIdAndTimeDto requestDto)
+        {
+            await _userService.CreateRequestAsync(User.GetUserId(),requestDto);
+            return Ok();
+        }//ready
 
-    [HttpDelete("tracks")]
-    public async Task<ActionResult> DeleteUserSavedTracks([FromQuery] string ids)
-    {
-        var id = 1;
+        [Authorize(Roles = "User")]
+        [HttpGet("become-artist/{id}")]
+        public async Task<ActionResult> GetRequestAsync(int id)
+        {
+            var request = await _userService.GetUserRequestAsync(User.GetUserId(), id);
+            return Ok(request);
+        }//ready
 
-        await _userService.DeleteUserSavedTracks(id, ids);
-        
-        return Ok();
-    }
+        [Authorize(Roles = "User")]
+        [HttpGet("become-artist")]
+        public async Task<ActionResult<IEnumerable<RequestDto>>> GetSeveralRequestsAsync([FromQuery] int limit,
+            [FromQuery] int offset,[FromQuery] string status)
+        {
+            var requestDtos = await _userService.GetSeveralUserRequestsAsync(User.GetUserId(), limit,offset , status);
+            
+            return Ok(requestDtos);
+        }//ready
 
-    [HttpGet("tracks/contains")]
-    public async Task<ActionResult<IEnumerable<bool>>> CheckUserSavedTracks([FromQuery] string ids)
-    {
+        [HttpGet("streams")]
+        public async Task<ActionResult<UserStreamDto>> GetUserStreamHistoryAsync([FromQuery] int limit,
+            [FromQuery] int offset)
+        {
+            var streams = await _userService.GetUserStreamHistoryAsync(User.GetUserId(), limit, offset);
+            return Ok(streams);
+        }//ready
 
-        var id = 1;
-        
-        var userFollowTracks  = await _userService.CheckUserSavedTracks(id, ids);
-        
-        return Ok(userFollowTracks);
-    }
+        [HttpPut("playlists/{playlistId}/followers")]
+        public async Task FollowPlaylistAsync(int playlistId)
+        {
+            await _userService.FollowPlaylistAsync(User.GetUserId(), playlistId);
+        }//ready
 
-    [HttpGet("following")]
-    public async Task<ActionResult<IEnumerable<ArtistDto>>> GetFollowedArtists([FromQuery] int limit,
-        [FromQuery] int offset)
-    {
-        var id = 1; // Заглушка для id
-
-        var artists = await _userService.GetFollowedArtists(id, limit, offset);
-        
-        
-        return Ok(artists);
-    }
-
-    [HttpPut("following")]
-    public async Task<ActionResult> FollowArtists([FromQuery] string ids)
-    {
-        var id = 1; // Заглушка для id
-        await _userService.FollowArtists( id,ids);
-        return Ok();
-    }
-
-    [HttpDelete("following")]
-    public async Task<ActionResult> UnfollowArtists([FromQuery] string ids)
-    {
-        var id = 1; // Заглушка для id
-        await _userService.UnfollowArtists( id,ids);
-        return Ok();
-    }
-
-    [HttpGet("following/contains")]
-    public async Task<ActionResult<IEnumerable<bool>>> CheckUserFollowsArtists([FromQuery] string ids)
-    {
-
-        var id = 1; // Заглушка для id
-        
-        var followings = await _userService.CheckUserFollowsArtists( id,  ids);
-        
-        return Ok(followings);
-    }
-
-    [HttpPost("become-artist")]
-    public async Task<ActionResult> CreateRequest([FromBody] RequestWithoutIdAndTimeDto requestDto)
-    {
-        var id = 1;
-        
-        await _userService.CreateRequest(id,requestDto);
-        return Ok();
-    }
-
-    [HttpGet("become-artist/{id}")]
-    public async Task<ActionResult> GetRequest(int id)
-    {
-        var userId = 1; // Заглушка для id
-
-        var request = await _userService.GetUserRequest(userId, id);
-        
-        return Ok(request);
-    }
-
-    [HttpGet("become-artist")]
-    public async Task<ActionResult<IEnumerable<RequestDto>>> GetSeveralRequests([FromQuery] int limit,
-        [FromQuery] int offset,[FromQuery] string status)
-    {
-
-        var id = 1; // Заглушка для id
-        
-        var requestDtos = await _userService.GetSeveralUserRequests(id, limit,offset , status);
-        
-        return Ok(requestDtos);
-    }
-
-    [HttpGet("streams")]
-    public async Task<ActionResult<IEnumerable<UserStreamDto>>> GetUserStreamHistory([FromQuery] int limit,
-        [FromQuery] int offset)
-    {
-        var id = 1;
-
-        var streams = await _userService.GetUserStreamHistory(id, limit, offset);
-        
-        return Ok(streams);
+        [HttpDelete("playlists/{playlistId}/followers")]
+        public async Task UnfollowPlaylistAsync(int playlistId)
+        {
+            await _userService.UnfollowPlaylistAsync(User.GetUserId(), playlistId);
+        }//ready
     }
 }

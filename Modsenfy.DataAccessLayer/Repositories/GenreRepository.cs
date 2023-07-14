@@ -13,7 +13,7 @@ public class GenreRepository : IGenreRepository
 		_databaseContext = databaseContex;
 	}
 	
-	public Task Create(Genre entity)
+	public Task CreateAsync(Genre entity)
 	{
 		throw new NotImplementedException();
 	}
@@ -23,13 +23,13 @@ public class GenreRepository : IGenreRepository
 		throw new NotImplementedException();
 	}
 
-	public async Task<IEnumerable<Genre>> GetAll()
+	public async Task<IEnumerable<Genre>> GetAllAsync()
 	{
 		var genres = await _databaseContext.Genres.ToListAsync();
 		return genres;
 	}
 
-	public async Task<Genre> GetById(int id)
+	public async Task<Genre> GetByIdAsync(int id)
 	{
 		var genre = await _databaseContext.Genres.FindAsync(id);
 		return genre;
@@ -41,12 +41,12 @@ public class GenreRepository : IGenreRepository
         return genre;
     }
 
-	public Task SaveChanges()
+	public Task SaveChangesAsync()
 	{
 		throw new NotImplementedException();
 	}
 
-	public Task Update(Genre entity)
+	public Task UpdateAsync(Genre entity)
 	{
 		throw new NotImplementedException();
 	}

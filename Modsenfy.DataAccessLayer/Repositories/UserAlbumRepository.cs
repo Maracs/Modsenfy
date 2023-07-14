@@ -14,38 +14,37 @@ public class UserAlbumRepository:IUserAlbumRepository
         _databaseContext = databaseContext;
     }
 
-    public async Task<UserAlbums> GetById(int userId,int albumId)
+    public async Task<UserAlbums> GetByIdAsync(int userId,int albumId)
     {
         return await _databaseContext.UserAlbums.FindAsync(userId,albumId);
     }
 
-    public async Task SaveChanges()
+    public async Task SaveChangesAsync()
     {
         await _databaseContext.SaveChangesAsync();
     }
 
-    
-    public async Task<IEnumerable<UserAlbums>> GetAll()
+    public async Task<IEnumerable<UserAlbums>> GetAllAsync()
     {
        return await _databaseContext.UserAlbums.ToListAsync();
     }
 
-    public async Task Create(UserAlbums entity)
+    public async Task CreateAsync(UserAlbums entity)
     {
         await _databaseContext.UserAlbums.AddAsync(entity);
     }
 
-    public async Task Update(UserAlbums entity)
+    public async Task UpdateAsync(UserAlbums entity)
     {
         _databaseContext.UserAlbums.Update(entity);
     }
 
-    public void Delete(UserAlbums entity)
+    public void DeleteAsync(UserAlbums entity)
     {
         _databaseContext.UserAlbums.Remove(entity);
     }
 
-    public async Task<bool> IfUserFollowAlbum(int userId, int albumId)
+    public async Task<bool> IfUserFollowAlbumAsync(int userId, int albumId)
     {
         return (await _databaseContext.UserAlbums.AnyAsync(albums   =>albums.AlbumId ==albumId && albums.UserId == userId));
     }

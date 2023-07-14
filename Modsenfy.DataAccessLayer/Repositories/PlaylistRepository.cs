@@ -14,14 +14,14 @@ namespace Modsenfy.DataAccessLayer.Repositories
             _databaseContext = databaseContext;
         }
 
-        public async Task<Playlist> GetById(int id)
+        public async Task<Playlist> GetByIdAsync(int id)
         {
             var playlist = await _databaseContext.Playlists.FindAsync(id);
 
             return playlist;
         }
 
-        public async Task<Playlist> GetByIdWithJoins(int id) 
+        public async Task<Playlist> GetByIdWithJoinsAsync(int id) 
         {
             var playlist = await _databaseContext.Playlists
                 .Include(p => p.PlaylistTracks)
@@ -31,7 +31,7 @@ namespace Modsenfy.DataAccessLayer.Repositories
             return playlist;
         }
 
-        public async Task<IEnumerable<Playlist>> GetSeveralPlaylists(List<int> ids)
+        public async Task<IEnumerable<Playlist>> GetSeveralPlaylistsAsync(List<int> ids)
         {
             var playlists = await _databaseContext.Playlists
                 .Where(p => ids.Contains(p.PlaylistId))
@@ -40,7 +40,7 @@ namespace Modsenfy.DataAccessLayer.Repositories
             return playlists;
         }
 
-        public async Task<IEnumerable<Playlist>> GetAll()
+        public async Task<IEnumerable<Playlist>> GetAllAsync()
         {
             var playlists = await _databaseContext.Playlists
                 .OrderByDescending(p => p.PlaylistRelease)
@@ -49,17 +49,17 @@ namespace Modsenfy.DataAccessLayer.Repositories
             return playlists;
         }
 
-        public async Task SaveChanges()
+        public async Task SaveChangesAsync()
         {
             await _databaseContext.SaveChangesAsync();
         }
 
-        public async Task Create(Playlist entity)
+        public async Task CreateAsync(Playlist entity)
         {
             await _databaseContext.AddAsync(entity);
         }
 
-        public async Task Update(Playlist entity)
+        public async Task UpdateAsync(Playlist entity)
         {
             _databaseContext.Playlists.Update(entity);
         }
@@ -67,7 +67,6 @@ namespace Modsenfy.DataAccessLayer.Repositories
         public void Delete(Playlist entity) 
         {
             _databaseContext.Remove(entity);
-            _databaseContext.SaveChanges();
         }
     }
 }
